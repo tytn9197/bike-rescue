@@ -7,6 +7,7 @@ import androidx.annotation.Nullable;
 
 import com.example.bikerescueusermobile.R;
 import com.example.bikerescueusermobile.base.BaseActivity;
+import com.example.bikerescueusermobile.ui.main.LoginActivity;
 import com.example.bikerescueusermobile.ui.main.MainActivity;
 import com.google.gson.Gson;
 
@@ -25,7 +26,7 @@ public class LoadPageActivity extends BaseActivity {
                     sleep(1200);
 //                    String user = SharedPreferenceHelper.getSharedPreferenceString(LoadPageActivity.this,"user","");
 //                    if(user.trim().equals("")) {
-                        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                        Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
                         startActivity(intent);
                         finish();
 //                    }

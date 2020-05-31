@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "1010523604577",
+    "firebase_url": "https://verifyotp-c1ef3.firebaseio.com",
+    "project_id": "verifyotp-c1ef3",
+    "storage_bucket": "verifyotp-c1ef3.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1010523604577:android:2ee9a26b0c90d9c9f8cc20",
+        "android_client_info": {
+          "package_name": "com.example.bikerescueusermobile"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1010523604577-ftv4v6ua44tdhthqgdambdmm20uncqbm.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBAOTPPUe-evJBpTXKE9hCgk36sQn7Pm0s"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1010523604577-ftv4v6ua44tdhthqgdambdmm20uncqbm.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
