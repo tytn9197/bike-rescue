@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/core_color"
+        android:orientation="vertical"
+        android:padding="16dp"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark">
+
+        <LinearLayout
+            android:layout_width="220dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/head_avatar"
+                android:layout_width="90dp"
+                android:layout_height="90dp"
+                android:layout_gravity="center"
+                android:layout_marginTop="27dp"
+                android:backgroundTint="@color/white"
+                android:src="@drawable/ic_user" />
+
+            <TextView
+                android:id="@+id/txtName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:paddingTop="10dp"
+                android:text="Silla"
+                android:textColor="@color/white"
+                android:textSize="23dp"
+                android:textStyle="bold" />
+        </LinearLayout>
+    </LinearLayout>
+
+<!--    <androidx.appcompat.widget.SwitchCompat-->
+<!--        android:id="@+id/is_online"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_marginLeft="14dp"-->
+<!--        android:layout_marginTop="5dp"-->
+<!--        android:text="Trạng thái hoạt động:        "-->
+<!--        android:textSize="15dp"-->
+<!--        android:textStyle="italic"-->
+<!--        app:switchMinWidth="55dp"-->
+<!--        app:thumbTint="@drawable/switch_thumb"-->
+<!--        app:trackTint="@drawable/switch_track" />-->
+</LinearLayout>

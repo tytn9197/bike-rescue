@@ -6,5 +6,6 @@
     <color name="white">#FFFFFF</color>
     <color name="black">#000000</color>
     <color name="core_color">#C6F1E7</color>
-
+    <color name="fadded_grey">#E4E4E4</color>
+    <color name="light_red">#BA0000</color>
 </resources>

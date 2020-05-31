@@ -1,5 +1,128 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/screenContainer"/>
+    android:id="@+id/container"
+    android:background="@color/white"
+    android:fitsSystemWindows="true"
+    tools:context=".ui.main.MainActivity"
+    >
+
+
+    <androidx.drawerlayout.widget.DrawerLayout
+        android:id="@+id/drawer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fitsSystemWindows="true">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            >
+
+            <androidx.appcompat.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/core_color"
+                android:layout_alignParentEnd="true"
+                android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+                app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentStart="true">
+                <!--<Button-->
+                <!--android:id="@+id/btn_create_case"-->
+                <!--android:layout_width="130dp"-->
+                <!--android:layout_height="30dp"-->
+                <!--android:layout_gravity="right"-->
+                <!--android:layout_marginRight="10dp"-->
+                <!--android:background="@drawable/border_white"-->
+                <!--android:text="@string/title_create"-->
+                <!--android:textColor="@color/black"-->
+                <!--android:visibility="visible" />-->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/title_toolbar"
+                    android:layout_gravity="center"
+                    android:textSize="43sp"
+                    android:textColor="@color/white"
+                    android:id="@+id/toolbar_title" />
+            </androidx.appcompat.widget.Toolbar>
+
+
+            <androidx.coordinatorlayout.widget.CoordinatorLayout
+                android:id="@+id/load_layout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentBottom="true"
+                android:layout_below="@+id/toolbar">
+
+                <com.victor.loading.rotate.RotateLoading
+                    android:id="@+id/mainRotateloading"
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:layout_gravity="center"
+                    android:visibility="gone"
+                    app:loading_color="@color/light_red"
+                    app:loading_width="5dp"
+
+                    />
+
+                <FrameLayout
+                    android:id="@+id/frame_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                </FrameLayout>
+
+            </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+
+
+<!--            <FrameLayout-->
+<!--                android:id="@+id/layoutNotification"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="match_parent"-->
+<!--                android:layout_gravity="end|top"-->
+<!--                android:background="@color/white"-->
+<!--                android:layout_alignParentStart="true"-->
+<!--                android:layout_below="@+id/toolbar"-->
+<!--                android:visibility="gone">-->
+
+<!--                <com.baoyz.widget.PullRefreshLayout-->
+<!--                    android:id="@+id/swipeRefreshLayout"-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="match_parent"-->
+<!--                    app:refreshType="ring">-->
+
+<!--                    <android.support.v7.widget.RecyclerView-->
+<!--                        android:id="@+id/rvNotification"-->
+<!--                        android:layout_width="match_parent"-->
+<!--                        android:layout_height="match_parent">-->
+
+<!--                    </android.support.v7.widget.RecyclerView>-->
+<!--                </com.baoyz.widget.PullRefreshLayout>-->
+<!--            </FrameLayout>-->
+        </RelativeLayout>
+
+        <com.google.android.material.navigation.NavigationView
+            android:id="@+id/nav_view"
+            android:layout_width="245dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="start"
+            android:foreground="?attr/selectableItemBackground"
+            app:headerLayout="@layout/nav_header"
+            app:itemIconTint="@android:color/black"
+            app:itemTextColor="@android:color/black"
+            app:menu="@menu/left_navigation_menu" />
+
+    </androidx.drawerlayout.widget.DrawerLayout>
+
+</FrameLayout>
