@@ -1,4 +1,4 @@
-package com.example.bikerescueusermobile.ui.main;
+package com.example.bikerescueusermobile.ui.otp_page;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -10,9 +10,10 @@ import android.widget.EditText;
 import android.widget.Spinner;
 
 import com.example.bikerescueusermobile.R;
+import com.example.bikerescueusermobile.ui.main.MainActivity;
 import com.google.firebase.auth.FirebaseAuth;
 
-public class LoginActivity extends AppCompatActivity {
+public class LoginByPhoneNumberActivity extends AppCompatActivity {
     private Spinner spinner;
     private EditText editText;
 
@@ -25,26 +26,23 @@ public class LoginActivity extends AppCompatActivity {
 
         editText = findViewById(R.id.editTextPhone);
 
-        findViewById(R.id.buttonContinue).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String code = CountryData.countryAreaCodes[spinner.getSelectedItemPosition()];
+        findViewById(R.id.buttonContinue).setOnClickListener(v -> {
+            String code = CountryData.countryAreaCodes[spinner.getSelectedItemPosition()];
 
-                String number = editText.getText().toString().trim();
+            String number = editText.getText().toString().trim();
 
-                if (number.isEmpty() || number.length() < 10) {
-                    editText.setError("Valid number is required");
-                    editText.requestFocus();
-                    return;
-                }
-
-                String phoneNumber = "+" + code + number;
-
-                Intent intent = new Intent(LoginActivity.this, VerifyActivity.class);
-                intent.putExtra("phonenumber", phoneNumber);
-                startActivity(intent);
-
+            if (number.isEmpty() || number.length() < 10) {
+                editText.setError("Valid number is required");
+                editText.requestFocus();
+                return;
             }
+
+            String phoneNumber = "+" + code + number;
+
+            Intent intent = new Intent(LoginByPhoneNumberActivity.this, VerifyActivity.class);
+            intent.putExtra("phonenumber", phoneNumber);
+            startActivity(intent);
+
         });
     }
 

@@ -7,7 +7,7 @@ public class Repo {
     public final long id;
     public final String name;
     public final String description;
-    public final User owner;
+    public final UserRepo owner;
 
     @SerializedName("stargazers_count")
     public final long stars;
@@ -15,7 +15,7 @@ public class Repo {
     @SerializedName("forks_count")
     public final long forks;
 
-    public Repo(long id, String name, String description, User owner, long stars, long forks) {
+    public Repo(long id, String name, String description, UserRepo owner, long stars, long forks) {
         this.id = id;
         this.name = name;
         this.description = description;

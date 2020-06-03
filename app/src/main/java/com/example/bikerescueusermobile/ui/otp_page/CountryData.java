@@ -1,4 +1,4 @@
-package com.example.bikerescueusermobile.ui.main;
+package com.example.bikerescueusermobile.ui.otp_page;
 
 public class CountryData {
     public static final String[] countryNames = {"Viet Nam",

@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModelProvider;
 import com.example.bikerescueusermobile.di.util.ViewModelKey;
 import com.example.bikerescueusermobile.ui.detail.DetailsViewModel;
 import com.example.bikerescueusermobile.ui.list.ListViewModel;
+import com.example.bikerescueusermobile.ui.login.LoginModel;
 import com.example.bikerescueusermobile.util.ViewModelFactory;
 
 import javax.inject.Singleton;
@@ -29,5 +30,10 @@ public abstract class ViewModelModule {
 
     @Binds
     abstract ViewModelProvider.Factory bindViewModelFactory(ViewModelFactory factory);
+
+    @Binds
+    @IntoMap
+    @ViewModelKey(LoginModel.class)
+    abstract ViewModel bindViewModel(LoginModel loginModel);
 
 }

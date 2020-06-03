@@ -1,4 +1,4 @@
-package com.example.bikerescueusermobile.ui.main;
+package com.example.bikerescueusermobile.ui.otp_page;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -11,6 +11,7 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.example.bikerescueusermobile.R;
+import com.example.bikerescueusermobile.ui.main.MainActivity;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.TaskExecutors;
@@ -40,20 +41,17 @@ public class VerifyActivity extends AppCompatActivity {
 
         sendVerificationCode(phonenumber);
 
-        findViewById(R.id.buttonSignIn).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        findViewById(R.id.buttonSignIn).setOnClickListener(v -> {
 
-                String code = editText.getText().toString().trim();
+            String code = editText.getText().toString().trim();
 
-                if (code.isEmpty() || code.length() < 6) {
+            if (code.isEmpty() || code.length() < 6) {
 
-                    editText.setError("Enter code...");
-                    editText.requestFocus();
-                    return;
-                }
-                verifyCode(code);
+                editText.setError("Enter code...");
+                editText.requestFocus();
+                return;
             }
+            verifyCode(code);
         });
 
     }
@@ -65,19 +63,16 @@ public class VerifyActivity extends AppCompatActivity {
 
     private void signInWithCredential(PhoneAuthCredential credential) {
         mAuth.signInWithCredential(credential)
-                .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()) {
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
 
-                            Intent intent = new Intent(VerifyActivity.this, MainActivity.class);
-                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                        Intent intent = new Intent(VerifyActivity.this, MainActivity.class);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
 
-                            startActivity(intent);
+                        startActivity(intent);
 
-                        } else {
-                            Toast.makeText(VerifyActivity.this, task.getException().getMessage(), Toast.LENGTH_LONG).show();
-                        }
+                    } else {
+                        Toast.makeText(VerifyActivity.this, task.getException().getMessage(), Toast.LENGTH_LONG).show();
                     }
                 });
     }

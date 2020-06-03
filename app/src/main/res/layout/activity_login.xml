@@ -4,21 +4,21 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.main.LoginActivity"
+    tools:context=".ui.otp_page.LoginByPhoneNumberActivity"
     android:orientation="vertical"
     >
     <RelativeLayout
         android:id="@+id/relativeLayout"
         android:layout_width="match_parent"
         android:layout_height="200dp"
-        android:background="@color/colorPrimary">
+        android:background="@color/white">
 
         <ImageView
             android:layout_width="150dp"
             android:layout_height="150dp"
             android:layout_centerHorizontal="true"
             android:layout_centerVertical="true"
-            android:background="@drawable/icon_service_mechanics" />
+            android:background="@mipmap/ic_app" />
 
     </RelativeLayout>
 

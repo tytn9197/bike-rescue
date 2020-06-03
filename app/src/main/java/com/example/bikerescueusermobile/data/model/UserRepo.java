@@ -1,8 +1,8 @@
 package com.example.bikerescueusermobile.data.model;
 
-public class User {
+public class UserRepo {
     public final String login;
-    public User(String login) {
+    public UserRepo(String login) {
         this.login = login;
     }
 }

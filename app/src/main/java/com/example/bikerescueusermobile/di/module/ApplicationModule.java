@@ -1,5 +1,6 @@
 package com.example.bikerescueusermobile.di.module;
 
+import com.example.bikerescueusermobile.data.model.user.IUserService;
 import com.example.bikerescueusermobile.data.rest.RepoService;
 
 import javax.inject.Singleton;
@@ -12,7 +13,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 @Module(includes = ViewModelModule.class)
 public class ApplicationModule {
-    private static final String BASE_URL = "https://api.github.com/";
+    private static final String BASE_URL = "https://88c7072ec39e.jp.ngrok.io/";
 
     @Singleton
     @Provides
@@ -27,6 +28,12 @@ public class ApplicationModule {
     @Provides
     static RepoService provideRetrofitService(Retrofit retrofit){
         return retrofit.create(RepoService.class);
+    }
+
+    @Singleton
+    @Provides
+    static IUserService provideUserService(Retrofit retrofit){
+        return retrofit.create(IUserService.class);
     }
 
 }

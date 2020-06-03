@@ -7,8 +7,7 @@ import androidx.annotation.Nullable;
 
 import com.example.bikerescueusermobile.R;
 import com.example.bikerescueusermobile.base.BaseActivity;
-import com.example.bikerescueusermobile.ui.main.LoginActivity;
-import com.example.bikerescueusermobile.ui.main.MainActivity;
+import com.example.bikerescueusermobile.ui.login.LoginActivity;
 import com.google.gson.Gson;
 
 public class LoadPageActivity extends BaseActivity {
