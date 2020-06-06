@@ -1,4 +1,4 @@
-package com.example.bikerescueusermobile.data.model;
+package com.example.bikerescueusermobile.data.rest;
 
 import com.google.gson.annotations.SerializedName;
 

@@ -1,4 +1,4 @@
-package com.example.bikerescueusermobile.data.model;
+package com.example.bikerescueusermobile.data.rest;
 
 public class UserRepo {
     public final String login;

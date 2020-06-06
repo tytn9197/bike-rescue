@@ -49,7 +49,7 @@
                     android:layout_height="wrap_content"
                     android:text="@string/title_toolbar"
                     android:layout_gravity="center"
-                    android:textSize="43sp"
+                    android:textSize="35sp"
                     android:textColor="@color/white"
                     android:id="@+id/toolbar_title" />
             </androidx.appcompat.widget.Toolbar>
@@ -61,7 +61,7 @@
                 android:layout_height="match_parent"
                 android:layout_alignParentStart="true"
                 android:layout_alignParentEnd="true"
-                android:layout_alignParentBottom="true"
+                android:layout_above="@+id/bottomNav"
                 android:layout_below="@+id/toolbar">
 
                 <com.victor.loading.rotate.RotateLoading
@@ -79,7 +79,6 @@
                     android:id="@+id/frame_container"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent">
-
                 </FrameLayout>
 
             </androidx.coordinatorlayout.widget.CoordinatorLayout>
@@ -110,6 +109,17 @@
 <!--                    </android.support.v7.widget.RecyclerView>-->
 <!--                </com.baoyz.widget.PullRefreshLayout>-->
 <!--            </FrameLayout>-->
+            <com.google.android.material.bottomnavigation.BottomNavigationView
+                android:id="@+id/bottomNav"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentEnd="true"
+                android:background="@color/white"
+                android:foreground="?attr/selectableItemBackground"
+                app:itemIconTint="@color/black"
+                app:itemTextColor="@color/black"
+                app:menu="@menu/bottom_navigation_menu" />
         </RelativeLayout>
 
         <com.google.android.material.navigation.NavigationView

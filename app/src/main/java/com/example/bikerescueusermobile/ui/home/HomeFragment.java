@@ -1,35 +1,22 @@
 package com.example.bikerescueusermobile.ui.home;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Rect;
-import android.location.Address;
-import android.location.Geocoder;
+import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Log;
-import android.view.KeyEvent;
-import android.view.MotionEvent;
 import android.view.View;
-import android.view.WindowManager;
-import android.view.inputmethod.EditorInfo;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.RelativeLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.app.ActivityCompat;
 import com.example.bikerescueusermobile.R;
 import com.example.bikerescueusermobile.base.BaseFragment;
@@ -40,8 +27,10 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.Task;
 import com.google.android.libraries.places.compat.GeoDataClient;
 import com.google.android.libraries.places.compat.PlaceDetectionClient;
@@ -51,7 +40,6 @@ import com.karumi.dexter.PermissionToken;
 import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -59,7 +47,7 @@ import butterknife.BindView;
 
 
 public class HomeFragment extends BaseFragment
-        implements OnMapReadyCallback {
+        implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener, GoogleMap.OnMapClickListener {
     @Override
     protected int layoutRes() {
         return R.layout.biker_home_fragment;
@@ -72,12 +60,18 @@ public class HomeFragment extends BaseFragment
     private GeoDataClient mGeoDataClient;
     private PlaceDetectionClient mPlaceDetectionClient;
     View mapView;
+    private Marker mMarker;
+
+    private Location currentLocation;
 
     @BindView(R.id.btnSendRequest)
     Button btnSendRequest;
 
-    @BindView(R.id.edtFindLocation)
-    EditText edtFindLocation;
+    @BindView(R.id.homeShopDetail)
+    RelativeLayout homeShopDetail;
+
+//    @BindView(R.id.edtFindLocation)
+//    EditText edtFindLocation;
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
@@ -92,19 +86,19 @@ public class HomeFragment extends BaseFragment
 
     private void init(){
         Log.d(HomeFragmentConstants.TAG,"init: start");
-        edtFindLocation.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                if(actionId == EditorInfo.IME_ACTION_SEARCH
-                        || actionId == EditorInfo.IME_ACTION_DONE
-                        || event.getAction() == KeyEvent.ACTION_DOWN
-                        || event.getAction() == KeyEvent.KEYCODE_ENTER){
-                    searchLocation();
-                    hideSoftKeyboard();
-                }
-                return false;
-            }
-        });
+//        edtFindLocation.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+//            @Override
+//            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+//                if(actionId == EditorInfo.IME_ACTION_SEARCH
+//                        || actionId == EditorInfo.IME_ACTION_DONE
+//                        || event.getAction() == KeyEvent.ACTION_DOWN
+//                        || event.getAction() == KeyEvent.KEYCODE_ENTER){
+//                    searchLocation();
+//                    hideSoftKeyboard();
+//                }
+//                return false;
+//            }
+//        });
 
 
     }
@@ -119,36 +113,64 @@ public class HomeFragment extends BaseFragment
             googleMap.setMyLocationEnabled(true);
             mMap.getUiSettings().setMyLocationButtonEnabled(true);
         }
-        updateLocationUI();
         changeMyLocationButtonPosition();
+        updateLocationUI();
 
         if(mLocationPermissionGranted){
             getDeviceLocation();
         }
-//        getDeviceLocation();
 
+        LatLng s1 = new LatLng(10.7798827, 106.6333353);
+        LatLng s2 = new LatLng(10.7798827, 106.6333353);
+        LatLng s3 = new LatLng(10.7916663, 106.6351864);
+        LatLng s4 = new LatLng(10.7801671, 106.6311021);
+        LatLng s5 = new LatLng(10.7829047,106.6272502 );
+        LatLng s6 = new LatLng(10.7597079,106.6316521 );
+        List<LatLng> list = new ArrayList<>();
+        list.add(s1);
+        list.add(s2);
+        list.add(s3);
+        list.add(s4);
+        list.add(s5);
+        list.add(s6);
+
+        for (int i = 0; i <list.size(); i++) {
+            googleMap.addMarker(new MarkerOptions().position(list.get(i))
+                    .title("Tiem " + i));
+        }
+
+//        mMarker = googleMap.addMarker(new MarkerOptions().position(list.get(0))
+//                .title("Tiệm sửa xe La Thành").snippet("Địa chỉ 61 Hoàng Thiều Hoa, Hiệp Tân, Tân Phú"));
+        googleMap.setOnMarkerClickListener(this);
+        googleMap.setOnMapClickListener(this);
+        if(currentLocation != null) {
+            googleMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude())));
+        }else {
+            googleMap.moveCamera(CameraUpdateFactory.newLatLng(s1));
+        }
     }
 
     private void changeMyLocationButtonPosition(){
         if (mapView != null &&
                 mapView.findViewById(Integer.parseInt("1")) != null) {
-            // Get the button view
-            View locationButton = ((View) mapView.findViewById(Integer.parseInt("1")).getParent()).findViewById(Integer.parseInt("2"));
-            // and next place it, on bottom right (as Google Maps app)
-            RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams)
-                    locationButton.getLayoutParams();
-            // position on right bottom
-            layoutParams.addRule(RelativeLayout.ALIGN_PARENT_TOP, 0);
-            layoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
-            layoutParams.setMargins(0, 0, 30, 80 + btnSendRequest.getHeight());
-
+//            // Get the button view
+//            View locationButton = ((View) mapView.findViewById(Integer.parseInt("1")).getParent()).findViewById(Integer.parseInt("2"));
+//            // and next place it, on bottom right (as Google Maps app)
+//            RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams)
+//                    locationButton.getLayoutParams();
+//            layoutParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT, 0);
+//            layoutParams.addRule(RelativeLayout.ALIGN_PARENT_TOP, RelativeLayout.TRUE);
+//            layoutParams.setMargins(0, 10, 10, 10);
+//            try {
+//                locationButton.setBackground(Drawable.createFromXml(getResources(), getResources().getXml(R.xml.circle_button)));
+//            }catch (Exception ex){
+//                Log.e(TAG, "changeMyLocationButtonPosition - " + ex.getMessage());
+//            }
             //change position google map logo
             View googleLogo = mapView.findViewWithTag("GoogleWatermark");
             RelativeLayout.LayoutParams glLayoutParams = (RelativeLayout.LayoutParams)googleLogo.getLayoutParams();
-            layoutParams.addRule(RelativeLayout.ALIGN_PARENT_TOP, 0);
-            layoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
-            glLayoutParams.setMargins(0, 0, 30, 80 + btnSendRequest.getHeight());
             googleLogo.setLayoutParams(glLayoutParams);
+            googleLogo.setVisibility(View.GONE);
         }
 
     }
@@ -226,19 +248,16 @@ public class HomeFragment extends BaseFragment
         try {
             if(mLocationPermissionGranted){
                 Task location = mFusedLocationProviderClient.getLastLocation();
-                location.addOnCompleteListener(new OnCompleteListener() {
-                    @Override
-                    public void onComplete(@NonNull Task task) {
-                        if(task.isSuccessful()){
-                            Log.d(HomeFragmentConstants.TAG,"onComplete: found location!");
-                            Location currentLocation = (Location) task.getResult();
-                            MyMethods.moveCamera(mMap, new LatLng(currentLocation.getLatitude(),currentLocation.getLongitude()),
-                                    HomeFragmentConstants.DEFAULT_ZOOM_VALUE);
-                        }else{
-                            Log.d(HomeFragmentConstants.TAG,"onComplete: currents locaiton is null!");
-                            Toast.makeText(getActivity(), "Không thể lấy vị trí này", Toast.LENGTH_SHORT).show();
+                location.addOnCompleteListener(task -> {
+                    if(task.isSuccessful()){
+                        Log.d(HomeFragmentConstants.TAG,"onComplete: found location!");
+                        currentLocation = (Location) task.getResult();
+                        MyMethods.moveCamera(mMap, new LatLng(currentLocation.getLatitude(),currentLocation.getLongitude()),
+                                HomeFragmentConstants.DEFAULT_ZOOM_VALUE);
+                    }else{
+                        Log.d(HomeFragmentConstants.TAG,"onComplete: currents locaiton is null!");
+                        Toast.makeText(getActivity(), "Không thể lấy vị trí này", Toast.LENGTH_SHORT).show();
 
-                        }
                     }
                 });
             }
@@ -247,30 +266,43 @@ public class HomeFragment extends BaseFragment
         }
     }
 
-    private void searchLocation(){
-        Log.d(HomeFragmentConstants.TAG,"searchLocation start");
-
-        String searchString = edtFindLocation.getText().toString();
-
-        Geocoder geocoder = new Geocoder(getActivity());
-        List<Address> list = new ArrayList<>();
-        try {
-            list = geocoder.getFromLocationName(searchString,1);
-        }catch (IOException e){
-            Log.e(HomeFragmentConstants.TAG,"searchLocation: get list "+e.getMessage());
-        }
-
-        if(list.size() > 0){
-            Address address = list.get(0);
-            MyMethods.moveCamera(mMap,new LatLng(address.getLatitude(),address.getLongitude()),
-                    HomeFragmentConstants.DEFAULT_ZOOM_VALUE,
-                    address.getAddressLine(0));
-            Log.d(HomeFragmentConstants.TAG,"searchLocation end");
-        }
+    @Override
+    public boolean onMarkerClick(Marker marker) {
+        btnSendRequest.setVisibility(View.VISIBLE);
+        homeShopDetail.setVisibility(View.VISIBLE);
+        return false;
     }
 
-    private void hideSoftKeyboard(){
-        getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+    @Override
+    public void onMapClick(LatLng latLng) {
+        btnSendRequest.setVisibility(View.GONE);
+        homeShopDetail.setVisibility(View.GONE);
     }
+
+//    private void searchLocation(){
+//        Log.d(HomeFragmentConstants.TAG,"searchLocation start");
+//
+//        String searchString = edtFindLocation.getText().toString();
+//
+//        Geocoder geocoder = new Geocoder(getActivity());
+//        List<Address> list = new ArrayList<>();
+//        try {
+//            list = geocoder.getFromLocationName(searchString,1);
+//        }catch (IOException e){
+//            Log.e(HomeFragmentConstants.TAG,"searchLocation: get list "+e.getMessage());
+//        }
+//
+//        if(list.size() > 0){
+//            Address address = list.get(0);
+//            MyMethods.moveCamera(mMap,new LatLng(address.getLatitude(),address.getLongitude()),
+//                    HomeFragmentConstants.DEFAULT_ZOOM_VALUE,
+//                    address.getAddressLine(0));
+//            Log.d(HomeFragmentConstants.TAG,"searchLocation end");
+//        }
+//    }
+//
+//    private void hideSoftKeyboard(){
+//        getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+//    }
 
 }

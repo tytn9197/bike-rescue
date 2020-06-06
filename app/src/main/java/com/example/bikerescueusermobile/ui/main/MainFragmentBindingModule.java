@@ -1,5 +1,6 @@
 package com.example.bikerescueusermobile.ui.main;
 
+import com.example.bikerescueusermobile.ui.favorite.FavoriteShopFragment;
 import com.example.bikerescueusermobile.ui.history.HistoryFragment;
 import com.example.bikerescueusermobile.ui.home.HomeFragment;
 import com.example.bikerescueusermobile.ui.profile.ProfileFragment;
@@ -26,4 +27,7 @@ public abstract class MainFragmentBindingModule {
 
     @ContributesAndroidInjector
     abstract ProfileFragment provideProfileFragment();
+
+    @ContributesAndroidInjector
+    abstract FavoriteShopFragment provideFavoriteShopFragment();
 }

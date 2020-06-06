@@ -10,7 +10,7 @@ import androidx.lifecycle.LifecycleOwner;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.bikerescueusermobile.R;
-import com.example.bikerescueusermobile.data.model.Repo;
+import com.example.bikerescueusermobile.data.rest.Repo;
 
 import java.util.ArrayList;
 import java.util.List;

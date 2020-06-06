@@ -7,10 +7,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.view.MenuItem;
-import android.view.MotionEvent;
-import android.view.View;
-import android.view.inputmethod.InputMethodManager;
-import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -22,9 +18,11 @@ import androidx.fragment.app.FragmentManager;
 
 import com.example.bikerescueusermobile.R;
 import com.example.bikerescueusermobile.base.BaseActivity;
+import com.example.bikerescueusermobile.ui.favorite.FavoriteShopFragment;
 import com.example.bikerescueusermobile.ui.history.HistoryFragment;
 import com.example.bikerescueusermobile.ui.home.HomeFragment;
 import com.example.bikerescueusermobile.ui.profile.ProfileFragment;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
 import com.karumi.dexter.Dexter;
 import com.karumi.dexter.MultiplePermissionsReport;
@@ -57,6 +55,8 @@ public class MainActivity extends BaseActivity {
     private Fragment historyFragment;
     private Fragment profileFragment;
 
+    @BindView(R.id.bottomNav)
+    BottomNavigationView bottomNavigationView;
 
     @Override
     protected int layoutRes() {
@@ -68,6 +68,7 @@ public class MainActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         init();
         initGrantAppPermission();
+        bottomNavigationView.setOnNavigationItemSelectedListener(mOnBottomNavigationItemSelectedListener);
     }
 
     private void initGrantAppPermission(){
@@ -144,6 +145,29 @@ public class MainActivity extends BaseActivity {
 //        switchCompat = header.findViewById(R.id.is_online);
 //        fullname.setText(CurrentUser.getInstance().getFullname());
     }
+
+    private BottomNavigationView.OnNavigationItemSelectedListener mOnBottomNavigationItemSelectedListener
+            = new BottomNavigationView.OnNavigationItemSelectedListener() {
+
+        @Override
+        public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+            switch (item.getItemId()) {
+                case R.id.nav_home:
+                    fragment = new HomeFragment();
+                    replaceFragment();
+                    return true;
+                case R.id.nav_history:
+                    fragment = new HistoryFragment();
+                    replaceFragment();
+                    return true;
+                case R.id.nav_profile:
+                    fragment = new FavoriteShopFragment();
+                    replaceFragment();
+                    return true;
+            }
+            return false;
+        }
+    };
 
     public NavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener =
             new NavigationView.OnNavigationItemSelectedListener() {

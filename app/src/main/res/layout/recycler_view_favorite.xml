@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/fadded_grey">
+
+    <RelativeLayout
+        android:id="@+id/favorite_wrapper"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="4dp"
+        android:padding="7dp"
+        android:background="@drawable/border_white"
+        android:orientation="vertical">
+
+
+        <TextView
+            android:id="@+id/txtFavoriteShopName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="3dp"
+            android:layout_toStartOf="@+id/imgFavorite"
+            android:text="Tên cửa hàng"
+            android:textSize="23sp"
+            android:textStyle="bold" />
+
+        <ImageView
+            android:id="@+id/imgFavorite"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentTop="true"
+            android:layout_margin="2dp"
+            android:padding="3dp"
+            android:contentDescription="@string/app_name"
+            android:src="@drawable/ic_wrench" />
+
+        <TextView
+            android:id="@+id/txtFavoriteShopAddress"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/txtFavoriteShopName"
+            android:layout_alignParentStart="true"
+            android:layout_above="@id/favoriteRatingBar"
+            android:layout_toStartOf="@+id/imgFavorite"
+            android:layout_marginTop="8dp"
+            android:textColor="@color/black"
+            android:text="61 Hoàng Thiều Hoa, Hiệp Tân, Tân Phú, Tân Phú, Tân Phú"
+            android:textSize="15sp"
+            />
+
+        <com.willy.ratingbar.ScaleRatingBar
+            android:id="@+id/favoriteRatingBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/imgFavorite"
+            android:layout_alignParentStart="true"
+            app:srb_stepSize="0.5"
+            app:srb_numStars="5"
+            app:srb_starWidth="30dp"
+            app:srb_starHeight="30dp"
+            app:srb_isIndicator="true"
+            app:srb_clickable="false"
+            app:srb_drawableEmpty="@drawable/ic_star_empty"
+            app:srb_drawableFilled="@drawable/ic_star_filled"
+            />
+
+        <TextView
+            android:id="@+id/txtFavoriteNumberOfStar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@+id/favoriteRatingBar"
+            android:layout_below="@+id/imgFavorite"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="9dp"
+            android:text="4,7/5"
+            android:textSize="25sp"
+            android:textStyle="bold" />
+
+    </RelativeLayout>
+</RelativeLayout>

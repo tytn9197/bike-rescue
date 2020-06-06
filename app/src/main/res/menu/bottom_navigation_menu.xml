@@ -12,7 +12,7 @@
 
     <item
         android:id="@+id/nav_profile"
-        android:icon="@drawable/ic_user"
-        android:title="@string/botnav_title_profile" />
+        android:icon="@drawable/ic_favorite"
+        android:title="@string/bot_nav_string_like" />
 
 </menu>

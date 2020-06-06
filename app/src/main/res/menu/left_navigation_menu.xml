@@ -3,13 +3,17 @@
     <group android:checkableBehavior="single">
         <item
             android:id="@+id/nav_feed"
-            android:icon="@drawable/news"
-            android:title="@string/title_feed" />
+            android:icon="@drawable/ic_notification"
+            android:title="Thông báo" />
 
-    <item
-        android:id="@+id/nav_editPro"
-        android:icon="@drawable/ic_user"
-        android:title="@string/title_editPro" />
+        <item
+            android:id="@+id/nav_editPro"
+            android:icon="@drawable/ic_user"
+            android:title="@string/title_editPro" />
+        <item
+            android:id="@+id/nav_introduce"
+            android:icon="@drawable/ic_about"
+            android:title="Giới thiệu về chúng tôi" />
 
         <item
             android:id="@+id/nav_logout"

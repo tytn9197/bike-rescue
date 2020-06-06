@@ -1,7 +1,5 @@
 package com.example.bikerescueusermobile.data.rest;
 
-import com.example.bikerescueusermobile.data.model.Repo;
-
 import java.util.List;
 
 import javax.inject.Inject;

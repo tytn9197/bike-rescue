@@ -5,7 +5,10 @@
     <color name="colorAccent">#D81B60</color>
     <color name="white">#FFFFFF</color>
     <color name="black">#000000</color>
-    <color name="core_color">#C6F1E7</color>
+    <color name="core_color">#21C293</color>
     <color name="fadded_grey">#E4E4E4</color>
     <color name="light_red">#BA0000</color>
+    <color name="backgroundGrey">#E6F1F1F1</color>
+    <color name="grey">#B4ADADAD</color>
+
 </resources>
