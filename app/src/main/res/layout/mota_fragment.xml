@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical"
+    >
+
+<LinearLayout
+    android:layout_width="wrap_content"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    >
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:padding="5dp"
+        android:text="@string/tieu_de"
+        android:textSize="20dp"
+        android:textStyle="bold"></TextView>
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/noi_dung1"
+        android:padding="7dp"
+        android:paddingRight="4dp"
+        android:layout_gravity="fill_vertical"
+        android:gravity="fill"
+        android:textStyle="normal"
+        android:textSize="15dp"
+        ></TextView>
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/noi_dung2"
+        android:padding="7dp"
+        android:textSize="15dp"
+        ></TextView>
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/noi_dung3"
+        android:padding="7dp"
+        android:textSize="15dp"
+        ></TextView>
+
+
+</LinearLayout>
+
+
+</ScrollView>

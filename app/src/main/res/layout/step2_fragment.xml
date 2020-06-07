@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#E6E6E6"
+    >
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+
+        >
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="Mô tả sản phẩm"
+            android:layout_gravity="center"
+            android:padding="5dp"
+            android:textSize="20dp"
+            android:textColor="@color/colorPrimaryDark"
+            android:textStyle="bold"
+            ></TextView>
+
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Hãng Xe"
+            android:padding="20dp"
+            android:textSize="16dp"
+            android:textStyle="bold"
+            android:layout_marginStart="80dp"
+            android:layout_marginEnd="80dp"
+           android:drawableStart="@drawable/ic_bike_24"
+            android:background="@drawable/border_white"
+            android:layout_marginLeft="10dp"
+          android:gravity="center"
+            ></TextView>
+        <Spinner
+            android:id="@+id/spinner2"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:layout_marginLeft="30dp"
+
+            ></Spinner>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Đời Xe"
+            android:padding="20dp"
+            android:layout_marginStart="80dp"
+            android:layout_marginEnd="80dp"
+            android:textSize="16dp"
+            android:textStyle="bold"
+            android:drawableStart="@drawable/ic_doi_xe_24"
+            android:background="@drawable/border_white"
+            android:layout_marginLeft="10dp"
+            android:gravity="center"
+            ></TextView>
+        <Spinner
+            android:id="@+id/spinner3"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:layout_marginLeft="30dp"
+            ></Spinner>
+        <Button
+            android:id="@+id/btnTieptheo"
+            android:layout_width="100dp"
+            android:layout_height="40dp"
+            android:layout_gravity="center"
+            android:text="Tiếp Theo"
+            android:background="@drawable/border_login"
+            android:padding="5dp"
+            android:layout_marginBottom="15dp"
+            android:layout_marginTop="10dp"
+            ></Button>
+
+    </LinearLayout>
+</ScrollView>

@@ -20,6 +20,7 @@ import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import com.example.bikerescueusermobile.R;
 import com.example.bikerescueusermobile.base.BaseFragment;
+import com.example.bikerescueusermobile.ui.send_request.SendRequestActivity;
 import com.example.bikerescueusermobile.util.MyMethods;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
@@ -86,6 +87,11 @@ public class HomeFragment extends BaseFragment
 
     private void init(){
         Log.d(HomeFragmentConstants.TAG,"init: start");
+
+        btnSendRequest.setOnClickListener(v -> {
+            Intent intent = new Intent(getActivity(), SendRequestActivity.class);
+            startActivity(intent);
+        });
 //        edtFindLocation.setOnEditorActionListener(new TextView.OnEditorActionListener() {
 //            @Override
 //            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
@@ -180,7 +186,10 @@ public class HomeFragment extends BaseFragment
         Dexter.withContext(getActivity())
                 .withPermissions(
                         Manifest.permission.ACCESS_COARSE_LOCATION,
-                        Manifest.permission.ACCESS_FINE_LOCATION
+                        Manifest.permission.ACCESS_FINE_LOCATION,
+                        Manifest.permission.CAMERA,
+                        Manifest.permission.READ_EXTERNAL_STORAGE,
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE
                 )
                 .withListener(new MultiplePermissionsListener() {
                     @Override

@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#E6E6E6"
+    >
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        >
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="Thông tin khách hàng"
+            android:layout_gravity="center"
+            android:padding="5dp"
+            android:textSize="20dp"
+            android:textColor="@color/colorPrimaryDark"
+            android:textStyle="bold"
+            ></TextView>
+        <EditText
+            android:id="@+id/edtName"
+            android:layout_width="340dp"
+            android:layout_height="match_parent"
+            android:inputType="text"
+            android:drawableLeft="@drawable/ic_people_24"
+            android:hint=" Họ và tên"
+            android:paddingBottom="15dp"
+           android:layout_marginLeft="5dp"
+            android:layout_marginTop="5dp"
+            ></EditText>
+        <EditText
+            android:id="@+id/edtPhone"
+            android:layout_width="340dp"
+            android:layout_height="match_parent"
+            android:inputType="number"
+            android:drawableLeft="@drawable/ic_phone_android_22"
+            android:hint=" Số điện thoại"
+            android:paddingBottom="15dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginTop="5dp"
+            ></EditText>
+        <EditText
+            android:id="@+id/edtMarker"
+            android:layout_width="340dp"
+            android:layout_height="match_parent"
+            android:drawableLeft="@drawable/ic_marker_24"
+            android:paddingBottom="15dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginTop="5dp"
+            ></EditText>
+        <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Bạn gặp vấn đề gì ?"
+        android:padding="5dp"
+        android:textSize="16dp"
+        ></TextView>
+        <Spinner
+            android:id="@+id/spinner1"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:layout_marginBottom="10dp"
+            ></Spinner>
+        <Button
+            android:id="@+id/btnTieptheo"
+            android:layout_width="100dp"
+            android:layout_height="40dp"
+            android:layout_gravity="center"
+            android:text="Tiếp Theo"
+            android:background="@drawable/border_login"
+            android:layout_marginTop="-20dp"
+            android:padding="5dp"
+            android:layout_marginBottom="7dp"
+            ></Button>
+
+    </LinearLayout>
+</ScrollView>

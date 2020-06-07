@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+
+    xmlns:tools="http://schemas.android.com/tools"
+    >
+        <ImageButton
+
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/close_btn"
+        app:layout_constraintHorizontal_bias="0"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:src="@drawable/ic_baseline_close_24"
+            android:translationZ="1dp"
+            android:padding="4dp"
+            android:layout_marginTop="4dp"
+            android:background="@drawable/custom_close_button"
+        />
+    <LinearLayout
+        android:translationZ="0px"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="15dp"
+        >
+    
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/tabLayout2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:background="@color/colorPrimaryDark"
+           app:tabBackground="@drawable/tab_color_selector"
+            app:tabGravity="fill"
+            app:tabMode="fixed" />
+    
+        <androidx.viewpager.widget.ViewPager
+            android:id="@+id/idViewPager2"
+            android:layout_width="match_parent"
+            android:layout_height="320dp">
+        </androidx.viewpager.widget.ViewPager>
+    
+    
+    
+    </LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

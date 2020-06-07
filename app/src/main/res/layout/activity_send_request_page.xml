@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+   >
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appbar"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:elevation="0dp"
+        android:background="@color/core_color"
+        android:gravity="center">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/suaxe"
+            />
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/tabLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:background="@color/core_color"
+        app:tabBackground="@drawable/tab_color_selector"
+        app:tabGravity="fill"
+        app:tabMode="fixed" />
+
+    <androidx.viewpager.widget.ViewPager
+        android:id="@+id/idViewPager"
+        android:layout_width="match_parent"
+        android:layout_height="320dp">
+    </androidx.viewpager.widget.ViewPager>
+    <Button
+        android:id="@+id/buttonHotro"
+        android:layout_width="130dp"
+        android:layout_height="50dp"
+        android:text="Gọi Hỗ Trợ"
+        android:gravity="center"
+        android:layout_gravity="center"
+        android:background="@drawable/border_login"
+        android:drawableLeft="@drawable/phonenumber"
+        android:padding="13dp"
+        android:paddingRight="14dp"
+        android:layout_marginTop="5dp"
+        android:textColor="@color/white"
+        >
+    </Button>
+
+</LinearLayout>
