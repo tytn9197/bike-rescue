@@ -18,7 +18,7 @@ import androidx.viewpager.widget.ViewPager;
 import com.example.bikerescueusermobile.R;
 import com.google.android.material.tabs.TabLayout;
 
-public class CustomDialogClass  extends DialogFragment implements View.OnClickListener {
+public class CustomDialogClass  extends DialogFragment implements View.OnClickListener,SelectTab {
 
     public AppCompatActivity c;
     public Dialog d;
@@ -42,8 +42,8 @@ public class CustomDialogClass  extends DialogFragment implements View.OnClickLi
         closeBtn = view.findViewById(R.id.close_btn);
         ViewPageAdapte viewPageAdapte = new ViewPageAdapte(getChildFragmentManager());
         //add fargmnet
-        viewPageAdapte.AddFragment(new FragmentStep1(),"Bước 1");
-        viewPageAdapte.AddFragment(new FragmentStep2(),"Bước 2");
+        viewPageAdapte.AddFragment(new FragmentStep1(this),"Bước 1");
+        viewPageAdapte.AddFragment(new FragmentStep2(this),"Bước 2");
         viewPageAdapte.AddFragment(new FragmentStep3(),"Bước 3");
         viewPager.setAdapter(viewPageAdapte);
         tabLayout.setupWithViewPager(viewPager);
@@ -57,9 +57,7 @@ public class CustomDialogClass  extends DialogFragment implements View.OnClickLi
             }
         });
 
-
     }
-
     @Override
     public void onClick(View v) {
 //        switch (v.getId()) {
@@ -75,4 +73,9 @@ public class CustomDialogClass  extends DialogFragment implements View.OnClickLi
         dismiss();
     }
 
+    @Override
+    public void selectTab(int index) throws IndexOutOfBoundsException {
+        if (index < 0 || index > tabLayout.getTabCount()) throw new IndexOutOfBoundsException("The tab number out of bound");
+        tabLayout.getTabAt(index).select();
+    }
 }
