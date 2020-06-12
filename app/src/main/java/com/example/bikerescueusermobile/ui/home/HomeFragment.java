@@ -71,6 +71,9 @@ public class HomeFragment extends BaseFragment
     @BindView(R.id.homeShopDetail)
     RelativeLayout homeShopDetail;
 
+    @BindView(R.id.homeShopDetailBackground)
+    RelativeLayout homeShopDetailBackground;
+
 //    @BindView(R.id.edtFindLocation)
 //    EditText edtFindLocation;
 
@@ -279,6 +282,7 @@ public class HomeFragment extends BaseFragment
     public boolean onMarkerClick(Marker marker) {
         btnSendRequest.setVisibility(View.VISIBLE);
         homeShopDetail.setVisibility(View.VISIBLE);
+        homeShopDetailBackground.setVisibility(View.VISIBLE);
         return false;
     }
 
@@ -286,6 +290,8 @@ public class HomeFragment extends BaseFragment
     public void onMapClick(LatLng latLng) {
         btnSendRequest.setVisibility(View.GONE);
         homeShopDetail.setVisibility(View.GONE);
+        homeShopDetailBackground.setVisibility(View.GONE);
+
     }
 
 //    private void searchLocation(){

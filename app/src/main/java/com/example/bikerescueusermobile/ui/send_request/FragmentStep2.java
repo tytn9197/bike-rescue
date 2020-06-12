@@ -39,9 +39,9 @@ public class FragmentStep2 extends Fragment {
             });
         spinner1 = view.findViewById(R.id.spinner2);
         spinner2 = view.findViewById(R.id.spinner3);
-        ArrayAdapter<String> myAdapter1 = new ArrayAdapter<String>(getContext(),R.layout.support_simple_spinner_dropdown_item,getResources()
+        ArrayAdapter<String> myAdapter1 = new ArrayAdapter<>(getContext(),R.layout.support_simple_spinner_dropdown_item,getResources()
                 .getStringArray(R.array.hangxe));
-        ArrayAdapter<String> myAdapter2 = new ArrayAdapter<String>(getContext(),R.layout.support_simple_spinner_dropdown_item,getResources()
+        ArrayAdapter<String> myAdapter2 = new ArrayAdapter<>(getContext(),R.layout.support_simple_spinner_dropdown_item,getResources()
                 .getStringArray(R.array.doixe));
 
 

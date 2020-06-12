@@ -35,20 +35,21 @@
     <string name="noi_dung3">
         Việc sửa chữa xe máy trên đường giá thành có thể cao hơn bình thường vì các điểm <b>DỊCH VỤ HỘ TRỢ XE</b> phải di chuyển
         đến nơi bạn muốn. Nếu bạn <b>ĐỒNG Ý</b> với việc trả giá cao hơn thì mới nên sử dụng dịch vụ</string>
+    <string name="my_bike"><u>Xe của tôi</u></string>
     <string-array name="vande">
         <item>Vấn đề khác</item>
-        <item>Không khởi động được</item>
+        <item>Không khởi động được xe</item>
         <item>Tôi cần vá xăm lốp</item>
         <item>Tôi cần thay bình ác quy</item>
-        <item>Vấn cần đổ xăng</item>
+        <item>Tôi cần đổ xăng</item>
     </string-array>
     <string-array name="hangxe">
         <item>Honda</item>
-        <item>Hãng xe khác</item>
         <item>Yamaha</item>
         <item>Suzuki</item>
         <item>SWM</item>
         <item>Kawasaki</item>
+        <item>Hãng xe khác</item>
     </string-array>
     <string-array name="doixe">
         <item>2011</item>

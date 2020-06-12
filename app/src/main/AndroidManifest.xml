@@ -20,7 +20,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".ui.otp_page.VerifyActivity"></activity>
+        <activity android:name=".ui.otp_page.VerifyActivity"/>
         <activity android:name=".ui.otp_page.LoginByPhoneNumberActivity" />
         <activity android:name=".ui.loading_page.LoadPageActivity">
             <intent-filter>

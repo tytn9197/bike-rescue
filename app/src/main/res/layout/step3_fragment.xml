@@ -20,24 +20,24 @@
             android:textSize="20dp"
             android:textColor="@color/colorPrimaryDark"
             android:textStyle="bold"
-            ></TextView>
+            />
     <EditText
         android:layout_width="match_parent"
         android:layout_height="100dp"
-        android:hint="Bạn chưa có ghi chú nào. . . ."
+        android:hint="Vui lòng nhập thông tin thêm."
         android:background="@drawable/custom_border_text"
         android:padding="6dp"
         android:layout_marginLeft="5dp"
         android:layout_marginRight="5dp"
         android:inputType="text"
-        ></EditText>
+        />
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:text="Ảnh sản phẩm (nếu có):"
         android:padding="5dp"
         android:layout_marginTop="5dp"
-        ></TextView>
+        />
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
@@ -48,7 +48,7 @@
                 android:src="@drawable/ic_camera_alt_24"
                 android:background="@drawable/custom_border_text"
                 android:layout_margin="5dp"
-                ></ImageButton>
+                />
         </LinearLayout>
 
 
@@ -63,7 +63,7 @@
             android:layout_marginBottom="15dp"
             android:layout_marginTop="10dp"
             android:drawableLeft="@drawable/phonenumber"
-            ></Button>
+            />
 
     </LinearLayout>
 </ScrollView>

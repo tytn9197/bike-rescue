@@ -8,6 +8,7 @@ import androidx.annotation.Nullable;
 import com.example.bikerescueusermobile.R;
 import com.example.bikerescueusermobile.base.BaseActivity;
 import com.example.bikerescueusermobile.ui.login.LoginActivity;
+import com.example.bikerescueusermobile.ui.main.MainActivity;
 import com.google.gson.Gson;
 
 public class LoadPageActivity extends BaseActivity {
@@ -18,16 +19,17 @@ public class LoadPageActivity extends BaseActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         gson = new Gson();
-        Thread loadTime = new Thread(){
+        Thread loadTime = new Thread() {
             @Override
             public void run() {
                 try {
                     sleep(1200);
 //                    String user = SharedPreferenceHelper.getSharedPreferenceString(LoadPageActivity.this,"user","");
 //                    if(user.trim().equals("")) {
-                        Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
-                        startActivity(intent);
-                        finish();
+                    Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+//                    Intent intent = new Intent(getApplicationContext(), LoadPageActivity.class);
+                    startActivity(intent);
+                    finish();
 //                    }
 //                    }else{
 //                        User fromReference = gson.fromJson(user,User.class);
