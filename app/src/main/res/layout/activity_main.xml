@@ -84,7 +84,12 @@
             </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
 
-
+            <FrameLayout
+                android:id="@+id/mapContainer"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="gone">
+            </FrameLayout>
 <!--            <FrameLayout-->
 <!--                android:id="@+id/layoutNotification"-->
 <!--                android:layout_width="match_parent"-->
@@ -117,9 +122,10 @@
                 android:layout_alignParentEnd="true"
                 android:background="@color/white"
                 android:foreground="?attr/selectableItemBackground"
-                app:itemIconTint="@color/black"
-                app:itemTextColor="@color/black"
-                app:menu="@menu/bottom_navigation_menu" />
+                app:itemIconTint="@color/bottom_nav_color"
+                app:itemTextColor="@color/bottom_nav_color"
+                app:menu="@menu/bottom_navigation_menu"
+                />
         </RelativeLayout>
 
         <com.google.android.material.navigation.NavigationView

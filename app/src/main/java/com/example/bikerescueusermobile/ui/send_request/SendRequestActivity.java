@@ -5,8 +5,11 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.Toolbar;
 
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.viewpager.widget.ViewPager;
@@ -35,6 +38,9 @@ public class SendRequestActivity extends AppCompatActivity {
         appBarLayout = (AppBarLayout) findViewById(R.id.appbar);
         viewPager = (ViewPager) findViewById(R.id.idViewPager);
         supportBtn = (Button) findViewById(R.id.buttonHotro);
+        ImageView btnBack = findViewById(R.id.send_request_toolbar_back_btn);
+
+        btnBack.setOnClickListener(v -> {this.onBackPressed();});
 
         ViewPageAdapte viewPageAdapte = new ViewPageAdapte(getSupportFragmentManager());
         //add fargmnet

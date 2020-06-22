@@ -5,7 +5,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/fadded_grey">
+    android:background="@color/white">
 
     <RelativeLayout
         android:id="@+id/favorite_wrapper"
@@ -13,7 +13,7 @@
         android:layout_height="wrap_content"
         android:layout_margin="4dp"
         android:padding="7dp"
-        android:background="@drawable/border_white"
+        android:background="@drawable/border"
         android:orientation="vertical">
 
 
@@ -63,8 +63,8 @@
             android:layout_alignParentStart="true"
             app:srb_stepSize="0.5"
             app:srb_numStars="5"
-            app:srb_starWidth="30dp"
-            app:srb_starHeight="30dp"
+            app:srb_starWidth="20dp"
+            app:srb_starHeight="20dp"
             app:srb_isIndicator="true"
             app:srb_clickable="false"
             app:srb_drawableEmpty="@drawable/ic_star_empty"
@@ -80,8 +80,24 @@
             android:layout_marginStart="10dp"
             android:layout_marginTop="9dp"
             android:text="4,7/5"
-            android:textSize="25sp"
+            android:textSize="15sp"
             android:textStyle="bold" />
+
+        <com.willy.ratingbar.ScaleRatingBar
+            android:id="@+id/savedShopRatingBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_below="@+id/imgFavorite"
+            app:srb_stepSize="1"
+            android:clickable="true"
+            app:srb_numStars="1"
+            app:srb_starWidth="40dp"
+            app:srb_starHeight="40dp"
+            app:srb_isIndicator="false"
+            app:srb_drawableEmpty="@drawable/ic_love_empty"
+            app:srb_drawableFilled="@drawable/ic_love_filled"
+            />
 
     </RelativeLayout>
 </RelativeLayout>

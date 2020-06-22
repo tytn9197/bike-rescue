@@ -6,6 +6,7 @@ import com.example.bikerescueusermobile.ui.home.HomeFragment;
 import com.example.bikerescueusermobile.ui.profile.ProfileFragment;
 import com.example.bikerescueusermobile.ui.detail.DetailsFragment;
 import com.example.bikerescueusermobile.ui.list.ListFragment;
+import com.example.bikerescueusermobile.ui.seach_shop_service.SearchShopServiceFragment;
 
 import dagger.Module;
 import dagger.android.ContributesAndroidInjector;
@@ -30,4 +31,7 @@ public abstract class MainFragmentBindingModule {
 
     @ContributesAndroidInjector
     abstract FavoriteShopFragment provideFavoriteShopFragment();
+
+    @ContributesAndroidInjector
+    abstract SearchShopServiceFragment provideSearchShopServiceFragment();
 }

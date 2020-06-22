@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.Spinner;
 
 import androidx.annotation.NonNull;
@@ -17,8 +18,11 @@ public class FragmentStep2 extends Fragment {
     View view;
     Spinner spinner1;
     Spinner spinner2;
+    Button button;
+    SelectTab selectTab;
 
-    public FragmentStep2() {
+    public FragmentStep2(SelectTab selectTab) {
+            this.selectTab = selectTab;
 
     }
 
@@ -26,11 +30,18 @@ public class FragmentStep2 extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
             view = inflater.inflate(R.layout.step2_fragment,container,false);
+            button = (Button) view.findViewById(R.id.btnTieptheo);
+            button.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    selectTab.selectTab(2);
+                }
+            });
         spinner1 = view.findViewById(R.id.spinner2);
         spinner2 = view.findViewById(R.id.spinner3);
-        ArrayAdapter<String> myAdapter1 = new ArrayAdapter<String>(getContext(),R.layout.support_simple_spinner_dropdown_item,getResources()
+        ArrayAdapter<String> myAdapter1 = new ArrayAdapter<>(getContext(),R.layout.support_simple_spinner_dropdown_item,getResources()
                 .getStringArray(R.array.hangxe));
-        ArrayAdapter<String> myAdapter2 = new ArrayAdapter<String>(getContext(),R.layout.support_simple_spinner_dropdown_item,getResources()
+        ArrayAdapter<String> myAdapter2 = new ArrayAdapter<>(getContext(),R.layout.support_simple_spinner_dropdown_item,getResources()
                 .getStringArray(R.array.doixe));
 
 

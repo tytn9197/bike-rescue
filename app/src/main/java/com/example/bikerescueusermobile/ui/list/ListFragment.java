@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.bikerescueusermobile.R;
 import com.example.bikerescueusermobile.base.BaseFragment;
-import com.example.bikerescueusermobile.data.rest.Repo;
+import com.example.bikerescueusermobile.data.dont_use_it.Repo;
 import com.example.bikerescueusermobile.util.ViewModelFactory;
 
 import javax.inject.Inject;

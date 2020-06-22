@@ -8,6 +8,8 @@ import com.example.bikerescueusermobile.ui.main.MainFragmentBindingModule;
 import com.example.bikerescueusermobile.ui.register.CreatePasswordActivity;
 import com.example.bikerescueusermobile.ui.update_info.UpdateInfoActivity;
 
+import com.example.bikerescueusermobile.ui.map.MapActivity;
+
 import dagger.Module;
 import dagger.android.ContributesAndroidInjector;
 
@@ -23,6 +25,9 @@ public abstract class ActivityBindingModule {
 
     @ContributesAndroidInjector
     abstract LoginActivity bindLoginActivity();
+
+    @ContributesAndroidInjector
+    abstract MapActivity bindMapActivity();
 
     @ContributesAndroidInjector
     abstract CreatePasswordActivity bindcreatePasswordActivity();

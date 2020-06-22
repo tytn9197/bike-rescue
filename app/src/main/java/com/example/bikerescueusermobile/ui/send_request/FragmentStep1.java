@@ -18,10 +18,12 @@ public class FragmentStep1 extends Fragment {
     View view;
     Spinner spinner;
     Button btn;
+    SelectTab selectTab;
 
 
     // TODO: Externalize string-array
-    public FragmentStep1() {
+    public FragmentStep1(SelectTab selectTab) {
+            this.selectTab = selectTab;
 
     }
 
@@ -33,7 +35,7 @@ public class FragmentStep1 extends Fragment {
            btn.setOnClickListener(new View.OnClickListener() {
                @Override
                public void onClick(View v) {
-
+                        selectTab.selectTab(1);
                }
            });
         spinner = view.findViewById(R.id.spinner1);
