@@ -20,7 +20,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".ui.otp_page.VerifyActivity"></activity>
+        <activity android:name=".ui.otp_page.VerifyActivity" />
         <activity android:name=".ui.otp_page.LoginByPhoneNumberActivity" />
         <activity android:name=".ui.loading_page.LoadPageActivity">
             <intent-filter>
@@ -31,7 +31,12 @@
         </activity>
         <activity android:name=".ui.main.MainActivity" />
         <activity android:name=".ui.login.LoginActivity" />
+        <activity android:name=".ui.register.CreatePasswordActivity" />
         <activity android:name=".ui.send_request.SendRequestActivity" />
+        <activity android:name=".ui.confirm.ConfirmInfoActivity" />
+        <activity android:name=".ui.update_info.UpdateInfoActivity" />
+
+
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"

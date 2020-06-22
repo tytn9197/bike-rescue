@@ -14,8 +14,12 @@ import androidx.lifecycle.ViewModelProviders;
 import com.example.bikerescueusermobile.R;
 import com.example.bikerescueusermobile.base.BaseActivity;
 import com.example.bikerescueusermobile.data.model.login.LoginData;
+import com.example.bikerescueusermobile.data.model.user.CurrentUser;
+import com.example.bikerescueusermobile.ui.confirm.ConfirmInfoActivity;
 import com.example.bikerescueusermobile.ui.main.MainActivity;
 import com.example.bikerescueusermobile.ui.otp_page.LoginByPhoneNumberActivity;
+import com.example.bikerescueusermobile.ui.register.CreatePasswordActivity;
+import com.example.bikerescueusermobile.util.SharedPreferenceHelper;
 import com.example.bikerescueusermobile.util.ViewModelFactory;
 import com.google.gson.Gson;
 import com.victor.loading.rotate.RotateLoading;
@@ -62,53 +66,62 @@ public class LoginActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
 
         viewRegister.setOnClickListener(view -> {
-                Intent intent = new Intent(LoginActivity.this, LoginByPhoneNumberActivity.class);
-                startActivity(intent);
+            Intent intent = new Intent(LoginActivity.this, LoginByPhoneNumberActivity.class);
+            startActivity(intent);
         });
 
         viewModel = ViewModelProviders.of(this, viewModelFactory).get(LoginModel.class);
         gson = new Gson();
         btnLogin.setOnClickListener(view -> {
-            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-            startActivity(intent);
-            finish();
-//            LoginData loginData = new LoginData(edtName.getText().toString(),edtPass.getText().toString());
+            //Share ref lưu username vs password
+//            LoginData loginData = new LoginData(edtName.getText().toString(), edtPass.getText().toString());
 //            viewModel.login(loginData).subscribeOn(Schedulers.io())
 //                    .observeOn(AndroidSchedulers.mainThread())
 //                    .subscribe(user -> {
 //                        viewModel.setLoading(false);
-//                        if(user != null){
-////                            String sharedPreferenceStr = gson.toJson(user);
-////                            SharedPreferenceHelper.setSharedPreferenceString(LoginActivity.this,"user",sharedPreferenceStr);
-////                            CurrentUser.getInstance().setUsername(user.getUsername());
-////                            CurrentUser.getInstance().setFullname(user.getFullname());
-////                            CurrentUser.getInstance().setToken(user.getToken());
-////                            CurrentUser.getInstance().setAccessToken(user.getAccessToken());
-////                            CurrentUser.getInstance().setAvatarUrl(user.getAvatarUrl());
-////                            CurrentUser.getInstance().setId(user.getId());
-////                            CurrentUser.getInstance().setProvider(user.getProvider());
-////                            CurrentUser.getInstance().setCreatedTime(user.getCreatedTime());
-////                            CurrentUser.getInstance().setAddress(user.getAddress());
-////                            CurrentUser.getInstance().setEmail(user.getEmail());
-////                            CurrentUser.getInstance().setIdentifyNumber(user.getIdentifyNumber());
-////                            CurrentUser.getInstance().setPhoneNumber(user.getPhoneNumber());
-////                            CurrentUser.getInstance().setRoleId(user.getRoleId());
-////                            if(user.getRoleId() == 2) {
-//                                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-//                                startActivity(intent);
+//                        if (user != null) {
+//                            String sharedPreferenceStr = gson.toJson(user);
+//                            SharedPreferenceHelper.setSharedPreferenceString(LoginActivity.this,"user",sharedPreferenceStr);
+//                            CurrentUser.getInstance().setUsername(user.getUsername());
+//                            CurrentUser.getInstance().setFullname(user.getFullname());
+//                            CurrentUser.getInstance().setToken(user.getToken());
+//                            CurrentUser.getInstance().setAccessToken(user.getAccessToken());
+//                            CurrentUse--r.getInstance().setAvatarUrl(user.getAvatarUrl());
+//                            CurrentUser.getInstance().setId(user.getId());
+//                            CurrentUser.getInstance().setProvider(user.getProvider());
+//                            CurrentUser.getInstance().setCreatedTime(user.getCreatedTime());
+//                            CurrentUser.getInstance().setAddress(user.getAddress());
+//                            CurrentUser.getInstance().setEmail(user.getEmail());
+//                            CurrentUser.getInstance().setIdentifyNumber(user.getIdentifyNumber());
+//                            CurrentUser.getInstance().setPhoneNumber(user.getPhoneNumber());
+//                            CurrentUser.getInstance().setRoleId(user.getRoleId());
+//                            if(user.getRoleId() == 2) {
+//                                Intent intent1 = new Intent(LoginActivity.this, MainActivity.class);
+//                                startActivity(intent1);
 //                                finish();
-////                            }else{
-////                                errorTextView.setVisibility(View.VISIBLE);
-////                                errorTextView.setText("Lỗi ! Tài khoản hoặc mật khẩu không đúng. ");
-////                            }
+//                            }else{
+//                                errorTextView.setVisibility(View.VISIBLE);
+//                                errorTextView.setText("Lỗi ! Tài khoản hoặc mật khẩu không đúng. ");
+//                            }
 //                        }
 //
-//                    },throwable -> {
+//                    }, throwable -> {
 //                        viewModel.setLoading(false);
 //                        errorTextView.setVisibility(View.VISIBLE);
 //                        errorTextView.setText("Lỗi xảy ra !".concat(throwable.getMessage()));
-//                        Log.e("LoginActivity","" + throwable.getMessage());
+//                        Log.e("LoginActivity", "" + throwable.getMessage());
 //                    });
+            Intent intent = new Intent(LoginActivity.this, CreatePasswordActivity.class);
+
+//            Intent intent = new Intent(LoginActivity.this, ConfirmInfoActivity.class);
+
+
+            //intent.putExtra("SDT", "0865137822");
+            startActivity(intent);
+            finish();
+
+
+
         });
 
     }

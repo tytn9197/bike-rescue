@@ -1,5 +1,6 @@
 package com.example.bikerescueusermobile.ui.send_request;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
@@ -11,6 +12,9 @@ import androidx.fragment.app.FragmentManager;
 import androidx.viewpager.widget.ViewPager;
 
 import com.example.bikerescueusermobile.R;
+import com.example.bikerescueusermobile.ui.confirm.ConfirmInfoActivity;
+import com.example.bikerescueusermobile.ui.login.LoginActivity;
+import com.example.bikerescueusermobile.ui.otp_page.LoginByPhoneNumberActivity;
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.tabs.TabLayout;
 
@@ -31,6 +35,7 @@ public class SendRequestActivity extends AppCompatActivity {
         appBarLayout = (AppBarLayout) findViewById(R.id.appbar);
         viewPager = (ViewPager) findViewById(R.id.idViewPager);
         supportBtn = (Button) findViewById(R.id.buttonHotro);
+
         ViewPageAdapte viewPageAdapte = new ViewPageAdapte(getSupportFragmentManager());
         //add fargmnet
         viewPageAdapte.AddFragment(new FragemtMota(),"Mô Tả");
@@ -43,17 +48,19 @@ public class SendRequestActivity extends AppCompatActivity {
         supportBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (userInfoDialog != null
-                        && userInfoDialog.getDialog() != null
-                        && userInfoDialog.getDialog().isShowing()
-                        && !userInfoDialog.isRemoving()) {
-                    //dialog is showing so do something
-                } else {
-                    FragmentManager fm = getSupportFragmentManager();
-                    userInfoDialog = new CustomDialogClass();
-                    userInfoDialog.setCancelable(false);
-                    userInfoDialog.show(fm, null);
-                }
+//                if (userInfoDialog != null
+//                        && userInfoDialog.getDialog() != null
+//                        && userInfoDialog.getDialog().isShowing()
+//                        && !userInfoDialog.isRemoving()) {
+//                    //dialog is showing so do something
+//                } else {
+//                    FragmentManager fm = getSupportFragmentManager();
+//                    userInfoDialog = new CustomDialogClass();
+//                    userInfoDialog.setCancelable(false);
+//                    userInfoDialog.show(fm, null);
+//                }
+                Intent intent = new Intent(SendRequestActivity.this, ConfirmInfoActivity.class);
+                startActivity(intent);
             }
         });
 

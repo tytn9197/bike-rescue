@@ -12,6 +12,7 @@ import android.widget.Toast;
 
 import com.example.bikerescueusermobile.R;
 import com.example.bikerescueusermobile.ui.main.MainActivity;
+import com.example.bikerescueusermobile.ui.register.CreatePasswordActivity;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.TaskExecutors;
@@ -52,6 +53,10 @@ public class VerifyActivity extends AppCompatActivity {
                 return;
             }
             verifyCode(code);
+
+            //chuyển đến trang tạo mật khẩu sau khi verify code thành công
+            Intent intent = new Intent(this, CreatePasswordActivity.class);
+
         });
 
     }

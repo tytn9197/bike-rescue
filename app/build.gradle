@@ -89,4 +89,5 @@ dependencies {
     implementation 'com.google.android.libraries.places:places-compat:2.3.0'
     implementation 'com.google.firebase:firebase-analytics:17.4.2'
     implementation 'com.github.ome450901:SimpleRatingBar:1.5.0'
+    implementation 'com.github.f0ris.sweetalert:library:1.6.2'
 }
