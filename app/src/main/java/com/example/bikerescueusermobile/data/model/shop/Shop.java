@@ -1,5 +1,7 @@
 package com.example.bikerescueusermobile.data.model.shop;
 
+import androidx.annotation.NonNull;
+
 public class Shop {
     private int id;
     private String shopName;
@@ -43,5 +45,11 @@ public class Shop {
 
     public void setShopRatingStar(String shopRatingStar) {
         this.shopRatingStar = shopRatingStar;
+    }
+
+    @NonNull
+    @Override
+    public String toString() {
+        return "id =" + id + " name= " + shopName;
     }
 }

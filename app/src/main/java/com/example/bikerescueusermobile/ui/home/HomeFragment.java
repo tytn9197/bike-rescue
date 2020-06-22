@@ -20,12 +20,14 @@ import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import com.example.bikerescueusermobile.R;
 import com.example.bikerescueusermobile.base.BaseFragment;
+import com.example.bikerescueusermobile.ui.main.MyCurrentLocation;
 import com.example.bikerescueusermobile.ui.send_request.SendRequestActivity;
 import com.example.bikerescueusermobile.util.MyMethods;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.LocationSource;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
@@ -48,7 +50,7 @@ import butterknife.BindView;
 
 
 public class HomeFragment extends BaseFragment
-        implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener, GoogleMap.OnMapClickListener {
+        implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener, GoogleMap.OnMapClickListener, GoogleMap.OnMyLocationChangeListener {
     @Override
     protected int layoutRes() {
         return R.layout.biker_home_fragment;
@@ -65,14 +67,7 @@ public class HomeFragment extends BaseFragment
 
     private Location currentLocation;
 
-    @BindView(R.id.btnSendRequest)
-    Button btnSendRequest;
 
-    @BindView(R.id.homeShopDetail)
-    RelativeLayout homeShopDetail;
-
-    @BindView(R.id.homeShopDetailBackground)
-    RelativeLayout homeShopDetailBackground;
 
 //    @BindView(R.id.edtFindLocation)
 //    EditText edtFindLocation;
@@ -84,33 +79,9 @@ public class HomeFragment extends BaseFragment
                 .findFragmentById(R.id.mapHome);
         mapFragment.getMapAsync(this);
         mapView = mapFragment.getView();
-        init();
-
     }
 
-    private void init(){
-        Log.d(HomeFragmentConstants.TAG,"init: start");
 
-        btnSendRequest.setOnClickListener(v -> {
-            Intent intent = new Intent(getActivity(), SendRequestActivity.class);
-            startActivity(intent);
-        });
-//        edtFindLocation.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-//            @Override
-//            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-//                if(actionId == EditorInfo.IME_ACTION_SEARCH
-//                        || actionId == EditorInfo.IME_ACTION_DONE
-//                        || event.getAction() == KeyEvent.ACTION_DOWN
-//                        || event.getAction() == KeyEvent.KEYCODE_ENTER){
-//                    searchLocation();
-//                    hideSoftKeyboard();
-//                }
-//                return false;
-//            }
-//        });
-
-
-    }
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
@@ -152,10 +123,17 @@ public class HomeFragment extends BaseFragment
 //                .title("Tiệm sửa xe La Thành").snippet("Địa chỉ 61 Hoàng Thiều Hoa, Hiệp Tân, Tân Phú"));
         googleMap.setOnMarkerClickListener(this);
         googleMap.setOnMapClickListener(this);
+        googleMap.setOnMyLocationChangeListener(this);
         if(currentLocation != null) {
             googleMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude())));
         }else {
             googleMap.moveCamera(CameraUpdateFactory.newLatLng(s1));
+        }
+
+        if(MyCurrentLocation.getInstance().getCurrentLocation() != null) {
+            Log.e("aaaaa", "lat: " + MyCurrentLocation.getInstance().getCurrentLocation().latitude + " ----long: " + MyCurrentLocation.getInstance().getCurrentLocation().longitude);
+        }else{
+            Log.e("aaaa", "null");
         }
     }
 
@@ -213,7 +191,7 @@ public class HomeFragment extends BaseFragment
                     public void onPermissionRationaleShouldBeShown(List<PermissionRequest> permissions, PermissionToken token) {
                         token.continuePermissionRequest();
                     }
-                }).withErrorListener(error -> Toast.makeText(getActivity().getApplicationContext(), "Error occurred! ", Toast.LENGTH_SHORT).show())
+                }).withErrorListener(error -> Log.e("HomeFragment", "" + error ))
                 .onSameThread()
                 .check();
     }
@@ -264,6 +242,7 @@ public class HomeFragment extends BaseFragment
                     if(task.isSuccessful()){
                         Log.d(HomeFragmentConstants.TAG,"onComplete: found location!");
                         currentLocation = (Location) task.getResult();
+                        MyCurrentLocation.getInstance().setCurrentLocation(new LatLng(currentLocation.getLatitude(),currentLocation.getLongitude()));
                         MyMethods.moveCamera(mMap, new LatLng(currentLocation.getLatitude(),currentLocation.getLongitude()),
                                 HomeFragmentConstants.DEFAULT_ZOOM_VALUE);
                     }else{
@@ -280,19 +259,29 @@ public class HomeFragment extends BaseFragment
 
     @Override
     public boolean onMarkerClick(Marker marker) {
-        btnSendRequest.setVisibility(View.VISIBLE);
-        homeShopDetail.setVisibility(View.VISIBLE);
-        homeShopDetailBackground.setVisibility(View.VISIBLE);
+//        btnSendRequest.setVisibility(View.VISIBLE);
+//        homeShopDetail.setVisibility(View.VISIBLE);
+//        homeShopDetailBackground.setVisibility(View.VISIBLE);
+
         return false;
     }
 
     @Override
     public void onMapClick(LatLng latLng) {
-        btnSendRequest.setVisibility(View.GONE);
-        homeShopDetail.setVisibility(View.GONE);
-        homeShopDetailBackground.setVisibility(View.GONE);
+//        btnSendRequest.setVisibility(View.GONE);
+//        homeShopDetail.setVisibility(View.GONE);
+//        homeShopDetailBackground.setVisibility(View.GONE);
 
     }
+
+
+    @Override
+    public void onMyLocationChange(Location location) {
+        if(location != null){
+            MyCurrentLocation.getInstance().setCurrentLocation(new LatLng(currentLocation.getLatitude(),currentLocation.getLongitude()));
+        }
+    }
+
 
 //    private void searchLocation(){
 //        Log.d(HomeFragmentConstants.TAG,"searchLocation start");

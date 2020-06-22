@@ -8,7 +8,7 @@
     android:background="@color/white">
 
     <RelativeLayout
-        android:id="@+id/favorite_wrapper"
+        android:id="@+id/top_shop_wrapper"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="4dp"
@@ -18,20 +18,20 @@
 
 
         <TextView
-            android:id="@+id/txtFavoriteShopName"
+            android:id="@+id/txtTopShopName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
             android:layout_alignParentTop="true"
             android:layout_marginTop="5dp"
             android:layout_marginBottom="3dp"
-            android:layout_toStartOf="@+id/imgFavorite"
+            android:layout_toStartOf="@+id/imgTopShop"
             android:text="Tên cửa hàng"
             android:textSize="23sp"
             android:textStyle="bold" />
 
         <ImageView
-            android:id="@+id/imgFavorite"
+            android:id="@+id/imgTopShop"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
@@ -42,13 +42,13 @@
             android:src="@drawable/ic_wrench" />
 
         <TextView
-            android:id="@+id/txtFavoriteShopAddress"
+            android:id="@+id/txtTopShopShopAddress"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/txtFavoriteShopName"
+            android:layout_below="@id/txtTopShopName"
             android:layout_alignParentStart="true"
-            android:layout_above="@id/favoriteRatingBar"
-            android:layout_toStartOf="@+id/imgFavorite"
+            android:layout_above="@id/topShopRatingBar"
+            android:layout_toStartOf="@+id/imgTopShop"
             android:layout_marginTop="8dp"
             android:textColor="@color/black"
             android:text="61 Hoàng Thiều Hoa, Hiệp Tân, Tân Phú, Tân Phú, Tân Phú"
@@ -56,10 +56,10 @@
             />
 
         <com.willy.ratingbar.ScaleRatingBar
-            android:id="@+id/favoriteRatingBar"
+            android:id="@+id/topShopRatingBar"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/imgFavorite"
+            android:layout_below="@id/imgTopShop"
             android:layout_alignParentStart="true"
             app:srb_stepSize="0.5"
             app:srb_numStars="5"
@@ -72,28 +72,42 @@
             />
 
         <TextView
-            android:id="@+id/txtFavoriteNumberOfStar"
+            android:id="@+id/txtTopShopNumberOfStar"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_toEndOf="@+id/favoriteRatingBar"
-            android:layout_below="@+id/imgFavorite"
+            android:layout_toEndOf="@+id/topShopRatingBar"
+            android:layout_below="@+id/imgTopShop"
             android:layout_marginStart="10dp"
             android:layout_marginTop="9dp"
             android:text="4,7/5"
             android:textSize="15sp"
             android:textStyle="bold" />
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_toStartOf="@id/savedTopShopRatingBar"
+            android:layout_below="@id/savedTopShopRatingBar"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="-30dp"
+            android:textColor="@color/grey"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:text="Cách đây 3km"/>
+
         <com.willy.ratingbar.ScaleRatingBar
-            android:id="@+id/savedShopRatingBar"
+            android:id="@+id/savedTopShopRatingBar"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
-            android:layout_below="@+id/imgFavorite"
+            android:layout_below="@+id/imgTopShop"
+            app:srb_numStars="1"
             app:srb_stepSize="1"
             android:clickable="true"
-            app:srb_numStars="1"
             app:srb_starWidth="40dp"
             app:srb_starHeight="40dp"
+            android:layout_marginTop="20dp"
             app:srb_isIndicator="false"
             app:srb_drawableEmpty="@drawable/ic_love_empty"
             app:srb_drawableFilled="@drawable/ic_love_filled"

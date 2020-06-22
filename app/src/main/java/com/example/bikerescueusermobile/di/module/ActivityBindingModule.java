@@ -4,6 +4,8 @@ import com.example.bikerescueusermobile.ui.loading_page.LoadPageActivity;
 import com.example.bikerescueusermobile.ui.login.LoginActivity;
 import com.example.bikerescueusermobile.ui.main.MainActivity;
 import com.example.bikerescueusermobile.ui.main.MainFragmentBindingModule;
+import com.example.bikerescueusermobile.ui.map.MapActivity;
+
 import dagger.Module;
 import dagger.android.ContributesAndroidInjector;
 
@@ -19,5 +21,8 @@ public abstract class ActivityBindingModule {
 
     @ContributesAndroidInjector
     abstract LoginActivity bindLoginActivity();
+
+    @ContributesAndroidInjector
+    abstract MapActivity bindMapActivity();
 
 }

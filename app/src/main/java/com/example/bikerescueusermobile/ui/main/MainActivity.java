@@ -6,7 +6,9 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.util.Log;
 import android.view.MenuItem;
+import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -21,7 +23,10 @@ import com.example.bikerescueusermobile.base.BaseActivity;
 import com.example.bikerescueusermobile.ui.favorite.FavoriteShopFragment;
 import com.example.bikerescueusermobile.ui.history.HistoryFragment;
 import com.example.bikerescueusermobile.ui.home.HomeFragment;
+import com.example.bikerescueusermobile.ui.login.LoginActivity;
 import com.example.bikerescueusermobile.ui.profile.ProfileFragment;
+import com.example.bikerescueusermobile.ui.seach_shop_service.SearchShopServiceFragment;
+import com.example.bikerescueusermobile.util.SharedPreferenceHelper;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
 import com.karumi.dexter.Dexter;
@@ -50,6 +55,9 @@ public class MainActivity extends BaseActivity {
     @BindView(R.id.mainRotateloading)
     RotateLoading rotateLoading;
 
+    @BindView(R.id.mapContainer)
+    FrameLayout mapContainer;
+
     private Fragment fragment; // use it to change fragment
     private Fragment homeFragment;
     private Fragment historyFragment;
@@ -66,9 +74,17 @@ public class MainActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         init();
         initGrantAppPermission();
         bottomNavigationView.setOnNavigationItemSelectedListener(mOnBottomNavigationItemSelectedListener);
+
+        FragmentManager manager = getSupportFragmentManager();
+        manager.beginTransaction().replace(R.id.mapContainer, new HomeFragment()).commit();
+
+//        UpdateDevice device = new UpdateDevice(token);
+//        viewModel.updateFcm(CurrentUser.getInstance().getToken(), CurrentUser.getInstance().getId(), device);
+//        CurrentUser.getInstance().setDeviceToken(token);
     }
 
     private void initGrantAppPermission(){
@@ -82,8 +98,8 @@ public class MainActivity extends BaseActivity {
                     public void onPermissionsChecked(MultiplePermissionsReport report) {
                         // check if all permissions are granted or not
                         if (report.areAllPermissionsGranted()) {
-                            fragment = new HomeFragment();
-                            replaceFragment();
+//                            fragment = new SearchShopServiceFragment();
+//                            replaceFragment();
                         }
                         // check for permanent denial of any permission show alert dialog
                         if (report.isAnyPermissionPermanentlyDenied()) {
@@ -96,7 +112,7 @@ public class MainActivity extends BaseActivity {
                     public void onPermissionRationaleShouldBeShown(List<PermissionRequest> permissions, PermissionToken token) {
                         token.continuePermissionRequest();
                     }
-                }).withErrorListener(error -> Toast.makeText(this.getApplicationContext(), "Error occurred! ", Toast.LENGTH_SHORT).show())
+                }).withErrorListener(error -> Log.e("Main", "" + error ))
                 .onSameThread()
                 .check();
     }
@@ -120,12 +136,11 @@ public class MainActivity extends BaseActivity {
     }
 
     private void init(){
-        homeFragment = new HomeFragment();
+        homeFragment = new SearchShopServiceFragment();
         historyFragment = new HistoryFragment();
         profileFragment = new ProfileFragment();
         //init a home page when login
         fragment = homeFragment;
-        replaceFragment();
         replaceFragment();
 
         setSupportActionBar(toolbar);
@@ -153,7 +168,7 @@ public class MainActivity extends BaseActivity {
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
             switch (item.getItemId()) {
                 case R.id.nav_home:
-                    fragment = new HomeFragment();
+                    fragment = new SearchShopServiceFragment();
                     replaceFragment();
                     return true;
                 case R.id.nav_history:
@@ -176,7 +191,7 @@ public class MainActivity extends BaseActivity {
 //                    closeNotification();
                     switch (item.getItemId()) {
                         case R.id.nav_feed:
-                            fragment = new HomeFragment();
+                            fragment = new SearchShopServiceFragment();
                             replaceFragment();
                             drawer.close();
                             return true;
@@ -185,10 +200,15 @@ public class MainActivity extends BaseActivity {
                             replaceFragment();
                             drawer.close();
                             return true;
+                        case R.id.nav_introduce:
+                            fragment = new HomeFragment();
+                            replaceFragment();
+                            drawer.close();
+                            return true;
                         case R.id.nav_logout:
-//                            SharedPreferenceHelper.setSharedPreferenceString(MainActivity.this, "user", "");
-//                            Intent intentLog = new Intent(MainActivity.this, LoginActivity.class);
-//                            startActivity(intentLog);
+                            SharedPreferenceHelper.setSharedPreferenceString(MainActivity.this, "user", "");
+                            Intent intentLog = new Intent(MainActivity.this, LoginActivity.class);
+                            startActivity(intentLog);
 //                            goesOffline();
                             finish();
                             return true;
@@ -202,5 +222,4 @@ public class MainActivity extends BaseActivity {
         FragmentManager manager = getSupportFragmentManager();
         manager.beginTransaction().replace(R.id.frame_container, fragment).commit();
     }
-
 }

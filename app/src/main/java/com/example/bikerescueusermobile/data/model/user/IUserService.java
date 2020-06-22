@@ -19,30 +19,5 @@ public interface IUserService {
     @POST("/api/login")
     Single<User> login(@Body LoginData loginData);
 
-    @POST("/api/users/{userId}/refresh-token")
-    Single<User> updateFCM(@Header("Authorization") String token, @Path("userId") int userId, @Body UpdateDevice updateDevice);
-
-    @Multipart
-    @PUT("/api/users/{userId}")
-    Single<User> updateUser(@Header("Authorization") String token, @Path("userId") int userId, @Part MultipartBody.Part file,
-                            @Part("fullname") RequestBody fullname,
-                            @Part("email") RequestBody email,
-                            @Part("address") RequestBody address,
-                            @Part("phoneNumber") RequestBody phoneNumber
-    );
-
-//    @GET("/api/users/{id}/createdCases")
-//    Single<List<Case>> getHistoryCaseByUserId(@Path("id") int userId);
-
-    @Multipart
-    @POST("/api/users")
-    Single<User> createUser(@Part MultipartBody.Part file,
-                            @Part("username") RequestBody username,
-                            @Part("password") RequestBody password,
-                            @Part("fullname") RequestBody fullname,
-//                            @Part("email") RequestBody email,
-//                            @Part("address") RequestBody address,
-                            @Part("phoneNumber") RequestBody phoneNumber
-    );
 
 }

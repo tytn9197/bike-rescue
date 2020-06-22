@@ -5,8 +5,8 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import com.example.bikerescueusermobile.data.rest.Repo;
-import com.example.bikerescueusermobile.data.rest.RepoRepository;
+import com.example.bikerescueusermobile.data.dont_use_it.Repo;
+import com.example.bikerescueusermobile.data.dont_use_it.RepoRepository;
 
 import java.util.List;
 import javax.inject.Inject;

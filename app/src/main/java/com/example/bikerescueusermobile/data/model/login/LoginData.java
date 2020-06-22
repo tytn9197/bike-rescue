@@ -2,20 +2,20 @@ package com.example.bikerescueusermobile.data.model.login;
 
 public class LoginData {
 
-    private String username;
+    private String phoneNumber;
     private String password;
 
     public LoginData(String username, String password) {
-        this.username = username;
+        this.phoneNumber = username;
         this.password = password;
     }
 
-    public String getUsername() {
-        return username;
+    public String getPhoneNumber() {
+        return phoneNumber;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
     }
 
     public String getPassword() {

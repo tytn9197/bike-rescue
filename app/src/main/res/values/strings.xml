@@ -14,13 +14,15 @@
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
     <string name="title_toolbar">BR</string>
-    <string name="button_send_request_text">Gọi hỗ trợ</string>
+    <string name="button_send_request_text">Gọi dịch vụ</string>
 
     <string name="map_api_key">AIzaSyCsA_sV97saxUUDQKw4WsXSeardFnW3LfE</string>
     <string name="message_need_permission">Cung cấp quyền sử dụng</string>
     <string name="message_permission">Cần cung cấp quyền sử dụng của điện thoại</string>
     <string name="title_go_to_setting">Mở trang cài đặt</string>
     <string name="bot_nav_string_like">Yêu thích</string>
+
+    <string name="mapbox_access_token">pk.eyJ1IjoidHl0bjkxOTciLCJhIjoiY2tibDFzdWM0MTRybjJxbWx4OWQwbzM1ZSJ9.96AqX9d9-fsfHspUlOXQig</string>
 
 <!--    @@@@@@@@@@@@@@@@@@@@@@@@@@@ HOAN @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@-->
     <string name="tieu_de">Xe của bạn không thể di chuyển được ? Gặp trục trặc trên đường ?</string>

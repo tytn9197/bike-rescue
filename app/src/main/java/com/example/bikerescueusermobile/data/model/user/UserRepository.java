@@ -23,24 +23,4 @@ public class UserRepository {
         return userService.login(loginData);
     }
 
-    public Single<User> updateFCM(String token, int userId, UpdateDevice updateDevice){
-        return userService.updateFCM(token,userId,updateDevice);
-    }
-
-//    public Single<User> updateUser(String token, int userId, MultipartBody.Part file){
-//        return  userService.updateUser(token,userId,file);
-//    }
-
-    public Single<User> updateUser(String token, int userId, MultipartBody.Part file, RequestBody fullname, RequestBody email, RequestBody address, RequestBody phoneNumber){
-        return  userService.updateUser(token,userId,file,fullname,email,address,phoneNumber);
-    }
-
-
-    public Single<User> createUser(MultipartBody.Part file, RequestBody username, RequestBody password, RequestBody fullname, RequestBody phoneNumber){
-        return  userService.createUser(file,username,password,fullname,phoneNumber);
-    }
-
-//    public Single<List<Case>> getHistoryCasesByUserId(int userId){
-//        return userService.getHistoryCaseByUserId(userId);
-//    }
 }
