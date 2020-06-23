@@ -90,7 +90,7 @@ public class TopShopRecyclerViewAdapter  extends RecyclerView.Adapter<TopShopRec
 
             txtTopShopName.setText(shop.getShopName());
 
-            txtTopShopShopAddress.setText(shop.getShopAddress());
+            txtTopShopShopAddress.setText(shop.getAddress());
 
             String txtNumOfStar = shop.getShopRatingStar() + "/" + topShopRatingBar.getNumStars();
             txtTopShopNumberOfStar.setText(txtNumOfStar);

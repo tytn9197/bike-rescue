@@ -91,7 +91,7 @@ public class FavoriteRecyclerViewAdapter  extends RecyclerView.Adapter<FavoriteR
 
             txtFavoriteShopName.setText(shop.getShopName());
 
-            txtFavoriteShopAddress.setText(shop.getShopAddress());
+            txtFavoriteShopAddress.setText(shop.getAddress());
 
             String txtNumOfStar = shop.getShopRatingStar() + "/" + favoriteRatingBar.getNumStars();
             txtFavoriteNumberOfStar.setText(txtNumOfStar);
