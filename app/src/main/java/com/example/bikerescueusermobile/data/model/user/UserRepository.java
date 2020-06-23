@@ -23,4 +23,9 @@ public class UserRepository {
         return userService.login(loginData);
     }
 
+    public Single<User> register(User user, String roleName){
+        return userService.register(user, roleName);
+    }
+
+
 }

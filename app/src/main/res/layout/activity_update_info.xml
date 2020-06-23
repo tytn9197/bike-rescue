@@ -1,0 +1,608 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/actionBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/core_color" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="10">
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="#EEEEEE"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="left"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginTop="5dp"
+                    android:padding="5dp"
+                    android:text="QUÝ KHÁCH HÃY CẬP NHẬT THÔNG TIN"
+                    android:textColor="@color/colorPrimaryDark"
+                    android:textSize="14dp"
+                    android:textStyle="bold" />
+
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginRight="16dp"
+                    android:background="@color/white"
+                    android:orientation="horizontal"
+                    android:padding="10dp">
+
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="7"
+                        android:orientation="horizontal"
+                        android:paddingLeft="5dp">
+
+                        >
+
+
+                        <EditText
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="3"
+                            android:background="@android:color/transparent"
+                            android:hint="Họ tên"
+                            android:textAlignment="textStart"
+                            android:textSize="16dp" />
+
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <View
+                    android:id="@+id/divider2"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="?android:attr/listDivider" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginRight="16dp"
+                    android:background="@color/white"
+                    android:orientation="horizontal"
+                    android:padding="10dp">
+
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="7"
+                        android:orientation="horizontal"
+                        android:paddingLeft="5dp">
+
+                        >
+
+                        <TextView
+                            android:id="@+id/tvGTTT"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="3"
+                            android:background="@android:color/transparent"
+                            android:hint="Loại GTTT"
+                            android:textAlignment="textStart"
+                            android:textSize="16dp" />
+
+                        <ImageView
+                            android:id="@+id/imgGTTT"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:src="@drawable/ic_baseline_chevron_right_24" />
+
+
+                    </LinearLayout>
+
+
+                </LinearLayout>
+
+                <View
+                    android:id="@+id/divider1"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="?android:attr/listDivider" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginRight="16dp"
+                    android:background="@color/white"
+                    android:orientation="horizontal"
+                    android:padding="10dp">
+
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="7"
+                        android:orientation="horizontal"
+                        android:paddingLeft="5dp">
+
+                        >
+
+
+                        <EditText
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="3"
+                            android:background="@android:color/transparent"
+                            android:hint="Số GTTT"
+                            android:textAlignment="textStart"
+                            android:textSize="16dp" />
+
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <View
+                    android:id="@+id/divider3"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="?android:attr/listDivider" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginRight="16dp"
+                    android:background="@color/white"
+                    android:orientation="horizontal"
+                    android:padding="10dp">
+
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="7"
+                        android:orientation="horizontal"
+                        android:paddingLeft="5dp">
+
+                        >
+
+                        <EditText
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="3"
+                            android:background="@android:color/transparent"
+                            android:hint="Nơi cấp"
+                            android:textAlignment="textStart"
+                            android:textSize="16dp" />
+
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <View
+                    android:id="@+id/divider4"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="?android:attr/listDivider" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginRight="16dp"
+                    android:background="@color/white"
+                    android:orientation="horizontal"
+                    android:padding="10dp">
+
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="7"
+                        android:orientation="horizontal"
+                        android:paddingLeft="5dp">
+
+                        >
+
+
+                        <EditText
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="3"
+                            android:background="@android:color/transparent"
+                            android:hint="Ngày cấp"
+                            android:inputType="phone"
+                            android:textAlignment="textStart"
+                            android:textSize="16dp" />
+
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <View
+                    android:id="@+id/divider5"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="?android:attr/listDivider" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginRight="16dp"
+                    android:background="@color/white"
+                    android:orientation="horizontal"
+                    android:padding="10dp">
+
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="7"
+                        android:orientation="horizontal"
+                        android:paddingLeft="5dp">
+
+                        >
+
+
+                        <EditText
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="3"
+                            android:background="@android:color/transparent"
+                            android:hint="Ngày sinh"
+                            android:textAlignment="textStart"
+                            android:textSize="16dp" />
+
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <View
+                    android:id="@+id/divider6"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="?android:attr/listDivider" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginRight="16dp"
+                    android:background="@color/white"
+                    android:orientation="horizontal"
+                    android:padding="10dp">
+
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="7"
+                        android:orientation="horizontal"
+                        android:paddingLeft="5dp">
+
+                        >
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="6"
+                            android:text="Giới tính"
+                            android:textColor="@color/black"
+                            android:textSize="16dp" />
+
+                        <TextView
+                            android:id="@+id/tvMan"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="3"
+                            android:drawableLeft="@drawable/ic_baseline_check_box_outline_blank_24"
+                            android:text="Nam"
+                            android:textColor="@color/black"
+                            android:textSize="16dp" />
+
+                        <TextView
+                            android:id="@+id/tvWoman"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="3"
+                            android:drawableLeft="@drawable/ic_baseline_check_box_outline_blank_24"
+                            android:text="Nữ"
+                            android:textColor="@color/black"
+                            android:textSize="16dp" />
+
+
+                    </LinearLayout>
+
+
+                </LinearLayout>
+
+                <View
+                    android:id="@+id/divider7"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="?android:attr/listDivider" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginRight="16dp"
+                    android:background="@color/white"
+                    android:orientation="horizontal"
+                    android:padding="10dp">
+
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="7"
+                        android:orientation="horizontal"
+                        android:paddingLeft="5dp">
+
+                        >
+
+
+                        <EditText
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="3"
+                            android:background="@android:color/transparent"
+                            android:hint="Địa chỉ Email (không bắt buộc)"
+                            android:textAlignment="textStart"
+                            android:textSize="16dp">
+
+
+                        </EditText>
+
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="left"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginTop="10dp"
+                    android:padding="5dp"
+                    android:text="ĐỊA CHỈ LIÊN LẠC"
+                    android:textColor="@color/colorPrimaryDark"
+                    android:textSize="14dp"
+                    android:textStyle="bold" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginRight="16dp"
+                    android:background="@color/white"
+                    android:orientation="horizontal"
+                    android:padding="10dp">
+
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="7"
+                        android:orientation="horizontal"
+                        android:paddingLeft="5dp">
+
+                        >
+
+                        <TextView
+                            android:id="@+id/tvCityy"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="6"
+                            android:background="@android:color/transparent"
+                            android:hint="Chọn Tỉnh/ Thành phố"
+                            android:textAlignment="textStart"
+                            android:textSize="16dp" />
+
+                        <ImageView
+                            android:id="@+id/imgCityy"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:src="@drawable/ic_baseline_chevron_right_24" />
+
+
+                    </LinearLayout>
+
+
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginRight="16dp"
+                    android:background="@color/white"
+                    android:orientation="horizontal"
+                    android:padding="10dp">
+
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="7"
+                        android:orientation="horizontal"
+                        android:paddingLeft="5dp">
+
+                        >
+
+                        <TextView
+                            android:id="@+id/tvDistrict"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="6"
+                            android:background="@android:color/transparent"
+                            android:hint="Chọn Quận/ Huyện"
+                            android:textAlignment="textStart"
+                            android:textSize="16dp" />
+
+                        <ImageView
+                            android:id="@+id/imgDistrict"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:src="@drawable/ic_baseline_chevron_right_24" />
+
+
+                    </LinearLayout>
+
+
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginRight="16dp"
+                    android:background="@color/white"
+                    android:orientation="horizontal"
+                    android:padding="10dp">
+
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="7"
+                        android:orientation="horizontal"
+                        android:paddingLeft="5dp">
+
+                        >
+
+                        <TextView
+                            android:id="@+id/tvWard"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="6"
+                            android:background="@android:color/transparent"
+                            android:hint="Chọn Phường/ Xã"
+                            android:textAlignment="textStart"
+                            android:textSize="16dp" />
+
+                        <ImageView
+                            android:id="@+id/imgWard"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:src="@drawable/ic_baseline_chevron_right_24" />
+
+
+                    </LinearLayout>
+
+
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginRight="16dp"
+                    android:background="@color/white"
+                    android:orientation="horizontal"
+                    android:padding="10dp">
+
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="7"
+                        android:orientation="horizontal"
+                        android:paddingLeft="5dp">
+
+                        >
+
+                        <TextView
+                            android:id="@+id/tvStreet"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="6"
+                            android:background="@android:color/transparent"
+                            android:hint="Số nhà, thôn, tổ, tên đường"
+                            android:textAlignment="textStart"
+                            android:textSize="16dp" />
+
+                        <ImageView
+                            android:id="@+id/imgStreet"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:src="@drawable/ic_baseline_chevron_right_24" />
+
+
+                    </LinearLayout>
+
+
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:background="@color/gray_btn_bg_color"
+                    android:orientation="vertical">
+
+
+                </LinearLayout>
+            </LinearLayout>
+        </ScrollView>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_gravity="bottom"
+        android:layout_weight="1">
+
+        <TextView
+            android:id="@+id/tvContinue"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginRight="20dp"
+            android:layout_marginBottom="10dp"
+            android:background="@drawable/border_login"
+            android:gravity="center"
+            android:padding="10dp"
+            android:text="Tiếp tục"
+            android:textColor="@color/white"
+            android:textSize="17dp" />
+    </LinearLayout>
+</LinearLayout>

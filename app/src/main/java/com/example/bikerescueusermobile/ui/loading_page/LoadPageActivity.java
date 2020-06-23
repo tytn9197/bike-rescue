@@ -10,6 +10,8 @@ import com.example.bikerescueusermobile.base.BaseActivity;
 import com.example.bikerescueusermobile.data.model.user.CurrentUser;
 import com.example.bikerescueusermobile.data.model.user.User;
 import com.example.bikerescueusermobile.ui.login.LoginActivity;
+import com.example.bikerescueusermobile.ui.otp_page.LoginByPhoneNumberActivity;
+import com.example.bikerescueusermobile.ui.register.CreatePasswordActivity;
 import com.google.gson.Gson;
 
 public class LoadPageActivity extends BaseActivity {
@@ -48,8 +50,8 @@ public class LoadPageActivity extends BaseActivity {
 //                        CurrentUser.getInstance().setPhoneNumber(fromReference.getPhoneNumber());
 //
 //                        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-//                        startActivity(intent);
-//                        finish();
+////                        startActivity(intent);
+////                        finish();
 //                    }
                 } catch (InterruptedException e) {
                     e.printStackTrace();

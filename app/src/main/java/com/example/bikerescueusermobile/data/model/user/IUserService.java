@@ -13,11 +13,15 @@ import retrofit2.http.POST;
 import retrofit2.http.PUT;
 import retrofit2.http.Part;
 import retrofit2.http.Path;
+import retrofit2.http.Query;
 
 public interface IUserService {
 
     @POST("/api/login")
     Single<User> login(@Body LoginData loginData);
 
+    @POST("/biker/register?roleName=ROLE_BIKER")
+    Single<User> register(@Body LoginData user);
 
+    Single<User> register(User user, String roleName);
 }

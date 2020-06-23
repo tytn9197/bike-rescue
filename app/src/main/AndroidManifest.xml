@@ -35,6 +35,8 @@
         <activity android:name=".ui.send_request.SendRequestActivity" />
         <activity android:name=".ui.confirm.ConfirmInfoActivity" />
         <activity android:name=".ui.update_info.UpdateInfoActivity" />
+        <activity android:name=".ui.create_request.CreateRequestActivity" />
+
 
 
         <activity android:name=".ui.map.MapActivity" />

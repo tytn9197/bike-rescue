@@ -11,6 +11,7 @@ import android.widget.Spinner;
 
 import com.example.bikerescueusermobile.R;
 import com.example.bikerescueusermobile.ui.main.MainActivity;
+import com.example.bikerescueusermobile.ui.register.CreatePasswordActivity;
 import com.google.firebase.auth.FirebaseAuth;
 
 public class LoginByPhoneNumberActivity extends AppCompatActivity {
@@ -37,11 +38,15 @@ public class LoginByPhoneNumberActivity extends AppCompatActivity {
                 return;
             }
 
-            String phoneNumber = "+" + code + number;
+            String phoneNumber = number;
 
-            Intent intent = new Intent(LoginByPhoneNumberActivity.this, VerifyActivity.class);
+
+
+//            Intent intent = new Intent(LoginByPhoneNumberActivity.this, VerifyActivity.class);
+            Intent intent = new Intent(LoginByPhoneNumberActivity.this, CreatePasswordActivity.class);
             intent.putExtra("phonenumber", phoneNumber);
             startActivity(intent);
+            finish();
 
         });
     }

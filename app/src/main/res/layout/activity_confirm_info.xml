@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/confirm_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/core_color"
+        />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:layout_marginTop="5dp"
+                android:padding="5dp"
+                android:text="Thông tin khách hàng"
+                android:textColor="@color/colorPrimaryDark"
+                android:textSize="20dp"
+                android:textStyle="bold" />
+
+            <EditText
+                android:id="@+id/edtName"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="5dp"
+                android:layout_marginTop="10dp"
+                android:drawableLeft="@drawable/ic_people_24"
+                android:hint=" Họ và tên"
+                android:inputType="text"
+                android:paddingBottom="15dp" />
+
+            <EditText
+                android:id="@+id/edtPhone"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="5dp"
+                android:layout_marginTop="5dp"
+                android:drawableLeft="@drawable/ic_phone_android_22"
+                android:hint=" Số điện thoại"
+                android:inputType="number"
+                android:paddingBottom="15dp" />
+
+            <EditText
+                android:id="@+id/edtMarker"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="5dp"
+                android:layout_marginTop="5dp"
+                android:drawableLeft="@drawable/ic_marker_24"
+                android:paddingBottom="15dp" />
+
+            <TextView
+                android:id="@+id/tvProblem"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"
+                android:drawableEnd="@drawable/ic_baseline_chevron_right_24"
+                android:padding="5dp"
+                android:text="Bạn gặp vấn đề gì ?"
+                android:textSize="16dp" />
+
+            <!--            <Spinner-->
+            <!--                android:id="@+id/spinner1"-->
+            <!--                android:layout_width="wrap_content"-->
+            <!--                android:layout_height="match_parent"-->
+            <!--                android:layout_gravity="center"-->
+            <!--                android:layout_marginBottom="10dp"/>-->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="16dp"
+                android:background="@color/grey" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:layout_marginTop="5dp"
+                android:padding="5dp"
+                android:text="Mô tả sản phẩm"
+                android:textColor="@color/colorPrimaryDark"
+                android:textSize="20dp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvBrand"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginEnd="20dp"
+                android:background="@drawable/border_white"
+                android:drawableStart="@drawable/ic_bike_24"
+                android:drawableEnd="@drawable/ic_baseline_chevron_right_24"
+                android:gravity="center"
+                android:padding="20dp"
+                android:text="Hãng Xe"
+                android:textSize="16dp"
+                android:textStyle="bold" />
+
+            <!--            <Spinner-->
+            <!--                android:id="@+id/spinner2"-->
+            <!--                android:layout_width="wrap_content"-->
+            <!--                android:layout_height="match_parent"-->
+            <!--                android:layout_gravity="center"-->
+            <!--                android:layout_marginLeft="30dp" />-->
+
+            <TextView
+                android:id="@+id/tvYear"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="20dp"
+                android:background="@drawable/border_white"
+                android:drawableStart="@drawable/ic_doi_xe_24"
+                android:drawableEnd="@drawable/ic_baseline_chevron_right_24"
+                android:gravity="center"
+                android:padding="20dp"
+                android:text="Đời Xe"
+                android:textSize="16dp"
+                android:textStyle="bold" />
+
+            <!--            <Spinner-->
+            <!--                android:id="@+id/spinner3"-->
+            <!--                android:layout_width="wrap_content"-->
+            <!--                android:layout_height="match_parent"-->
+            <!--                android:layout_gravity="center"-->
+            <!--                android:layout_marginLeft="30dp" />-->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="16dp"
+                android:background="@color/grey" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:layout_marginTop="5dp"
+                android:padding="5dp"
+                android:text="Thông tin thêm"
+                android:textColor="@color/colorPrimaryDark"
+                android:textSize="20dp"
+                android:textStyle="bold" />
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="100dp"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"
+                android:background="@drawable/custom_border_text"
+                android:hint="Bạn chưa có ghi chú nào. . . ."
+                android:inputType="text"
+                android:padding="6dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginTop="5dp"
+                android:padding="5dp"
+                android:text="Ảnh sản phẩm (nếu có):" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <ImageButton
+                    android:id="@+id/btnImg"
+                    android:layout_width="70dp"
+                    android:layout_height="50dp"
+                    android:layout_margin="5dp"
+                    android:background="@drawable/custom_border_text"
+                    android:src="@drawable/ic_camera_alt_24" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/btnBookService"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginRight="20dp"
+                android:layout_marginBottom="10dp"
+                android:background="@drawable/border_login"
+                android:gravity="center"
+                android:padding="10dp"
+                android:text="Xác nhận &amp; Gọi dịch vụ"
+                android:textColor="@color/white"
+                android:textSize="17dp" />
+        </LinearLayout>
+    </ScrollView>
+
+</LinearLayout>

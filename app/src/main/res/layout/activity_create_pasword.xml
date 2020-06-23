@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+
+    <!-- Toolbar -->
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/actionBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/core_color" />
+
+    <!-- Linear Create Password-->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="19"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="16dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginRight="16dp"
+            android:background="@drawable/border_pw"
+            android:orientation="horizontal"
+            android:padding="10dp">
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingLeft="5dp">
+
+                >
+
+                <TextView
+                    android:id="@+id/phoneNumber"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="8"
+                    android:background="@android:color/transparent"
+                    android:textAlignment="textStart"
+                    android:textSize="16dp" />
+
+
+            </LinearLayout>
+
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="16dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginRight="16dp"
+            android:background="@drawable/border_pw"
+            android:orientation="horizontal"
+            android:padding="10dp">
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingLeft="5dp">
+
+                >
+
+                <EditText
+                    android:id="@+id/newPassword"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="8"
+                    android:background="@android:color/transparent"
+                    android:hint="Mật khẩu mới"
+                    android:inputType="textPassword"
+                    android:textAlignment="textStart"
+                    android:textSize="16dp" />
+
+                <ImageView
+                    android:id="@+id/clearNewPw"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="2"
+                    android:src="@drawable/ic_baseline_clear_24"
+                    android:visibility="gone" />
+
+
+            </LinearLayout>
+
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="16dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginRight="16dp"
+            android:background="@drawable/border_pw"
+            android:orientation="horizontal"
+            android:padding="10dp">
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingLeft="5dp">
+
+                >
+
+                <EditText
+                    android:id="@+id/confirmPassword"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="8"
+                    android:background="@android:color/transparent"
+                    android:hint="Xác nhận mật khẩu mới"
+                    android:inputType="textPassword"
+                    android:textAlignment="textStart"
+                    android:textSize="16dp" />
+
+                <ImageView
+                    android:id="@+id/clearConfirmPw"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="2"
+                    android:src="@drawable/ic_baseline_clear_24"
+                    android:visibility="gone" />
+
+
+            </LinearLayout>
+
+
+        </LinearLayout>
+    </LinearLayout>
+
+
+    <!-- Linear Button Confirm-->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_weight="1"
+        android:orientation="horizontal"
+        android:padding="10dp">
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingLeft="5dp">
+
+            >
+
+            <TextView
+                android:id="@+id/tvConfirm"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginRight="20dp"
+                android:layout_marginBottom="10dp"
+                android:background="@drawable/border_login"
+                android:gravity="center"
+                android:padding="10dp"
+                android:text="Xác nhận"
+                android:textColor="@color/white"
+                android:textSize="17dp" />
+
+
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+</LinearLayout>

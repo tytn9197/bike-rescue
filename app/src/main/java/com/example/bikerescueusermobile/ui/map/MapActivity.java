@@ -15,6 +15,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.bikerescueusermobile.R;
+import com.example.bikerescueusermobile.ui.confirm.ConfirmInfoActivity;
 import com.example.bikerescueusermobile.ui.home.HomeFragmentConstants;
 import com.example.bikerescueusermobile.ui.send_request.SendRequestActivity;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -109,8 +110,9 @@ public class MapActivity extends AppCompatActivity implements
         btnMapBack = findViewById(R.id.btnMapBack);
 
         btnSendRequest.setOnClickListener(v -> {
-            Intent intent = new Intent(this, SendRequestActivity.class);
+            Intent intent = new Intent(this, ConfirmInfoActivity.class);
             startActivity(intent);
+            finish();
         });
 
         btnMapBack.setOnClickListener(v->{

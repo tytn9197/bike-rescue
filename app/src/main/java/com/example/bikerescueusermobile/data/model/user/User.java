@@ -22,6 +22,9 @@ public class User {
     @SerializedName("fullName")
     private String fullName;
 
+    @SerializedName("password")
+    private String password;
+
     @SerializedName("phoneNumber")
     private String phoneNumber;
 
@@ -30,6 +33,11 @@ public class User {
 
     public User(){
 
+    }
+
+    public User(String password, String phoneNumber) {
+        this.password = password;
+        this.phoneNumber = phoneNumber;
     }
 
     public int getId() {
@@ -94,5 +102,13 @@ public class User {
 
     public void setToken(String token) {
         this.token = token;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 }
