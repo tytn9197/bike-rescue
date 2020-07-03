@@ -1,12 +1,15 @@
 package com.example.bikerescueusermobile.ui.confirm;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.PersistableBundle;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -22,19 +25,23 @@ import androidx.appcompat.widget.Toolbar;
 
 import com.example.bikerescueusermobile.R;
 import com.example.bikerescueusermobile.base.BaseActivity;
+import com.example.bikerescueusermobile.data.model.user.CurrentUser;
 import com.example.bikerescueusermobile.ui.create_request.CreateRequestActivity;
 import com.example.bikerescueusermobile.ui.main.MainActivity;
 import com.example.bikerescueusermobile.ui.map.MapActivity;
 import com.example.bikerescueusermobile.ui.register.CreatePasswordActivity;
 import com.example.bikerescueusermobile.ui.send_request.SendRequestActivity;
 import com.example.bikerescueusermobile.ui.update_info.UpdateInfoActivity;
+import com.example.bikerescueusermobile.util.MyMethods;
+import com.github.dhaval2404.imagepicker.ImagePicker;
+
+import java.io.File;
 
 import butterknife.BindView;
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
 public class ConfirmInfoActivity extends BaseActivity {
 
-    private static final int REQUEST_IMAGE_CAPTURE = 101;
 //    @BindView(R.id.spinner1)
 //    Spinner problem;
 //
@@ -44,6 +51,7 @@ public class ConfirmInfoActivity extends BaseActivity {
 //    @BindView(R.id.spinner3)
 //    Spinner year;
 
+    private static final String TAG = "ConfirmInfoActivity";
 
     @BindView(R.id.confirm_toolbar)
     Toolbar toolbar;
@@ -88,133 +96,110 @@ public class ConfirmInfoActivity extends BaseActivity {
         getSupportActionBar().setTitle("Xác nhận thông tin");
 
 
-
         //test data
-        edtName.setText("Phan Gia Cường");
-        edtPhone.setText("0865137822");
-        edtMarker.setText("206/16 đường số 20 phường 5 quận Gò Vấp");
+        edtName.setText(CurrentUser.getInstance().getFullName());
+        edtPhone.setText(CurrentUser.getInstance().getPhoneNumber());
+        String mPlace = getIntent().getStringExtra("placeName");
+        edtMarker.setText(mPlace);
 
+        String serviceName = getIntent().getStringExtra("serviceName");
+        tvProblem.setOnClickListener(v -> {
+            AlertDialog.Builder builder = new AlertDialog.Builder(ConfirmInfoActivity.this);
+            builder.setTitle("Vấn đề của bạn");
+            String[] problems = getBaseContext().getResources().getStringArray(R.array.vande);
+            builder.setItems(problems, (dialog, which) -> {
+                //Toast.makeText(getApplicationContext(), "city: " + city[which], Toast.LENGTH_SHORT).show();
+                tvProblem.setText(problems[which]);
+            });
+            AlertDialog alertDialog = builder.create();
+            alertDialog.show();
+        });
+        if(serviceName.equals("")){
+            tvProblem.setText("Vấn đề của bạn");
+        }else {
+            String s = "Tôi cần " + serviceName.toLowerCase().trim() + ".";
+            tvProblem.setText(s);
+        }
 
+        tvBrand.setOnClickListener(v -> {
+            AlertDialog.Builder builder = new AlertDialog.Builder(ConfirmInfoActivity.this);
+            builder.setTitle("Hãng xe");
+            String[] brands = getBaseContext().getResources().getStringArray(R.array.hangxe);
+            builder.setItems(brands, (dialog, which) -> {
+                //Toast.makeText(getApplicationContext(), "city: " + city[which], Toast.LENGTH_SHORT).show();
+                tvBrand.setText(brands[which]);
+            });
 
-        tvProblem.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(ConfirmInfoActivity.this);
-                builder.setTitle("Vấn đề của bạn");
-                String[] problems = getBaseContext().getResources().getStringArray(R.array.vande);
-                builder.setItems(problems, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        //Toast.makeText(getApplicationContext(), "city: " + city[which], Toast.LENGTH_SHORT).show();
-                        tvProblem.setText(problems[which]);
-                    }
-                });
-
-                AlertDialog alertDialog = builder.create();
-                alertDialog.show();
-            }
+            AlertDialog alertDialog = builder.create();
+            alertDialog.show();
         });
 
+        tvYear.setOnClickListener(v -> {
+            AlertDialog.Builder builder = new AlertDialog.Builder(ConfirmInfoActivity.this);
+            builder.setTitle("Đời xe");
+            String[] year = getBaseContext().getResources().getStringArray(R.array.doixe);
+            builder.setItems(year, (dialog, which) -> {
+                //Toast.makeText(getApplicationContext(), "city: " + city[which], Toast.LENGTH_SHORT).show();
+                tvYear.setText(year[which]);
+            });
 
-        tvBrand.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(ConfirmInfoActivity.this);
-                builder.setTitle("Hãng xe");
-                String[] brands = getBaseContext().getResources().getStringArray(R.array.hangxe);
-                builder.setItems(brands, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        //Toast.makeText(getApplicationContext(), "city: " + city[which], Toast.LENGTH_SHORT).show();
-                        tvBrand.setText(brands[which]);
-                    }
-                });
-
-                AlertDialog alertDialog = builder.create();
-                alertDialog.show();
-            }
+            AlertDialog alertDialog = builder.create();
+            alertDialog.show();
         });
 
-        tvYear.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(ConfirmInfoActivity.this);
-                builder.setTitle("Đời xe");
-                String[] year = getBaseContext().getResources().getStringArray(R.array.doixe);
-                builder.setItems(year, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        //Toast.makeText(getApplicationContext(), "city: " + city[which], Toast.LENGTH_SHORT).show();
-                        tvYear.setText(year[which]);
-                    }
-                });
+        tvBookService.setOnClickListener(v -> {
 
-                AlertDialog alertDialog = builder.create();
-                alertDialog.show();
-            }
+            SweetAlertDialog sweetAlertDialog = new SweetAlertDialog(ConfirmInfoActivity.this, SweetAlertDialog.NORMAL_TYPE);
+            sweetAlertDialog.setTitleText("Thông báo");
+            sweetAlertDialog.setContentText("Quý khách xác nhận thực hiện gọi dịch vụ lúc này?");
+            sweetAlertDialog.setConfirmText("Xác nhận");
+            sweetAlertDialog.setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
+                @Override
+                public void onClick(SweetAlertDialog sDialog) {
+                    Intent intent = new Intent(getApplicationContext(), CreateRequestActivity.class);
+                    startActivity(intent);
+                    finish();
+                }
+            });
+            sweetAlertDialog.setCancelButton("Quay lại", sDialog -> {
+                sDialog.dismissWithAnimation();
+            });
+            sweetAlertDialog.show();
+
         });
 
-        tvBookService.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-
-                SweetAlertDialog sweetAlertDialog = new SweetAlertDialog(ConfirmInfoActivity.this, SweetAlertDialog.NORMAL_TYPE);
-                sweetAlertDialog.setTitleText("Thông báo");
-                sweetAlertDialog.setContentText("Quý khách xác nhận thực hiện gọi dịch vụ lúc này?");
-                sweetAlertDialog.setConfirmText("Xác nhận");
-                sweetAlertDialog.setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
-                    @Override
-                    public void onClick(SweetAlertDialog sDialog) {
-                        Intent intent = new Intent(getApplicationContext(), CreateRequestActivity.class);
-                        startActivity(intent);
-                        finish();
-                    }
-                });
-                sweetAlertDialog.setCancelButton("Quay lại", new SweetAlertDialog.OnSweetClickListener() {
-                    @Override
-                    public void onClick(SweetAlertDialog sDialog) {
-                        sDialog.dismissWithAnimation();
-                    }
-                });
-                sweetAlertDialog.show();
-
-            }
+        btnImg.setOnClickListener(v -> {
+            ImagePicker.Companion.with(this)
+                    .crop()                    //Crop image(Optional), Check Customization for more option
+                    .compress(1024)            //Final image size will be less than 1 MB(Optional)
+                    .maxResultSize(100, 100)    //Final image resolution will be less than 1080 x 1080(Optional)
+                    .start();
         });
-
-//        btnImg.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                Intent imageIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-//                if (imageIntent.resolveActivity(getParent().getPackageManager())!=null)
-//                {
-//                    startActivityForResult(imageIntent,REQUEST_IMAGE_CAPTURE);
-//                }
-//            }
-//        });
-
-
 
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == Activity.RESULT_OK) {
+            //get File object from ImagePicker
+            File file = ImagePicker.Companion.getFile(data);
 
-//    @Override
-//    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-//        super.onActivityResult(requestCode, resultCode, data);
-//        if (requestCode == REQUEST_IMAGE_CAPTURE) {
-//            Bundle extras = data.getExtras();
-//            Bitmap imageBipmap = (Bitmap) extras.get("data");
-//            btnImg.setImageBitmap(imageBipmap);
-//
-//        }
-//    }
+            // set path toi' hin`h do' thanh` bitmap
+            Bitmap myBitmap = BitmapFactory.decodeFile(file.getAbsolutePath());
+
+            //set image to image view
+            btnImg.setImageBitmap(myBitmap);
+        } else if (resultCode == ImagePicker.RESULT_ERROR) {
+            Log.e(TAG, "ImagePicker - Get image fail: " + ImagePicker.Companion.getError(data));
+        } else {
+            Log.e(TAG, "ImagePicker - Task Cancelled");
+        }
+    }
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
-
-            //Trở lại trang gọi dịch vụ
-
             finish();
         }
 

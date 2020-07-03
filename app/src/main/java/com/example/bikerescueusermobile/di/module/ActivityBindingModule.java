@@ -6,17 +6,15 @@ import com.example.bikerescueusermobile.ui.loading_page.LoadPageActivity;
 import com.example.bikerescueusermobile.ui.login.LoginActivity;
 import com.example.bikerescueusermobile.ui.main.MainActivity;
 import com.example.bikerescueusermobile.ui.main.MainFragmentBindingModule;
+import com.example.bikerescueusermobile.ui.map.MapFragmentBindingModule;
 import com.example.bikerescueusermobile.ui.register.CreatePasswordActivity;
 import com.example.bikerescueusermobile.ui.update_info.UpdateInfoActivity;
-
 import com.example.bikerescueusermobile.ui.map.MapActivity;
-
 import dagger.Module;
 import dagger.android.ContributesAndroidInjector;
 
 @Module
 public abstract class ActivityBindingModule {
-
 
     @ContributesAndroidInjector(modules = {MainFragmentBindingModule.class})
     abstract MainActivity bindMainActivity();
@@ -26,9 +24,6 @@ public abstract class ActivityBindingModule {
 
     @ContributesAndroidInjector
     abstract LoginActivity bindLoginActivity();
-
-    @ContributesAndroidInjector
-    abstract MapActivity bindMapActivity();
 
     @ContributesAndroidInjector
     abstract CreatePasswordActivity bindcreatePasswordActivity();
@@ -41,5 +36,8 @@ public abstract class ActivityBindingModule {
 
     @ContributesAndroidInjector
     abstract CreateRequestActivity createRequestActivity();
+
+    @ContributesAndroidInjector(modules = {MapFragmentBindingModule.class})
+    abstract MapActivity bindMapActivity();
 
 }

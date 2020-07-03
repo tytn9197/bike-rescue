@@ -66,7 +66,6 @@ public class ShopServiceListViewAdapter extends BaseAdapter {
         charText = charText.toLowerCase(Locale.getDefault());
         listAllShopServicesName = new ArrayList<>();
         if (charText.length() == 0) {
-            listAllShopServicesName.addAll(list);
         } else {
             for (int i = 0; i < list.size(); i++) {
                 if (list.get(i).getName().toLowerCase(Locale.getDefault()).contains(charText)) {

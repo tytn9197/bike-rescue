@@ -17,6 +17,7 @@ import com.willy.ratingbar.ScaleRatingBar;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -80,6 +81,9 @@ public class TopShopRecyclerViewAdapter  extends RecyclerView.Adapter<TopShopRec
         @BindView(R.id.topShopRatingBar)
         ScaleRatingBar topShopRatingBar;
 
+        @BindView(R.id.txtDistance)
+        TextView txtDistance;
+
         public ViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
@@ -96,9 +100,9 @@ public class TopShopRecyclerViewAdapter  extends RecyclerView.Adapter<TopShopRec
             txtTopShopNumberOfStar.setText(txtNumOfStar);
 
             topShopRatingBar.setRating(Float.parseFloat(shop.getShopRatingStar()));
+            txtDistance.setText(String.format(Locale.getDefault(),"Cách đây %.1f km", shop.getDistanceFromUser()));
 
-
-            wrapper.setOnClickListener((View.OnClickListener) v -> listener.onDetailSelected(shop));
+            wrapper.setOnClickListener(v -> listener.onDetailSelected(shop));
         }
 
     }

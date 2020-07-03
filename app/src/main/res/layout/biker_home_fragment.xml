@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.coordinatorlayout.widget.CoordinatorLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
         android:id="@+id/homeFragmentLayout"
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:background="@color/white"
+        >
 
     <fragment
         android:id="@+id/mapHome"
@@ -13,36 +15,33 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         />
-
 <!--    <RelativeLayout-->
 <!--        android:id="@+id/homeShopDetailBackground"-->
 <!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="160dp"-->
+<!--        android:layout_height="200dp"-->
 <!--        app:layout_anchor="@+id/mapHome"-->
 <!--        app:layout_anchorGravity="center|top"-->
 <!--        android:background="@drawable/border_opacity"-->
 <!--        android:alpha="0.4"-->
 <!--        android:layout_margin="10dp"-->
 <!--        android:padding="5dp"-->
-<!--        android:visibility="gone"-->
 <!--        />-->
 <!--    <RelativeLayout-->
 <!--        android:id="@+id/homeShopDetail"-->
 <!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="160dp"-->
+<!--        android:layout_height="200dp"-->
 <!--        app:layout_anchor="@+id/mapHome"-->
 <!--        app:layout_anchorGravity="center|top"-->
 <!--        android:layout_margin="10dp"-->
 <!--        android:padding="5dp"-->
-<!--        android:visibility="gone"-->
 <!--        >-->
 
 <!--        <TextView-->
-<!--            android:id="@+id/txtMapShopAddress"-->
+<!--            android:id="@+id/txtHomeShopName"-->
 <!--            android:layout_width="wrap_content"-->
 <!--            android:layout_height="wrap_content"-->
 <!--            android:layout_alignParentStart="true"-->
-<!--            android:layout_toStartOf="@id/txtMapShopRatingStarNum"-->
+<!--            android:layout_toStartOf="@id/txtHomeShopRatingStarNum"-->
 <!--            android:layout_margin="10dp"-->
 <!--            android:text="Tiệm Sửa Xe Minh Tuấn"-->
 <!--            android:textColor="@color/white"-->
@@ -60,7 +59,7 @@
 <!--            />-->
 
 <!--        <TextView-->
-<!--            android:id="@+id/txtMapShopRatingStarNum"-->
+<!--            android:id="@+id/txtHomeShopRatingStarNum"-->
 <!--            android:layout_width="wrap_content"-->
 <!--            android:layout_height="wrap_content"-->
 <!--            android:layout_alignParentTop="true"-->
@@ -77,44 +76,43 @@
 <!--            android:layout_marginTop="40dp"-->
 <!--            android:layout_alignParentStart="true"-->
 <!--            android:layout_alignParentEnd="true"-->
-<!--            android:layout_above="@id/imgShopLogo"-->
 <!--            android:background="@color/white" />-->
 
-<!--        <ImageView-->
-<!--            android:id="@+id/imgShopLogo"-->
-<!--            android:layout_width="wrap_content"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:layout_alignParentBottom="true"-->
-<!--            android:layout_marginTop="7dp"-->
-<!--            android:layout_alignParentStart="true"-->
-<!--            android:src="@drawable/ic_shop_white" />-->
+<!--        &lt;!&ndash;        <ImageView&ndash;&gt;-->
+<!--        &lt;!&ndash;            android:id="@+id/imgShopLogo"&ndash;&gt;-->
+<!--        &lt;!&ndash;            android:layout_width="wrap_content"&ndash;&gt;-->
+<!--        &lt;!&ndash;            android:layout_height="wrap_content"&ndash;&gt;-->
+<!--        &lt;!&ndash;            android:layout_alignParentBottom="true"&ndash;&gt;-->
+<!--        &lt;!&ndash;            android:layout_marginTop="7dp"&ndash;&gt;-->
+<!--        &lt;!&ndash;            android:layout_alignParentStart="true"&ndash;&gt;-->
+<!--        &lt;!&ndash;            android:src="@drawable/ic_shop_white" />&ndash;&gt;-->
 <!--        <ImageView-->
 <!--            android:id="@+id/imgDistance"-->
-<!--            android:layout_width="wrap_content"-->
-<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_width="35dp"-->
+<!--            android:layout_height="35dp"-->
 <!--            android:layout_below="@+id/shopDetailDivider"-->
-<!--            android:layout_toEndOf="@+id/imgShopLogo"-->
+<!--            android:layout_alignParentStart="true"-->
 <!--            android:layout_marginTop="5dp"-->
 <!--            android:src="@drawable/ic_distance" />-->
 <!--        <TextView-->
-<!--            android:id="@+id/txtShopAndCurrentLocationDistance"-->
+<!--            android:id="@+id/txtHomeShopAndCurrentLocationDistance"-->
 <!--            android:layout_width="wrap_content"-->
 <!--            android:layout_height="wrap_content"-->
 <!--            android:textColor="@color/white"-->
 <!--            android:text="Cách đây 10km"-->
 <!--            android:layout_toEndOf="@+id/imgDistance"-->
 <!--            android:layout_below="@+id/shopDetailDivider"-->
-<!--            android:layout_marginTop="17dp"-->
-<!--            android:layout_marginStart="5dp"-->
+<!--            android:layout_marginTop="10dp"-->
+<!--            android:layout_marginStart="15dp"-->
 <!--            android:layout_alignParentEnd="true"-->
-<!--            android:textSize="13sp"-->
+<!--            android:textSize="17sp"-->
 <!--            />-->
 <!--        <ImageView-->
 <!--            android:id="@+id/imgShopAddress"-->
-<!--            android:layout_width="wrap_content"-->
-<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_width="35dp"-->
+<!--            android:layout_height="35dp"-->
 <!--            android:layout_below="@+id/imgDistance"-->
-<!--            android:layout_toEndOf="@+id/imgShopLogo"-->
+<!--            android:layout_alignParentStart="true"-->
 <!--            android:src="@drawable/ic_location_white" />-->
 <!--        <TextView-->
 <!--            android:id="@+id/txtHomeShopAddress"-->
@@ -123,47 +121,72 @@
 <!--            android:textColor="@color/white"-->
 <!--            android:text="100 Phan Huy Ích, Tân Hòa, Gò Vấp, Gò Vấp,100 Phan Huy Ích, Tân Hòa, Gò Vấp, Gò Vấp"-->
 <!--            android:layout_toEndOf="@+id/imgDistance"-->
-<!--            android:layout_below="@+id/txtShopAndCurrentLocationDistance"-->
-<!--            android:layout_marginTop="23dp"-->
-<!--            android:layout_marginStart="5dp"-->
+<!--            android:layout_below="@+id/txtHomeShopAndCurrentLocationDistance"-->
+<!--            android:layout_marginTop="3dp"-->
+<!--            android:layout_marginStart="15dp"-->
 <!--            android:layout_alignParentEnd="true"-->
-<!--            android:textSize="12sp"-->
+<!--            android:textSize="16sp"-->
 <!--            />-->
 
 
+<!--        <TextView-->
+<!--            android:id="@+id/txtHomeShopServices"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:textColor="@color/white"-->
+<!--            android:text="Các dịch vụ: "-->
+<!--            android:layout_toEndOf="@+id/imgDistance"-->
+<!--            android:layout_below="@+id/txtHomeShopAddress"-->
+<!--            android:layout_marginTop="7dp"-->
+<!--            android:layout_marginStart="15dp"-->
+<!--            android:layout_alignParentEnd="true"-->
+<!--            android:textSize="16sp"-->
+<!--            />-->
+
+<!--        <TextView-->
+<!--            android:id="@+id/txtHomeEstimatePrice"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:textColor="@color/white"-->
+<!--            android:text="Giá tham khảo: "-->
+<!--            android:layout_toEndOf="@+id/imgDistance"-->
+<!--            android:layout_below="@+id/txtHomeShopServices"-->
+<!--            android:layout_marginTop="7dp"-->
+<!--            android:layout_marginStart="15dp"-->
+<!--            android:layout_alignParentEnd="true"-->
+<!--            android:textSize="16sp"-->
+<!--            />-->
 <!--    </RelativeLayout>-->
-<!--    <Button-->
-<!--        android:id="@+id/btnSendRequest"-->
+<!--    <LinearLayout-->
 <!--        android:layout_width="match_parent"-->
 <!--        android:layout_height="wrap_content"-->
-<!--        android:text="@string/button_send_request_text"-->
-<!--        android:background="@drawable/border_login"-->
-<!--        android:textColor="@color/white"-->
+<!--        android:orientation="horizontal"-->
 <!--        android:layout_marginStart="20dp"-->
 <!--        android:layout_marginEnd="20dp"-->
 <!--        android:layout_marginBottom="20dp"-->
 <!--        android:layout_marginTop="20dp"-->
 <!--        app:layout_anchor="@+id/mapHome"-->
-<!--        app:layout_anchorGravity="center|bottom"-->
-<!--        android:visibility="gone"/>-->
-
-
-    <!--    <EditText-->
-<!--        android:id="@+id/edtFindLocation"-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:background="@drawable/map_edit_text_background"-->
-<!--        android:textColor="@color/black"-->
-<!--        android:layout_marginStart="20dp"-->
-<!--        android:textSize="40sp"-->
-<!--        android:layout_marginEnd="20dp"-->
-<!--        android:layout_marginTop="20dp"-->
-<!--        app:layout_anchor="@+id/mapHome"-->
-<!--        android:drawableStart="@drawable/ic_location_30px"-->
-<!--        android:drawablePadding="5dp"-->
-<!--        android:maxLines="1"-->
-<!--        android:lines="1"-->
-<!--        android:singleLine="true"-->
-<!--        app:layout_anchorGravity="center|top"-->
-<!--        />-->
+<!--        app:layout_anchorGravity="center|bottom">-->
+<!--        <Button-->
+<!--            android:id="@+id/btnHomeSendRequest"-->
+<!--            android:layout_width="0dp"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_weight="5"-->
+<!--            android:text="@string/button_send_request_text"-->
+<!--            android:background="@drawable/border_login"-->
+<!--            android:textColor="@color/white"-->
+<!--            android:textAllCaps="false"-->
+<!--            />-->
+<!--        <Button-->
+<!--            android:id="@+id/btnHomeMapBack"-->
+<!--            android:layout_width="0dp"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_weight="5"-->
+<!--            android:text="Trở về"-->
+<!--            android:background="@drawable/border_red"-->
+<!--            android:textColor="@color/white"-->
+<!--            android:textAllCaps="false"-->
+<!--            android:layout_marginStart="10dp"-->
+<!--            />-->
+<!--    </LinearLayout>-->
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

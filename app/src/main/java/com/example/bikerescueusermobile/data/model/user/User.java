@@ -2,6 +2,8 @@ package com.example.bikerescueusermobile.data.model.user;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.util.Date;
+
 public class User {
 
     @SerializedName("userId")
@@ -29,7 +31,14 @@ public class User {
     private String phoneNumber;
 
     @SerializedName("accessToken")
-    private String token;
+    private String accessToken;
+
+    private String latitude;
+
+    private String longtitude;
+
+    @SerializedName("createdDate")
+    private String createdTime;
 
     public User(){
 
@@ -96,12 +105,12 @@ public class User {
         this.phoneNumber = phoneNumber;
     }
 
-    public String getToken() {
-        return token;
+    public String getAccessToken() {
+        return accessToken;
     }
 
-    public void setToken(String token) {
-        this.token = token;
+    public void setAccessToken(String token) {
+        this.accessToken = token;
     }
 
     public String getPassword() {
@@ -110,5 +119,29 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(String latitude) {
+        this.latitude = latitude;
+    }
+
+    public String getLongtitude() {
+        return longtitude;
+    }
+
+    public void setLongtitude(String longtitude) {
+        this.longtitude = longtitude;
+    }
+
+    public String getCreatedTime() {
+        return createdTime;
+    }
+
+    public void setCreatedTime(String createdTime) {
+        this.createdTime = createdTime;
     }
 }

@@ -5,7 +5,9 @@ import androidx.annotation.NonNull;
 import com.example.bikerescueusermobile.data.model.user.User;
 import com.google.gson.annotations.SerializedName;
 
-public class Shop {
+import java.io.Serializable;
+
+public class Shop implements Serializable {
 
     @SerializedName("id")
     private int id;
@@ -40,7 +42,10 @@ public class Shop {
 //    @SerializedName("user")
     private User user;
 
+    @SerializedName("numOfStart")
     private String shopRatingStar;
+
+    private double distanceFromUser;
 
     public Shop(int id, String shopName, String address, String shopRatingStar) {
         this.id = id;
@@ -146,6 +151,32 @@ public class Shop {
 
     public void setShopRatingStar(String shopRatingStar) {
         this.shopRatingStar = shopRatingStar;
+    }
+
+    public double getDistanceFromUser() {
+        return distanceFromUser;
+    }
+
+    public void setDistanceFromUser(double distanceFromUser) {
+        this.distanceFromUser = distanceFromUser;
+    }
+
+    @Override
+    public String toString() {
+        return "Shop{" +
+                "id=" + id +
+                ", shopName='" + shopName + '\'' +
+                ", address='" + address + '\'' +
+                ", phoneNumber='" + phoneNumber + '\'' +
+                ", email='" + email + '\'' +
+                ", avatarUrl='" + avatarUrl + '\'' +
+                ", description='" + description + '\'' +
+                ", status=" + status +
+                ", latitude='" + latitude + '\'' +
+                ", longtitude='" + longtitude + '\'' +
+                ", user=" + user +
+                ", shopRatingStar='" + shopRatingStar + '\'' +
+                "}\n";
     }
 }
 

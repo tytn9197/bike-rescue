@@ -18,11 +18,18 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
+import androidx.lifecycle.ViewModelProviders;
+import androidx.recyclerview.widget.LinearLayoutManager;
+
 import com.example.bikerescueusermobile.R;
 import com.example.bikerescueusermobile.base.BaseFragment;
-import com.example.bikerescueusermobile.ui.main.MyCurrentLocation;
+import com.example.bikerescueusermobile.data.model.shop.Shop;
+import com.example.bikerescueusermobile.ui.map.MapActivity;
+import com.example.bikerescueusermobile.ui.seach_shop_service.ShopServiceViewModel;
+import com.example.bikerescueusermobile.ui.seach_shop_service.TopShopRecyclerViewAdapter;
 import com.example.bikerescueusermobile.ui.send_request.SendRequestActivity;
 import com.example.bikerescueusermobile.util.MyMethods;
+import com.example.bikerescueusermobile.util.ViewModelFactory;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -42,35 +49,39 @@ import com.karumi.dexter.MultiplePermissionsReport;
 import com.karumi.dexter.PermissionToken;
 import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
+import com.mapbox.android.core.permissions.PermissionsListener;
+import com.mapbox.android.core.permissions.PermissionsManager;
+import com.mapbox.mapboxsdk.maps.Style;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Inject;
+
 import butterknife.BindView;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 
 
 public class HomeFragment extends BaseFragment
-        implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener, GoogleMap.OnMapClickListener, GoogleMap.OnMyLocationChangeListener {
+        implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener, GoogleMap.OnMapClickListener, GoogleMap.OnMyLocationChangeListener, PermissionsListener {
     @Override
     protected int layoutRes() {
         return R.layout.biker_home_fragment;
     }
 
-    private boolean mLocationPermissionGranted = false;
+    private static final String TAG = "HomeFragment";
+
     private GoogleMap mMap;
-    private LatLng mLastKnownLocation;
     private FusedLocationProviderClient mFusedLocationProviderClient;
-    private GeoDataClient mGeoDataClient;
-    private PlaceDetectionClient mPlaceDetectionClient;
-    View mapView;
-    private Marker mMarker;
-
     private Location currentLocation;
+    private PermissionsManager permissionsManager;
+    private ShopServiceViewModel viewModel;
 
+    private List<Shop> listShop;
 
-
-//    @BindView(R.id.edtFindLocation)
-//    EditText edtFindLocation;
+    @Inject
+    ViewModelFactory viewModelFactory;
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
@@ -78,235 +89,126 @@ public class HomeFragment extends BaseFragment
         SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager()
                 .findFragmentById(R.id.mapHome);
         mapFragment.getMapAsync(this);
-        mapView = mapFragment.getView();
+        viewModel = ViewModelProviders.of(getActivity(), viewModelFactory).get(ShopServiceViewModel.class);
     }
-
-
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        if (mLocationPermissionGranted) {
+        if (PermissionsManager.areLocationPermissionsGranted(getActivity())) {
             if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                 return;
             }
             googleMap.setMyLocationEnabled(true);
             mMap.getUiSettings().setMyLocationButtonEnabled(true);
+            getDeviceLocation();
+        } else {
+            permissionsManager = new PermissionsManager(this);
+            permissionsManager.requestLocationPermissions(getActivity());
         }
-        changeMyLocationButtonPosition();
         updateLocationUI();
 
-        if(mLocationPermissionGranted){
-            getDeviceLocation();
+        // get shop by service name then set shop's marker
+        String serviceName = getActivity().getIntent().getStringExtra("serviceName");
+        if (!serviceName.equals("")) {
+            viewModel.getShopByServiceName(serviceName)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(listShop -> {
+                        if (listShop != null) {
+                            this.listShop = listShop;
+                            for (int i = 0; i < listShop.size(); i++) {
+                                googleMap.addMarker(new MarkerOptions()
+                                        .position(new LatLng(Double.parseDouble(listShop.get(i).getLatitude()), Double.parseDouble(listShop.get(i).getLongtitude())))
+                                        .title(listShop.get(i).getShopName()));
+                            }
+                            MyMethods.setDistance(listShop);
+                        }
+                    }, throwable -> {
+                        Log.e("SearchShopService", "getShopByServiceName: " + throwable.getMessage());
+                    });
         }
 
-        LatLng s1 = new LatLng(10.7798827, 106.6333353);
-        LatLng s2 = new LatLng(10.7798827, 106.6333353);
-        LatLng s3 = new LatLng(10.7916663, 106.6351864);
-        LatLng s4 = new LatLng(10.7801671, 106.6311021);
-        LatLng s5 = new LatLng(10.7829047,106.6272502 );
-        LatLng s6 = new LatLng(10.7597079,106.6316521 );
-        List<LatLng> list = new ArrayList<>();
-        list.add(s1);
-        list.add(s2);
-        list.add(s3);
-        list.add(s4);
-        list.add(s5);
-        list.add(s6);
-
-        for (int i = 0; i <list.size(); i++) {
-            googleMap.addMarker(new MarkerOptions().position(list.get(i))
-                    .title("Tiem " + i));
-        }
-
-//        mMarker = googleMap.addMarker(new MarkerOptions().position(list.get(0))
-//                .title("Tiệm sửa xe La Thành").snippet("Địa chỉ 61 Hoàng Thiều Hoa, Hiệp Tân, Tân Phú"));
         googleMap.setOnMarkerClickListener(this);
         googleMap.setOnMapClickListener(this);
         googleMap.setOnMyLocationChangeListener(this);
-        if(currentLocation != null) {
-            googleMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude())));
-        }else {
-            googleMap.moveCamera(CameraUpdateFactory.newLatLng(s1));
-        }
-
-        if(MyCurrentLocation.getInstance().getCurrentLocation() != null) {
-            Log.e("aaaaa", "lat: " + MyCurrentLocation.getInstance().getCurrentLocation().latitude + " ----long: " + MyCurrentLocation.getInstance().getCurrentLocation().longitude);
-        }else{
-            Log.e("aaaa", "null");
-        }
+        LatLng hcm = new LatLng(10.8229002, 106.7048471);
+        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(hcm, 10));
     }
 
-    private void changeMyLocationButtonPosition(){
-        if (mapView != null &&
-                mapView.findViewById(Integer.parseInt("1")) != null) {
-//            // Get the button view
-//            View locationButton = ((View) mapView.findViewById(Integer.parseInt("1")).getParent()).findViewById(Integer.parseInt("2"));
-//            // and next place it, on bottom right (as Google Maps app)
-//            RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams)
-//                    locationButton.getLayoutParams();
-//            layoutParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT, 0);
-//            layoutParams.addRule(RelativeLayout.ALIGN_PARENT_TOP, RelativeLayout.TRUE);
-//            layoutParams.setMargins(0, 10, 10, 10);
-//            try {
-//                locationButton.setBackground(Drawable.createFromXml(getResources(), getResources().getXml(R.xml.circle_button)));
-//            }catch (Exception ex){
-//                Log.e(TAG, "changeMyLocationButtonPosition - " + ex.getMessage());
-//            }
-            //change position google map logo
-            View googleLogo = mapView.findViewWithTag("GoogleWatermark");
-            RelativeLayout.LayoutParams glLayoutParams = (RelativeLayout.LayoutParams)googleLogo.getLayoutParams();
-            googleLogo.setLayoutParams(glLayoutParams);
-            googleLogo.setVisibility(View.GONE);
-        }
-
-    }
-
-    private void initGrantAppPermission(){
-        mLocationPermissionGranted = false;
-        Dexter.withContext(getActivity())
-                .withPermissions(
-                        Manifest.permission.ACCESS_COARSE_LOCATION,
-                        Manifest.permission.ACCESS_FINE_LOCATION,
-                        Manifest.permission.CAMERA,
-                        Manifest.permission.READ_EXTERNAL_STORAGE,
-                        Manifest.permission.WRITE_EXTERNAL_STORAGE
-                )
-                .withListener(new MultiplePermissionsListener() {
-                    @Override
-                    public void onPermissionsChecked(MultiplePermissionsReport report) {
-                        // check if all permissions are granted or not
-                        if (report.areAllPermissionsGranted()) {
-                            mLocationPermissionGranted = true;
-                            updateLocationUI();
-                        }
-                        // check for permanent denial of any permission show alert dialog
-                        if (report.isAnyPermissionPermanentlyDenied()) {
-                            // open Settings activity
-                            showSettingsDialog();
-                        }
-                    }
-
-                    @Override
-                    public void onPermissionRationaleShouldBeShown(List<PermissionRequest> permissions, PermissionToken token) {
-                        token.continuePermissionRequest();
-                    }
-                }).withErrorListener(error -> Log.e("HomeFragment", "" + error ))
-                .onSameThread()
-                .check();
-    }
-
-    private void showSettingsDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setTitle(getString(R.string.message_need_permission));
-        builder.setMessage(getString(R.string.message_permission));
-        builder.setPositiveButton(getString(R.string.title_go_to_setting), (dialog, which) -> {
-            dialog.cancel();
-            openSettings();
-        });
-        builder.show();
-    }
-
-    private void openSettings() {
-        Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-        Uri uri = Uri.fromParts("package", getActivity().getPackageName(), null);
-        intent.setData(uri);
-        startActivityForResult(intent, 101);
-    }
-
+    @SuppressWarnings({"MissingPermission"})
     private void updateLocationUI() {
         if (mMap == null) {
             return;
         }
         try {
-            if (mLocationPermissionGranted) {
-                mMap.setMyLocationEnabled(true);
-                mMap.getUiSettings().setMyLocationButtonEnabled(true);
-            } else {
-                mMap.setMyLocationEnabled(false);
-                mMap.getUiSettings().setMyLocationButtonEnabled(false);
-                mLastKnownLocation = null;
-                initGrantAppPermission();
-            }
-        } catch (SecurityException e)  {
+            mMap.setMyLocationEnabled(true);
+            mMap.getUiSettings().setMyLocationButtonEnabled(true);
+        } catch (SecurityException e) {
             Log.e("Exception: %s", e.getMessage());
         }
     }
 
-    public void getDeviceLocation(){
-        mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getActivity());
-        try {
-            if(mLocationPermissionGranted){
+    @SuppressWarnings({"MissingPermission"})
+    public void getDeviceLocation() {
+        if (PermissionsManager.areLocationPermissionsGranted(getActivity())) {
+            mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getActivity());
+            try {
                 Task location = mFusedLocationProviderClient.getLastLocation();
                 location.addOnCompleteListener(task -> {
-                    if(task.isSuccessful()){
-                        Log.d(HomeFragmentConstants.TAG,"onComplete: found location!");
+                    if (task.isSuccessful()) {
                         currentLocation = (Location) task.getResult();
-                        MyCurrentLocation.getInstance().setCurrentLocation(new LatLng(currentLocation.getLatitude(),currentLocation.getLongitude()));
-                        MyMethods.moveCamera(mMap, new LatLng(currentLocation.getLatitude(),currentLocation.getLongitude()),
-                                HomeFragmentConstants.DEFAULT_ZOOM_VALUE);
-                    }else{
-                        Log.d(HomeFragmentConstants.TAG,"onComplete: currents locaiton is null!");
+                    } else {
                         Toast.makeText(getActivity(), "Không thể lấy vị trí này", Toast.LENGTH_SHORT).show();
-
                     }
                 });
+            } catch (SecurityException e) {
+                Log.e(TAG, "getDeviceLocation: SecurityException: " + e.getMessage());
             }
-        }catch (SecurityException e){
-            Log.e(HomeFragmentConstants.TAG,"getDeviceLocation: SecurityException: "+e.getMessage());
+        } else {
+            permissionsManager = new PermissionsManager(this);
+            permissionsManager.requestLocationPermissions(getActivity());
         }
     }
 
     @Override
     public boolean onMarkerClick(Marker marker) {
-//        btnSendRequest.setVisibility(View.VISIBLE);
-//        homeShopDetail.setVisibility(View.VISIBLE);
-//        homeShopDetailBackground.setVisibility(View.VISIBLE);
-
+        for (int i = 0; i < listShop.size(); i++) {
+            if (Double.parseDouble(listShop.get(i).getLatitude()) == marker.getPosition().latitude
+                    && Double.parseDouble(listShop.get(i).getLongtitude()) == marker.getPosition().longitude) {
+                ((MapActivity) getActivity()).setShopDetailToMapbox(listShop.get(i));
+            }
+        }
         return false;
     }
 
     @Override
     public void onMapClick(LatLng latLng) {
-//        btnSendRequest.setVisibility(View.GONE);
-//        homeShopDetail.setVisibility(View.GONE);
-//        homeShopDetailBackground.setVisibility(View.GONE);
 
     }
-
 
     @Override
     public void onMyLocationChange(Location location) {
-        if(location != null){
-            MyCurrentLocation.getInstance().setCurrentLocation(new LatLng(currentLocation.getLatitude(),currentLocation.getLongitude()));
-        }
+
     }
 
+    @Override
+    public void onExplanationNeeded(List<String> permissionsToExplain) {
+        Log.e(TAG, "onExplanationNeeded: " + permissionsToExplain.toString());
+    }
 
-//    private void searchLocation(){
-//        Log.d(HomeFragmentConstants.TAG,"searchLocation start");
-//
-//        String searchString = edtFindLocation.getText().toString();
-//
-//        Geocoder geocoder = new Geocoder(getActivity());
-//        List<Address> list = new ArrayList<>();
-//        try {
-//            list = geocoder.getFromLocationName(searchString,1);
-//        }catch (IOException e){
-//            Log.e(HomeFragmentConstants.TAG,"searchLocation: get list "+e.getMessage());
-//        }
-//
-//        if(list.size() > 0){
-//            Address address = list.get(0);
-//            MyMethods.moveCamera(mMap,new LatLng(address.getLatitude(),address.getLongitude()),
-//                    HomeFragmentConstants.DEFAULT_ZOOM_VALUE,
-//                    address.getAddressLine(0));
-//            Log.d(HomeFragmentConstants.TAG,"searchLocation end");
-//        }
-//    }
-//
-//    private void hideSoftKeyboard(){
-//        getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
-//    }
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        permissionsManager.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    }
 
+    @Override
+    public void onPermissionResult(boolean granted) {
+        if (granted) {
+            updateLocationUI();
+            getDeviceLocation();
+        } else {
+            Log.e(TAG, "onPermissionResult: Khong co quyen truy cap");
+        }
+    }
 }

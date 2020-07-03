@@ -1,5 +1,6 @@
 package com.example.bikerescueusermobile.ui.seach_shop_service;
 
+import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.example.bikerescueusermobile.data.model.shop.Shop;
@@ -18,23 +19,41 @@ public class ShopServiceViewModel extends ViewModel {
 
     private final ShopServicesRepository shopServicesRepository;
     private final ShopRepository shopRepository;
+    private final MutableLiveData<Boolean> loading = new MutableLiveData<>();
+
+    public MutableLiveData<Boolean> getLoading() {
+        return loading;
+    }
+
+    public void setLoading(boolean isLoad){
+        loading.setValue(isLoad);
+    }
 
     @Inject
     public ShopServiceViewModel(ShopServicesRepository shopServicesRepository, ShopRepository shopRepository) {
+        loading.setValue(true);
         this.shopServicesRepository = shopServicesRepository;
         this.shopRepository = shopRepository;
     }
 
     public Single<List<ShopService>> getAllServices() {
-        return shopServicesRepository.getAllServices(CurrentUser.getInstance().getToken());
+        loading.setValue(true);
+        return shopServicesRepository.getAllServices(CurrentUser.getInstance().getAccessToken());
     }
 
     public Single<List<ShopService>> getTop3Services(){
-        return shopServicesRepository.getTop3Services(CurrentUser.getInstance().getToken());
+        loading.setValue(true);
+        return shopServicesRepository.getTop3Services(CurrentUser.getInstance().getAccessToken());
     }
 
     public Single<List<Shop>> getTop5Shop(){
-        return shopRepository.getTop5Shop(CurrentUser.getInstance().getToken());
+        loading.setValue(true);
+        return shopRepository.getTop5Shop(CurrentUser.getInstance().getAccessToken());
+    }
+
+    public Single<List<Shop>> getShopByServiceName(String serviceName){
+        loading.setValue(true);
+        return shopRepository.getShopByServiceName(CurrentUser.getInstance().getAccessToken(), serviceName);
     }
 
 }

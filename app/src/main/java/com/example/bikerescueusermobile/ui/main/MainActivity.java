@@ -3,6 +3,7 @@ package com.example.bikerescueusermobile.ui.main;
 import android.Manifest;
 import android.app.AlertDialog;
 import android.content.Intent;
+import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
@@ -12,14 +13,17 @@ import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.widget.Toolbar;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.example.bikerescueusermobile.R;
 import com.example.bikerescueusermobile.base.BaseActivity;
+import com.example.bikerescueusermobile.data.model.user.CurrentUser;
 import com.example.bikerescueusermobile.ui.favorite.FavoriteShopFragment;
 import com.example.bikerescueusermobile.ui.history.HistoryFragment;
 import com.example.bikerescueusermobile.ui.home.HomeFragment;
@@ -27,6 +31,9 @@ import com.example.bikerescueusermobile.ui.login.LoginActivity;
 import com.example.bikerescueusermobile.ui.profile.ProfileFragment;
 import com.example.bikerescueusermobile.ui.seach_shop_service.SearchShopServiceFragment;
 import com.example.bikerescueusermobile.util.SharedPreferenceHelper;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
 import com.karumi.dexter.Dexter;
@@ -43,6 +50,13 @@ import butterknife.BindView;
 
 public class MainActivity extends BaseActivity {
 
+    @Override
+    protected int layoutRes() {
+        return R.layout.activity_main;
+    }
+
+    private static final String TAG = "MainActivity";
+
     @BindView(R.id.drawer)
     DrawerLayout drawer;
 
@@ -55,36 +69,44 @@ public class MainActivity extends BaseActivity {
     @BindView(R.id.mainRotateloading)
     RotateLoading rotateLoading;
 
-    @BindView(R.id.mapContainer)
-    FrameLayout mapContainer;
-
     private Fragment fragment; // use it to change fragment
-    private Fragment homeFragment;
-    private Fragment historyFragment;
-    private Fragment profileFragment;
 
     @BindView(R.id.bottomNav)
     BottomNavigationView bottomNavigationView;
 
-    @Override
-    protected int layoutRes() {
-        return R.layout.activity_main;
-    }
+    private FusedLocationProviderClient fusedLocationClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         init();
         initGrantAppPermission();
-        bottomNavigationView.setOnNavigationItemSelectedListener(mOnBottomNavigationItemSelectedListener);
-
-        FragmentManager manager = getSupportFragmentManager();
-        manager.beginTransaction().replace(R.id.mapContainer, new HomeFragment()).commit();
+        getCurrentLocation();
 
 //        UpdateDevice device = new UpdateDevice(token);
 //        viewModel.updateFcm(CurrentUser.getInstance().getToken(), CurrentUser.getInstance().getId(), device);
 //        CurrentUser.getInstance().setDeviceToken(token);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        Fragment fragment = getSupportFragmentManager().findFragmentByTag("profileTag");
+        if (fragment != null) {
+            fragment.onActivityResult(requestCode, resultCode, data);
+        }
+    }
+
+    @SuppressWarnings({"MissingPermission"})
+    private void getCurrentLocation(){
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        fusedLocationClient.getLastLocation()
+                .addOnSuccessListener(this, location -> {
+                    if (location != null) {
+                        CurrentUser.getInstance().setLatitude(""+location.getLatitude());
+                        CurrentUser.getInstance().setLongtitude(""+location.getLongitude());
+                    }
+                });
     }
 
     private void initGrantAppPermission(){
@@ -98,8 +120,7 @@ public class MainActivity extends BaseActivity {
                     public void onPermissionsChecked(MultiplePermissionsReport report) {
                         // check if all permissions are granted or not
                         if (report.areAllPermissionsGranted()) {
-//                            fragment = new SearchShopServiceFragment();
-//                            replaceFragment();
+                            Log.d(TAG, "onPermissionsChecked: " + "all permissions are granted");
                         }
                         // check for permanent denial of any permission show alert dialog
                         if (report.isAnyPermissionPermanentlyDenied()) {
@@ -136,11 +157,8 @@ public class MainActivity extends BaseActivity {
     }
 
     private void init(){
-        homeFragment = new SearchShopServiceFragment();
-        historyFragment = new HistoryFragment();
-        profileFragment = new ProfileFragment();
         //init a home page when login
-        fragment = homeFragment;
+        fragment = new SearchShopServiceFragment();
         replaceFragment();
 
         setSupportActionBar(toolbar);
@@ -151,14 +169,7 @@ public class MainActivity extends BaseActivity {
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.menu);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
         navigation.setNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
-//        View header = navigation.getHeaderView(0);
-//        fullname = header.findViewById(R.id.txtName);
-////        avatar = header.findViewById(R.id.head_avatar);
-////        Picasso.with(this).load(CurrentUser.getInstance().getAvatarUrl()).placeholder(R.mipmap.user).into(avatar);
-//        avatar = header.findViewById(R.id.head_avatar);
-//        Picasso.with(this).load(CurrentUser.getInstance().getAvatarUrl()).placeholder(R.mipmap.user).into(avatar);
-//        switchCompat = header.findViewById(R.id.is_online);
-//        fullname.setText(CurrentUser.getInstance().getFullname());
+        bottomNavigationView.setOnNavigationItemSelectedListener(mOnBottomNavigationItemSelectedListener);
     }
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnBottomNavigationItemSelectedListener
@@ -188,7 +199,6 @@ public class MainActivity extends BaseActivity {
             new NavigationView.OnNavigationItemSelectedListener() {
                 @Override
                 public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-//                    closeNotification();
                     switch (item.getItemId()) {
                         case R.id.nav_feed:
                             fragment = new SearchShopServiceFragment();
@@ -197,7 +207,11 @@ public class MainActivity extends BaseActivity {
                             return true;
                         case R.id.nav_editPro:
                             fragment = new ProfileFragment();
-                            replaceFragment();
+//                            replaceFragment();
+                            FragmentManager fragmentManager = getSupportFragmentManager();
+                            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                            fragmentTransaction.add(R.id.frame_container,fragment,"profileTag");
+                            fragmentTransaction.commit();
                             drawer.close();
                             return true;
                         case R.id.nav_introduce:
@@ -209,7 +223,6 @@ public class MainActivity extends BaseActivity {
                             SharedPreferenceHelper.setSharedPreferenceString(MainActivity.this, "user", "");
                             Intent intentLog = new Intent(MainActivity.this, LoginActivity.class);
                             startActivity(intentLog);
-//                            goesOffline();
                             finish();
                             return true;
                     }
