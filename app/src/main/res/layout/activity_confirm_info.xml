@@ -91,7 +91,7 @@
                 android:layout_gravity="center"
                 android:layout_marginTop="5dp"
                 android:padding="5dp"
-                android:text="Mô tả sản phẩm"
+                android:text="Thông tin xe"
                 android:textColor="@color/colorPrimaryDark"
                 android:textSize="20dp"
                 android:textStyle="bold" />
@@ -200,7 +200,7 @@
                 android:background="@drawable/border_login"
                 android:gravity="center"
                 android:padding="10dp"
-                android:text="Xác nhận &amp; Gọi dịch vụ"
+                android:text="Yêu cầu dịch vụ"
                 android:textColor="@color/white"
                 android:textSize="17dp" />
         </LinearLayout>

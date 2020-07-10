@@ -9,7 +9,9 @@ import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.FrameLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -30,6 +32,7 @@ import com.example.bikerescueusermobile.ui.home.HomeFragment;
 import com.example.bikerescueusermobile.ui.login.LoginActivity;
 import com.example.bikerescueusermobile.ui.profile.ProfileFragment;
 import com.example.bikerescueusermobile.ui.seach_shop_service.SearchShopServiceFragment;
+import com.example.bikerescueusermobile.util.MyMethods;
 import com.example.bikerescueusermobile.util.SharedPreferenceHelper;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
@@ -46,6 +49,7 @@ import com.victor.loading.rotate.RotateLoading;
 import java.util.List;
 
 import butterknife.BindView;
+import de.hdodenhof.circleimageview.CircleImageView;
 
 
 public class MainActivity extends BaseActivity {
@@ -74,6 +78,8 @@ public class MainActivity extends BaseActivity {
     @BindView(R.id.bottomNav)
     BottomNavigationView bottomNavigationView;
 
+    private CircleImageView head_avatar;
+    private TextView txtHeaderName;
     private FusedLocationProviderClient fusedLocationClient;
 
     @Override
@@ -82,6 +88,13 @@ public class MainActivity extends BaseActivity {
         init();
         initGrantAppPermission();
         getCurrentLocation();
+
+        // set header image & name
+        View header =navigation.getHeaderView(0);
+        head_avatar = header.findViewById(R.id.head_avatar);
+        txtHeaderName = header.findViewById(R.id.txtName);
+        txtHeaderName.setText(CurrentUser.getInstance().getFullName());
+        head_avatar.setImageBitmap(MyMethods.stringToBitmap(CurrentUser.getInstance().getAvatarUrl()));
 
 //        UpdateDevice device = new UpdateDevice(token);
 //        viewModel.updateFcm(CurrentUser.getInstance().getToken(), CurrentUser.getInstance().getId(), device);

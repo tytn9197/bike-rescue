@@ -13,7 +13,6 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -163,7 +162,7 @@ public class MapActivity extends DaggerAppCompatActivity implements
         txtShopAndCurrentLocationDistance.setText(String.format("Cách đây %.1f km", shop.getDistanceFromUser()));
         String services = "Các dịch vụ: " + "thay bình, thay nhớt, vá lốp xe,...";
         txtMapShopServices.setText(services);
-        String price = "Giá tham khảo: " + "100k ~ 200k";
+        String price = "Giá: " + "100k ~ 200k";
         txtMapEstimatePrice.setText(price);
     }
 
@@ -440,19 +439,21 @@ public class MapActivity extends DaggerAppCompatActivity implements
                     .query(Point.fromLngLat(point.longitude(), point.latitude()))
                     .geocodingTypes(GeocodingCriteria.TYPE_ADDRESS)
                     .build();
-            Log.e(TAG, "MapboxGeocoding: " + point.longitude() + " lat: " + point.latitude());
 
             client.enqueueCall(new Callback<GeocodingResponse>() {
                 @Override
                 public void onResponse(Call<GeocodingResponse> call, Response<GeocodingResponse> response) {
 
                     if (response.body() != null) {
+
                         List<CarmenFeature> results = response.body().features();
+                        Log.e(TAG, "response.body().toJson() = " + response.body().toJson());
+
                         if (results.size() > 0) {
                             // If the geocoder returns a result, we take the first in the list and show a Toast with the place name.
                             CarmenFeature feature = results.get(0);
-                            Log.e(TAG, "MY PLACE NAME: " + feature.address());
-                            mPlaceName = feature.address();
+                            Log.e(TAG, "MY PLACE NAME: " + feature.placeName());
+                            mPlaceName = feature.placeName();
                         } else {
                             Log.e(TAG, "ReverseGeocode fail - results.size() <= 0!!");
                         }
