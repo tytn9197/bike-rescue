@@ -12,6 +12,7 @@ import com.example.bikerescueusermobile.data.model.user.User;
 import com.example.bikerescueusermobile.ui.login.LoginActivity;
 import com.example.bikerescueusermobile.ui.otp_page.LoginByPhoneNumberActivity;
 import com.example.bikerescueusermobile.ui.register.CreatePasswordActivity;
+import com.example.bikerescueusermobile.ui.shopMain.ShopMainActivity;
 import com.google.gson.Gson;
 
 public class LoadPageActivity extends BaseActivity {

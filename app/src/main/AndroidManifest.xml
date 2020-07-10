@@ -32,13 +32,19 @@
             </intent-filter>
         </activity>
         <activity android:name=".ui.main.MainActivity" />
+        <activity android:name=".ui.shopMain.ShopMainActivity" />
         <activity android:name=".ui.login.LoginActivity" />
         <activity android:name=".ui.register.CreatePasswordActivity" />
         <activity android:name=".ui.send_request.SendRequestActivity" />
         <activity android:name=".ui.confirm.ConfirmInfoActivity" />
         <activity android:name=".ui.update_info.UpdateInfoActivity" />
         <activity android:name=".ui.create_request.CreateRequestActivity" />
+        <activity android:name=".ui.shop_owner.ShopRequestDetailActivity" />
+        <activity android:name=".ui.shop_owner.ShopUpdateInfoActivity" />
+
+
         <activity android:name=".ui.map.MapActivity" />
+
 
         <service android:name=".ui.create_request.SendNotificationService"
             android:exported="false"

@@ -8,6 +8,10 @@ import com.example.bikerescueusermobile.ui.main.MainActivity;
 import com.example.bikerescueusermobile.ui.main.MainFragmentBindingModule;
 import com.example.bikerescueusermobile.ui.map.MapFragmentBindingModule;
 import com.example.bikerescueusermobile.ui.register.CreatePasswordActivity;
+import com.example.bikerescueusermobile.ui.shopMain.ShopMainActivity;
+import com.example.bikerescueusermobile.ui.shopMain.ShopMainFragmentBindingModule;
+import com.example.bikerescueusermobile.ui.shop_owner.ShopRequestDetailActivity;
+import com.example.bikerescueusermobile.ui.shop_owner.ShopUpdateInfoActivity;
 import com.example.bikerescueusermobile.ui.update_info.UpdateInfoActivity;
 import com.example.bikerescueusermobile.ui.map.MapActivity;
 import dagger.Module;
@@ -18,6 +22,9 @@ public abstract class ActivityBindingModule {
 
     @ContributesAndroidInjector(modules = {MainFragmentBindingModule.class})
     abstract MainActivity bindMainActivity();
+
+    @ContributesAndroidInjector(modules = {ShopMainFragmentBindingModule.class})
+    abstract ShopMainActivity bindShopMainActivity();
 
     @ContributesAndroidInjector
     abstract LoadPageActivity bindLoadPageActivity();
@@ -39,5 +46,11 @@ public abstract class ActivityBindingModule {
 
     @ContributesAndroidInjector(modules = {MapFragmentBindingModule.class})
     abstract MapActivity bindMapActivity();
+
+    @ContributesAndroidInjector
+    abstract ShopUpdateInfoActivity shopUpdateInfoActivity();
+
+    @ContributesAndroidInjector
+    abstract ShopRequestDetailActivity shopRequestDetailActivity();
 
 }

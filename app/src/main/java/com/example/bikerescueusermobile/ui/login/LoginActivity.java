@@ -21,6 +21,7 @@ import com.example.bikerescueusermobile.data.model.user.CurrentUser;
 import com.example.bikerescueusermobile.ui.confirm.ConfirmInfoActivity;
 import com.example.bikerescueusermobile.ui.main.MainActivity;
 import com.example.bikerescueusermobile.ui.otp_page.LoginByPhoneNumberActivity;
+import com.example.bikerescueusermobile.ui.shopMain.ShopMainActivity;
 import com.example.bikerescueusermobile.util.SharedPreferenceHelper;
 import com.example.bikerescueusermobile.ui.register.CreatePasswordActivity;
 import com.example.bikerescueusermobile.util.SharedPreferenceHelper;
@@ -91,6 +92,7 @@ public class LoginActivity extends BaseActivity {
                     .subscribe(user -> {
                         viewModel.setLoading(false);
                         if (user != null) {
+
                             String sharedPreferenceStr = gson.toJson(user);
                             SharedPreferenceHelper.setSharedPreferenceString(LoginActivity.this, "user", sharedPreferenceStr);
                             CurrentUser.getInstance().setFullName(user.getFullName());
@@ -119,9 +121,18 @@ public class LoginActivity extends BaseActivity {
                                         Log.e("token: ", deviceToken);
                                         CurrentUser.getInstance().setDeviceToken(deviceToken);
                                     });
-                            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                            startActivity(intent);
-                            finish();
+                            if(user.getRoleId() == 3){
+                                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                                startActivity(intent);
+                                finish();
+                            } else if(user.getRoleId() == 2){
+                                Intent intent = new Intent(LoginActivity.this, ShopMainActivity.class);
+                                startActivity(intent);
+                                finish();
+                            } else{
+                                errorTextView.setVisibility(View.VISIBLE);
+                                errorTextView.setText("Access Denied!!! ");
+                            }
                         }
 
                     }, throwable -> {

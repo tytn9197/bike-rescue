@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="5dp"
+    android:orientation="horizontal"
+    android:layout_marginBottom="5dp"
+    android:background="@drawable/border_white">
+
+
+    <ImageView
+        android:id="@+id/imageId"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="20dp"
+        app:srcCompat="@drawable/ic_user" />
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="8"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="3dp"
+            android:paddingLeft="5dp"
+            android:text="Phan Gia Cường"
+            android:textColor="@color/black"
+            android:textSize="16dp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/request_code"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="3dp"
+            android:paddingLeft="5dp"
+            android:text="Mã yêu cầu: "
+            />
+
+        <TextView
+            android:id="@+id/request_problem"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingLeft="5dp"
+            android:text="Vấn đề: Hết xăng"
+            android:layout_marginBottom="3dp"
+            android:textStyle="bold"/>
+
+        <TextView
+            android:id="@+id/request_address"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingLeft="5dp"
+            android:text="Địa chỉ: "
+            android:layout_marginBottom="3dp"/>
+        <TextView
+            android:id="@+id/request_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@color/main_green_color"
+            android:paddingLeft="5dp"
+            android:text="15 phút trước"
+            android:textStyle="bold"
+            android:textAlignment="center"
+            android:textColor="@color/white" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="4"
+        android:orientation="vertical">
+
+
+        <ImageView
+            android:id="@+id/ic_status"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_gravity="center"
+            android:layout_marginTop="20dp"
+            android:src="@drawable/ic_booking"/>
+
+        <TextView
+            android:id="@+id/request_status"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="Đang xử lí"
+            android:textColor="@color/black"
+            android:textStyle="bold"/>
+    </LinearLayout>
+
+</LinearLayout>

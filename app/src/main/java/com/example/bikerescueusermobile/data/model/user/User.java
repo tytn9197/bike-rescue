@@ -40,6 +40,9 @@ public class User {
     @SerializedName("createdDate")
     private String createdTime;
 
+    @SerializedName("roleId")
+    private int roleId;
+
     public User(){
 
     }
@@ -143,5 +146,13 @@ public class User {
 
     public void setCreatedTime(String createdTime) {
         this.createdTime = createdTime;
+    }
+
+    public int getRoleId() {
+        return roleId;
+    }
+
+    public void setRoleId(int roleId) {
+        this.roleId = roleId;
     }
 }

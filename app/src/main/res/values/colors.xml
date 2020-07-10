@@ -10,5 +10,6 @@
     <color name="light_red">#BA0000</color>
     <color name="backgroundGrey">#E6F1F1F1</color>
     <color name="grey">#B4ADADAD</color>
+    <color name="gray_light">#fafafa</color>
 
 </resources>

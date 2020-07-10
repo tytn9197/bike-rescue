@@ -4,6 +4,11 @@
     <string name="botnav_title_home">Trang Chủ</string>
     <string name="botnav_title_history">Lịch sử</string>
     <string name="botnav_title_profile">Thông tin</string>
+
+    <string name="botnav_title_home_shop">Yêu cầu mới</string>
+    <string name="botnav_title_history_shop">Lịch sử</string>
+    <string name="botnav_title_profile_shop">Cá nhân</string>
+
     <string name="title_notification">Thông báo</string>
     <string name="title_filter">Lọc</string>
     <string name="title_editPro">Thông tin tài khoản</string>
