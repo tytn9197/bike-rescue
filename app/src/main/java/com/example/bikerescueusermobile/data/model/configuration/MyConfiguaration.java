@@ -1,24 +1,25 @@
-package com.example.bikerescueusermobile.data.model.role;
+package com.example.bikerescueusermobile.data.model.configuration;
 
 import com.google.gson.annotations.SerializedName;
 
 import lombok.Data;
 
 @Data
-public class Role {
+public class MyConfiguaration {
+
     @SerializedName("id")
     private int id;
 
     @SerializedName("name")
     private String name;
 
+    @SerializedName("value")
+    private String value;
+
     @SerializedName("status")
     private boolean status;
 
-    public Role(int id, String name, boolean status) {
-        this.id = id;
-        this.name = name;
-        this.status = status;
-    }
+    public MyConfiguaration() {
 
+    }
 }

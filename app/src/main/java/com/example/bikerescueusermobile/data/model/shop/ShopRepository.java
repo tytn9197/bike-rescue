@@ -21,6 +21,10 @@ public class ShopRepository {
         return shopServices.getTop5Shop(token);
     }
 
+    public Single<List<Shop>> getAllShop(String token){
+        return shopServices.getAllShop(token);
+    }
+
     public Single<List<Shop>> getShopByServiceName(String token, String serviceName){
         return shopServices.getShopByServiceName(token, serviceName);
     }

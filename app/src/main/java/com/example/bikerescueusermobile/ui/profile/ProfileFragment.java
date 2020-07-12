@@ -23,6 +23,7 @@ import com.example.bikerescueusermobile.ui.main.MainActivity;
 import com.example.bikerescueusermobile.util.MyMethods;
 import com.example.bikerescueusermobile.util.SharedPreferenceHelper;
 import com.github.dhaval2404.imagepicker.ImagePicker;
+import com.squareup.picasso.Picasso;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -71,8 +72,9 @@ public class ProfileFragment extends BaseFragment {
         String date = CurrentUser.getInstance().getCreatedTime();
         txtUserCreateDate.setText((date.split(" "))[0]);
 
-        if(!avatar.equals("string")){
-            avatar.setImageBitmap(MyMethods.stringToBitmap(CurrentUser.getInstance().getAvatarUrl()));
+
+        if(CurrentUser.getInstance().getAvatarUrl().contains("imgur")) {
+            Picasso.with(getActivity()).load(CurrentUser.getInstance().getAvatarUrl()).placeholder(R.drawable.ic_load).into(avatar);
         }
 
         avatar.setOnClickListener(v -> {
@@ -99,24 +101,11 @@ public class ProfileFragment extends BaseFragment {
             Log.e(TAG, "b -> string " + s);
 
             //set image to image view
-            avatar.setImageBitmap(MyMethods.stringToBitmap(s));
+
         } else if (resultCode == ImagePicker.RESULT_ERROR) {
             Log.e(TAG, "ImagePicker - Get image fail: " + ImagePicker.Companion.getError(data));
         } else {
             Log.e(TAG, "ImagePicker - Task Cancelled");
-        }
-    }
-    private String simpleFileName = "note.txt";
-    private void saveData(String s) {
-        try {
-            // Open Stream to write file.
-            FileOutputStream out = getActivity().openFileOutput(simpleFileName, Context.MODE_PRIVATE);
-            // Ghi dữ liệu.
-            out.write(s.getBytes());
-            out.close();
-            Toast.makeText(getActivity(),"File saved!",Toast.LENGTH_SHORT).show();
-        } catch (Exception e) {
-            Toast.makeText(getActivity(),"Error:"+ e.getMessage(),Toast.LENGTH_SHORT).show();
         }
     }
 }

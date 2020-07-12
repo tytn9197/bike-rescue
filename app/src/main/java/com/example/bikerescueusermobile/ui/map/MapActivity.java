@@ -4,10 +4,12 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -16,6 +18,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.fragment.app.FragmentManager;
 
 import com.example.bikerescueusermobile.R;
@@ -152,6 +155,14 @@ public class MapActivity extends DaggerAppCompatActivity implements
         initShopDetail(s);
     }
 
+//    private void setupMapShopDetailBackground(){
+//        CoordinatorLayout.LayoutParams layoutParams = new CoordinatorLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, mapShopDetail.getHeight() + 20);
+//        layoutParams.setMargins(10,10,10,10);
+//        mapShopDetailBackground.setLayoutParams(layoutParams);
+//        mapShopDetailBackground.setAlpha((float)0.6);
+//        mapShopDetailBackground.setBackground(getResources().getDrawable(R.drawable.border_opacity));
+//    }
+
     @SuppressLint("DefaultLocale")
     private void initShopDetail(Shop shop) {
         shopLocation = new LatLng(Double.parseDouble(shop.getLatitude()), Double.parseDouble(shop.getLongtitude()));
@@ -191,6 +202,7 @@ public class MapActivity extends DaggerAppCompatActivity implements
     private void hideClusterMap() {
         mapClusterShop.setVisibility(View.GONE);
         btnGoogleMapBack.setVisibility(View.GONE);
+
     }
 
     private View.OnClickListener btnMapBackOnClickListener = v -> {

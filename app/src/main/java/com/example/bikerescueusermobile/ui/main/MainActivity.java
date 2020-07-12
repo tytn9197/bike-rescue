@@ -44,6 +44,7 @@ import com.karumi.dexter.MultiplePermissionsReport;
 import com.karumi.dexter.PermissionToken;
 import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
+import com.squareup.picasso.Picasso;
 import com.victor.loading.rotate.RotateLoading;
 
 import java.util.List;
@@ -74,6 +75,7 @@ public class MainActivity extends BaseActivity {
     RotateLoading rotateLoading;
 
     private Fragment fragment; // use it to change fragment
+    private SearchShopServiceFragment searchShopServiceFragment;
 
     @BindView(R.id.bottomNav)
     BottomNavigationView bottomNavigationView;
@@ -88,13 +90,15 @@ public class MainActivity extends BaseActivity {
         init();
         initGrantAppPermission();
         getCurrentLocation();
-
+        searchShopServiceFragment = new SearchShopServiceFragment();
         // set header image & name
         View header =navigation.getHeaderView(0);
         head_avatar = header.findViewById(R.id.head_avatar);
         txtHeaderName = header.findViewById(R.id.txtName);
         txtHeaderName.setText(CurrentUser.getInstance().getFullName());
-        head_avatar.setImageBitmap(MyMethods.stringToBitmap(CurrentUser.getInstance().getAvatarUrl()));
+        if(CurrentUser.getInstance().getAvatarUrl().contains("imgur")) {
+            Picasso.with(this).load(CurrentUser.getInstance().getAvatarUrl()).placeholder(R.drawable.ic_load).into(head_avatar);
+        }
 
 //        UpdateDevice device = new UpdateDevice(token);
 //        viewModel.updateFcm(CurrentUser.getInstance().getToken(), CurrentUser.getInstance().getId(), device);
@@ -192,7 +196,7 @@ public class MainActivity extends BaseActivity {
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
             switch (item.getItemId()) {
                 case R.id.nav_home:
-                    fragment = new SearchShopServiceFragment();
+                    fragment = searchShopServiceFragment;
                     replaceFragment();
                     return true;
                 case R.id.nav_history:

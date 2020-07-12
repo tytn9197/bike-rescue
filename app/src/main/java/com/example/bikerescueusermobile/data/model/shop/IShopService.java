@@ -13,6 +13,10 @@ public interface IShopService {
     @GET("/shop/getTop5Shop")
     Single<List<Shop>> getTop5Shop(@Header("Authorization") String token);
 
+    @GET("/shop/shops")
+    Single<List<Shop>> getAllShop(@Header("Authorization") String token);
+
+
     @GET("/shop/getShopByService")
     Single<List<Shop>> getShopByServiceName(@Header("Authorization") String token, @Query("name") String serviceName);
 }

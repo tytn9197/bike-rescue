@@ -22,23 +22,33 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
+import androidx.lifecycle.ViewModelProviders;
 
 import com.example.bikerescueusermobile.R;
 import com.example.bikerescueusermobile.base.BaseActivity;
+import com.example.bikerescueusermobile.data.model.configuration.MyConfiguaration;
 import com.example.bikerescueusermobile.data.model.user.CurrentUser;
 import com.example.bikerescueusermobile.ui.create_request.CreateRequestActivity;
 import com.example.bikerescueusermobile.ui.main.MainActivity;
 import com.example.bikerescueusermobile.ui.map.MapActivity;
 import com.example.bikerescueusermobile.ui.register.CreatePasswordActivity;
+import com.example.bikerescueusermobile.ui.seach_shop_service.ShopServiceViewModel;
 import com.example.bikerescueusermobile.ui.send_request.SendRequestActivity;
 import com.example.bikerescueusermobile.ui.update_info.UpdateInfoActivity;
 import com.example.bikerescueusermobile.util.MyMethods;
+import com.example.bikerescueusermobile.util.ViewModelFactory;
 import com.github.dhaval2404.imagepicker.ImagePicker;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.inject.Inject;
 
 import butterknife.BindView;
 import cn.pedant.SweetAlert.SweetAlertDialog;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 
 public class ConfirmInfoActivity extends BaseActivity {
 
@@ -80,20 +90,89 @@ public class ConfirmInfoActivity extends BaseActivity {
     @BindView(R.id.edtMarker)
     EditText edtMarker;
 
+    @BindView(R.id.tvVehicleType)
+    TextView tvVehicleType;
+
+    @Inject
+    ViewModelFactory viewModelFactory;
+
+    private ConfirmViewModel viewModel;
+
     @Override
     protected int layoutRes() {
         return R.layout.activity_confirm_info;
     }
 
-
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        //setup toolbar
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle("Xác nhận thông tin");
+
+        //setup viewmodel
+        viewModel = ViewModelProviders.of(this, viewModelFactory).get(ConfirmViewModel.class);
+
+        //get all vehicle title
+        viewModel.getAllConfig()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(listConfig -> {
+                    if(listConfig != null){
+                        ArrayAdapter<String> brands = new ArrayAdapter<>(this,
+                                android.R.layout.simple_list_item_1);
+                        ArrayAdapter<String> years = new ArrayAdapter<>(this,
+                                android.R.layout.simple_list_item_1);
+                        ArrayAdapter<String> types = new ArrayAdapter<>(this,
+                                android.R.layout.simple_list_item_1);
+
+                        for (int i = 0; i < listConfig.size(); i++){
+                            if (listConfig.get(i).getName().equals("brand name")){
+                                brands.add(listConfig.get(i).getValue());
+                            }
+                            if(listConfig.get(i).getName().equals("vehicle year")){
+                                years.add(listConfig.get(i).getValue());
+                            }
+                            if(listConfig.get(i).getName().equals("vehicle type")){
+                                types.add(listConfig.get(i).getValue());
+                            }
+                        }
+                        tvBrand.setOnClickListener(v -> {
+                            AlertDialog.Builder builder = new AlertDialog.Builder(ConfirmInfoActivity.this);
+                            builder.setTitle("Hãng xe");
+                            builder.setAdapter(brands, (dialog, which) -> {
+                                tvBrand.setText(brands.getItem(which));
+                            });
+
+                            AlertDialog alertDialog = builder.create();
+                            alertDialog.show();
+                        });
+
+                        tvYear.setOnClickListener(v -> {
+                            AlertDialog.Builder builder = new AlertDialog.Builder(ConfirmInfoActivity.this);
+                            builder.setTitle("Đời xe");
+                            builder.setAdapter(years, (dialog, which) -> {
+                                tvYear.setText(years.getItem(which));
+                            });
+
+                            AlertDialog alertDialog = builder.create();
+                            alertDialog.show();
+                        });
+
+                        tvVehicleType.setOnClickListener(v -> {
+                            AlertDialog.Builder builder = new AlertDialog.Builder(ConfirmInfoActivity.this);
+                            builder.setTitle("Loại xe");
+                            builder.setAdapter(types, (dialog, which) -> {
+                                tvVehicleType.setText(types.getItem(which));
+                            });
+                            AlertDialog alertDialog = builder.create();
+                            alertDialog.show();
+                        });
+                    }
+                });
 
 
         //test data
@@ -108,44 +187,17 @@ public class ConfirmInfoActivity extends BaseActivity {
             builder.setTitle("Vấn đề của bạn");
             String[] problems = getBaseContext().getResources().getStringArray(R.array.vande);
             builder.setItems(problems, (dialog, which) -> {
-                //Toast.makeText(getApplicationContext(), "city: " + city[which], Toast.LENGTH_SHORT).show();
                 tvProblem.setText(problems[which]);
             });
             AlertDialog alertDialog = builder.create();
             alertDialog.show();
         });
-        if(serviceName.equals("")){
-            tvProblem.setText("Vấn đề của bạn");
-        }else {
+        if (serviceName.equals("")) {
+            tvProblem.setText("Vui lòng chọn vấn đề của bạn");
+        } else {
             String s = "Tôi cần " + serviceName.toLowerCase().trim() + ".";
             tvProblem.setText(s);
         }
-
-        tvBrand.setOnClickListener(v -> {
-            AlertDialog.Builder builder = new AlertDialog.Builder(ConfirmInfoActivity.this);
-            builder.setTitle("Hãng xe");
-            String[] brands = getBaseContext().getResources().getStringArray(R.array.hangxe);
-            builder.setItems(brands, (dialog, which) -> {
-                //Toast.makeText(getApplicationContext(), "city: " + city[which], Toast.LENGTH_SHORT).show();
-                tvBrand.setText(brands[which]);
-            });
-
-            AlertDialog alertDialog = builder.create();
-            alertDialog.show();
-        });
-
-        tvYear.setOnClickListener(v -> {
-            AlertDialog.Builder builder = new AlertDialog.Builder(ConfirmInfoActivity.this);
-            builder.setTitle("Đời xe");
-            String[] year = getBaseContext().getResources().getStringArray(R.array.doixe);
-            builder.setItems(year, (dialog, which) -> {
-                //Toast.makeText(getApplicationContext(), "city: " + city[which], Toast.LENGTH_SHORT).show();
-                tvYear.setText(year[which]);
-            });
-
-            AlertDialog alertDialog = builder.create();
-            alertDialog.show();
-        });
 
         tvBookService.setOnClickListener(v -> {
 

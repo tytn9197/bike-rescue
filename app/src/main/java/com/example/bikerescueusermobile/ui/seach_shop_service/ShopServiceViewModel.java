@@ -51,6 +51,11 @@ public class ShopServiceViewModel extends ViewModel {
         return shopRepository.getTop5Shop(CurrentUser.getInstance().getAccessToken());
     }
 
+    public Single<List<Shop>> getAllShop(){
+        loading.setValue(true);
+        return shopRepository.getAllShop(CurrentUser.getInstance().getAccessToken());
+    }
+
     public Single<List<Shop>> getShopByServiceName(String serviceName){
         loading.setValue(true);
         return shopRepository.getShopByServiceName(CurrentUser.getInstance().getAccessToken(), serviceName);

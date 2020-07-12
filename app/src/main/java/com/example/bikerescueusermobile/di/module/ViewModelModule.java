@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.bikerescueusermobile.di.util.ViewModelKey;
+import com.example.bikerescueusermobile.ui.confirm.ConfirmViewModel;
 import com.example.bikerescueusermobile.ui.detail.DetailsViewModel;
 import com.example.bikerescueusermobile.ui.list.ListViewModel;
 import com.example.bikerescueusermobile.ui.login.LoginModel;
@@ -47,5 +48,10 @@ public abstract class ViewModelModule {
     @IntoMap
     @ViewModelKey(RegisterViewModel.class)
     abstract ViewModel bindRegisterViewModel(RegisterViewModel registerViewModel);
+
+    @Binds
+    @IntoMap
+    @ViewModelKey(ConfirmViewModel.class)
+    abstract ViewModel bindConfirmViewModel(ConfirmViewModel confirmViewModel);
 
 }

@@ -84,21 +84,25 @@ public class SearchShopServiceFragment extends BaseFragment implements TopShopSe
 
         //isLoading => show dialog loading
         observeLoading();
-        //--------------------------------set up top 5 shop-------------------------------
+
         listTop5Shop = new ArrayList<>();
-        viewModel.getTop5Shop()
+        listAllShopServices = new ArrayList<>();
+        listTop3Services = new ArrayList<>();
+
+        //--------------------------------set up top 5 shop-------------------------------
+        viewModel.getAllShop()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(listTop5Shop -> {
+                .subscribe(listShops -> {
                     viewModel.setLoading(false);
-                    if (listTop5Shop != null) {
-                        this.listTop5Shop.addAll(listTop5Shop);
+                    if (listShops != null) {
+                        this.listTop5Shop.addAll(listShops);
                         shop = listTop5Shop.get(0);
                         try {
-                            MyMethods.setDistance(listTop5Shop);
+                            MyMethods.setDistance(listShops);
                         }catch (Exception e) {
-                            for (int i = 0; i < listTop5Shop.size(); i++) {
-                                listTop5Shop.get(i).setDistanceFromUser(4);
+                            for (int i = 0; i < listShops.size(); i++) {
+                                listShops.get(i).setDistanceFromUser(4);
                             }
                         }
                         mRecyclerView.setAdapter(new TopShopRecyclerViewAdapter(listTop5Shop, this, this));
@@ -111,7 +115,6 @@ public class SearchShopServiceFragment extends BaseFragment implements TopShopSe
                 });
 
         //-----------------------------------search service---------------------------------------
-        listAllShopServices = new ArrayList<>();
         viewModel.getAllServices()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -119,6 +122,15 @@ public class SearchShopServiceFragment extends BaseFragment implements TopShopSe
                     viewModel.setLoading(false);
                     if (listServices != null) {
                         listAllShopServices.addAll(listServices);
+
+                        //set nhung dich vu thuong dung`
+                        btnTopOneService.setText(listServices.get(0).getName());
+                        btnTopTwoService.setText(listServices.get(1).getName());
+                        btnTopThreeService.setText(listServices.get(2).getName());
+                        this.serviceName = listServices.get(0).getName();
+                        for (int i = 0; i < 3; i++){
+                            listTop3Services.add(listServices.get(i));
+                        }
                     }
                 }, throwable -> {
                     viewModel.setLoading(false);
@@ -141,24 +153,24 @@ public class SearchShopServiceFragment extends BaseFragment implements TopShopSe
         });
 
 
-        //--------------------------------set up top 3 service-------------------------------
-        listTop3Services = new ArrayList<>();
-        viewModel.getTop3Services()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(list3Services -> {
-                    viewModel.setLoading(false);
-                    if (list3Services != null) {
-                        btnTopOneService.setText(list3Services.get(0).getName());
-                        btnTopTwoService.setText(list3Services.get(1).getName());
-                        btnTopThreeService.setText(list3Services.get(2).getName());
-                        this.serviceName = list3Services.get(0).getName();
-                        listTop3Services.addAll(list3Services);
-                    }
-                }, throwable -> {
-                    viewModel.setLoading(false);
-                    Log.e("SearchShopService", "getTop3Services: " + throwable.getMessage());
-                });
+//        //--------------------------------set up top 3 service-------------------------------
+//        listTop3Services = new ArrayList<>();
+//        viewModel.getTop3Services()
+//                .subscribeOn(Schedulers.io())
+//                .observeOn(AndroidSchedulers.mainThread())
+//                .subscribe(list3Services -> {
+//                    viewModel.setLoading(false);
+//                    if (list3Services != null) {
+//                        btnTopOneService.setText(list3Services.get(0).getName());
+//                        btnTopTwoService.setText(list3Services.get(1).getName());
+//                        btnTopThreeService.setText(list3Services.get(2).getName());
+//                        this.serviceName = list3Services.get(0).getName();
+//                        listTop3Services.addAll(list3Services);
+//                    }
+//                }, throwable -> {
+//                    viewModel.setLoading(false);
+//                    Log.e("SearchShopService", "getTop3Services: " + throwable.getMessage());
+//                });
 
         btnTopOneService.setOnClickListener(v->{
             clusterShopByService("" + btnTopOneService.getText());
