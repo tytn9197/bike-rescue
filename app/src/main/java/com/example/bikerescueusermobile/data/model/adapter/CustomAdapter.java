@@ -12,7 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.bikerescueusermobile.R;
-import com.example.bikerescueusermobile.data.model.shop_request.Order;
+import com.example.bikerescueusermobile.data.model.request.Request;
 import com.example.bikerescueusermobile.ui.shop_owner.ShopRequestDetailActivity;
 
 import java.util.List;
@@ -20,18 +20,18 @@ import java.util.List;
 public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.MyViewHolder> {
 
 
-    private List<Order> orderList;
+    private List<Request> requestList;
     private Context context;
     private OnRequestListener mOnRequestListener;
 
 
-    public CustomAdapter(List<Order> orderList, Context context) {
-        this.orderList = orderList;
+    public CustomAdapter(List<Request> requestList, Context context) {
+        this.requestList = requestList;
         this.context = context;
     }
 
-    public CustomAdapter(List<Order> orderList, Context context, OnRequestListener mOnRequestListener) {
-        this.orderList = orderList;
+    public CustomAdapter(List<Request> requestList, Context context, OnRequestListener mOnRequestListener) {
+        this.requestList = requestList;
         this.context = context;
         this.mOnRequestListener = mOnRequestListener;
     }
@@ -50,14 +50,18 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.MyViewHold
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
 
 
-        holder.imageView.setImageResource(orderList.get(position).getImage());
-        holder.request_code.setText(orderList.get(position).getRequest_code());
-        holder.name.setText(orderList.get(position).getName());
-        holder.address.setText(orderList.get(position).getAddress());
-        holder.field.setText(orderList.get(position).getField());
-        holder.time.setText(orderList.get(position).getTime());
-        holder.ic_status.setImageResource(orderList.get(position).getStatus_ic());
-        holder.status.setText(orderList.get(position).getStatus());
+        holder.imageView.setImageResource(R.drawable.ic_user);
+        holder.request_code.setText(requestList.get(position).getRequest_code());
+        holder.name.setText(requestList.get(position).getCreated().getFullName());
+        holder.address.setText(requestList.get(position).getAddress());
+        holder.field.setText("Sữa chữa xe máy");
+        holder.time.setText(requestList.get(position).getTime().toString());
+        if(requestList.get(position).getStatus() == "DONE"){
+            holder.ic_status.setImageResource(R.drawable.ic_complete);
+        } else if(requestList.get(position).getStatus() == "CANCEL"){
+            holder.ic_status.setImageResource(R.drawable.ic_hand);
+        }
+        holder.status.setText(requestList.get(position).getStatus());
 
 
 
@@ -65,7 +69,7 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.MyViewHold
 
     @Override
     public int getItemCount() {
-        return orderList.size();
+        return requestList.size();
     }
 
     public class MyViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {

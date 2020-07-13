@@ -6,7 +6,7 @@
 
 
     <androidx.appcompat.widget.Toolbar
-        android:id="@+id/shopUpdateToolBar"
+        android:id="@+id/bikerUpdateToolBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/core_color" />
@@ -48,7 +48,6 @@
 
 
                         <TextView
-                            android:id="@+id/shopAva"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             android:background="@drawable/border_white"
@@ -95,7 +94,7 @@
 
 
                         <EditText
-                            android:id="@+id/boss_name"
+                            android:id="@+id/bikerName"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_weight="3"
@@ -139,7 +138,7 @@
 
 
                         <EditText
-                            android:id="@+id/phone_number"
+                            android:id="@+id/bikerPhone"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_weight="3"
@@ -189,7 +188,7 @@
 
 
                         <EditText
-                            android:id="@+id/email"
+                            android:id="@+id/bikerEmail"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_weight="3"
@@ -239,7 +238,7 @@
                         >
 
                         <EditText
-                            android:id="@+id/street"
+                            android:id="@+id/bikerStreet"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="6"
@@ -275,7 +274,7 @@
                         >
 
                         <EditText
-                            android:id="@+id/ward"
+                            android:id="@+id/bikerWard"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="6"
@@ -311,7 +310,7 @@
                         >
 
                         <EditText
-                            android:id="@+id/district"
+                            android:id="@+id/bikerDistrict"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="6"
@@ -347,7 +346,7 @@
                         >
 
                         <EditText
-                            android:id="@+id/city"
+                            android:id="@+id/bikerCity"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="6"
@@ -382,7 +381,7 @@
         android:layout_weight="1">
 
         <TextView
-            android:id="@+id/tvRegister"
+            android:id="@+id/tvUpdate"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="20dp"

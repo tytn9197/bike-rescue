@@ -27,5 +27,7 @@ public class UserRepository {
         return userService.register(user, roleName);
     }
 
-
+    public Single<User> updateInfo(String token, int userId, User user){
+        return userService.updateInfo(token, userId, user);
+    }
 }

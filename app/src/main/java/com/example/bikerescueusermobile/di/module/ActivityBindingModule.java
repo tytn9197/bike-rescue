@@ -7,6 +7,7 @@ import com.example.bikerescueusermobile.ui.login.LoginActivity;
 import com.example.bikerescueusermobile.ui.main.MainActivity;
 import com.example.bikerescueusermobile.ui.main.MainFragmentBindingModule;
 import com.example.bikerescueusermobile.ui.map.MapFragmentBindingModule;
+import com.example.bikerescueusermobile.ui.profile.BikerUpdateInfoActivity;
 import com.example.bikerescueusermobile.ui.register.CreatePasswordActivity;
 import com.example.bikerescueusermobile.ui.shopMain.ShopMainActivity;
 import com.example.bikerescueusermobile.ui.shopMain.ShopMainFragmentBindingModule;
@@ -52,5 +53,8 @@ public abstract class ActivityBindingModule {
 
     @ContributesAndroidInjector
     abstract ShopRequestDetailActivity shopRequestDetailActivity();
+
+    @ContributesAndroidInjector
+    abstract BikerUpdateInfoActivity bikerUpdateInfoActivity();
 
 }

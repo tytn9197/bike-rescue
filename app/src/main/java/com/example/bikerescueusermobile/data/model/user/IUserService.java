@@ -24,4 +24,8 @@ public interface IUserService {
     Single<User> register(@Body LoginData user);
 
     Single<User> register(User user, String roleName);
+
+    @POST("/biker/update/{id}")
+    Single<User> updateInfo(@Header("Authorization") String token, @Path("id") int userId, @Body User user);
+
 }

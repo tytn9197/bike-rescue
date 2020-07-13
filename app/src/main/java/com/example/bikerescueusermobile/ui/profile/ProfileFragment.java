@@ -20,6 +20,7 @@ import com.example.bikerescueusermobile.base.BaseFragment;
 import com.example.bikerescueusermobile.data.model.user.CurrentUser;
 import com.example.bikerescueusermobile.ui.login.LoginActivity;
 import com.example.bikerescueusermobile.ui.main.MainActivity;
+import com.example.bikerescueusermobile.ui.shop_owner.ShopUpdateInfoActivity;
 import com.example.bikerescueusermobile.util.MyMethods;
 import com.example.bikerescueusermobile.util.SharedPreferenceHelper;
 import com.github.dhaval2404.imagepicker.ImagePicker;
@@ -54,6 +55,9 @@ public class ProfileFragment extends BaseFragment {
     @BindView(R.id.logout)
     TextView logout;
 
+    @BindView(R.id.btnUpdateProfile)
+    Button btnUpdateProfile;
+
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -83,6 +87,14 @@ public class ProfileFragment extends BaseFragment {
                     .compress(1024)			//Final image size will be less than 1 MB(Optional)
                     .maxResultSize(1080, 1080)	//Final image resolution will be less than 1080 x 1080(Optional)
                     .start();
+        });
+
+        btnUpdateProfile.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getActivity(), ShopUpdateInfoActivity.class);
+                startActivity(intent);
+            }
         });
     }
 

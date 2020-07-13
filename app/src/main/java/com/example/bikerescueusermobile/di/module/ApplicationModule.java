@@ -2,6 +2,7 @@ package com.example.bikerescueusermobile.di.module;
 
 import com.example.bikerescueusermobile.data.dont_use_it.RepoService;
 import com.example.bikerescueusermobile.data.model.configuration.IConfigurationService;
+import com.example.bikerescueusermobile.data.model.request.IRequestService;
 import com.example.bikerescueusermobile.data.model.shop.IShopService;
 import com.example.bikerescueusermobile.data.model.user.IUserService;
 import com.example.bikerescueusermobile.data.model.shop_services.IShopServicesService;
@@ -16,7 +17,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 @Module(includes = ViewModelModule.class)
 public class ApplicationModule {
-    private static final String BASE_URL = "https://a370704a3a6d.jp.ngrok.io";
+    private static final String BASE_URL = "https://ac952cc01974.jp.ngrok.io";
 
     @Singleton
     @Provides
@@ -55,5 +56,11 @@ public class ApplicationModule {
     @Provides
     static IConfigurationService provideConfigurationService(Retrofit retrofit){
         return retrofit.create(IConfigurationService.class);
+    }
+
+    @Singleton
+    @Provides
+    static IRequestService provideRequestService(Retrofit retrofit){
+        return retrofit.create(IRequestService.class);
     }
 }

@@ -11,7 +11,7 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE"/>
+    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
 
     <application
         android:name=".base.BaseApplication"
@@ -41,14 +41,16 @@
         <activity android:name=".ui.create_request.CreateRequestActivity" />
         <activity android:name=".ui.shop_owner.ShopRequestDetailActivity" />
         <activity android:name=".ui.shop_owner.ShopUpdateInfoActivity" />
+        <activity android:name=".ui.profile.BikerUpdateInfoActivity" />
 
 
         <activity android:name=".ui.map.MapActivity" />
 
 
-        <service android:name=".ui.create_request.SendNotificationService"
-            android:exported="false"
-            android:enabled="true">
+        <service
+            android:name=".ui.create_request.SendNotificationService"
+            android:enabled="true"
+            android:exported="false">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>

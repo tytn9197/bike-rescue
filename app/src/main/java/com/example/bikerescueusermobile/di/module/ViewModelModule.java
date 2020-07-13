@@ -10,6 +10,9 @@ import com.example.bikerescueusermobile.ui.list.ListViewModel;
 import com.example.bikerescueusermobile.ui.login.LoginModel;
 import com.example.bikerescueusermobile.ui.register.RegisterViewModel;
 import com.example.bikerescueusermobile.ui.seach_shop_service.ShopServiceViewModel;
+import com.example.bikerescueusermobile.ui.shop_owner.ShopUpdateViewModel;
+import com.example.bikerescueusermobile.ui.shop_owner.shop_history.ShopHistoryViewModel;
+import com.example.bikerescueusermobile.ui.update_info.UpdateViewModel;
 import com.example.bikerescueusermobile.util.ViewModelFactory;
 
 import javax.inject.Singleton;
@@ -54,4 +57,18 @@ public abstract class ViewModelModule {
     @ViewModelKey(ConfirmViewModel.class)
     abstract ViewModel bindConfirmViewModel(ConfirmViewModel confirmViewModel);
 
+    @Binds
+    @IntoMap
+    @ViewModelKey(UpdateViewModel.class)
+    abstract ViewModel bindUpdateViewModel(UpdateViewModel updateViewModel);
+
+    @Binds
+    @IntoMap
+    @ViewModelKey(ShopUpdateViewModel.class)
+    abstract ViewModel bindShopUpdateViewModel(ShopUpdateViewModel shopUpdateViewModel);
+
+    @Binds
+    @IntoMap
+    @ViewModelKey(ShopHistoryViewModel.class)
+    abstract ViewModel bindShopHistoryViewModel(ShopHistoryViewModel shopHistoryViewModel);
 }
