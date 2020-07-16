@@ -1,5 +1,8 @@
 package com.example.bikerescueusermobile.data.model.shop_services;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
@@ -7,7 +10,7 @@ import java.util.List;
 import lombok.Data;
 
 @Data
-public class ShopService {
+public class ShopService implements Parcelable {
 
     @SerializedName("id")
     private int id;
@@ -38,4 +41,37 @@ public class ShopService {
     public ShopService() {
     }
 
+    protected ShopService(Parcel in) {
+        id = in.readInt();
+        name = in.readString();
+        serviceUrl = in.readString();
+        description = in.readString();
+        status = in.readByte() != 0;
+    }
+
+    public static final Creator<ShopService> CREATOR = new Creator<ShopService>() {
+        @Override
+        public ShopService createFromParcel(Parcel in) {
+            return new ShopService(in);
+        }
+
+        @Override
+        public ShopService[] newArray(int size) {
+            return new ShopService[size];
+        }
+    };
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(id);
+        dest.writeString(name);
+        dest.writeString(serviceUrl);
+        dest.writeString(description);
+        dest.writeByte((byte) (status ? 1 : 0));
+    }
 }

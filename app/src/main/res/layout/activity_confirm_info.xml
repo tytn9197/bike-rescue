@@ -8,8 +8,7 @@
         android:id="@+id/confirm_toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/core_color"
-        />
+        android:background="@color/core_color" />
 
     <ScrollView
         android:layout_width="match_parent"
@@ -25,7 +24,12 @@
                 android:layout_height="match_parent"
                 android:layout_gravity="center"
                 android:layout_marginTop="5dp"
+                android:defaultFocusHighlightEnabled="true"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
+                android:focusedByDefault="true"
                 android:padding="5dp"
+                android:screenReaderFocusable="true"
                 android:text="Thông tin khách hàng"
                 android:textColor="@color/colorPrimaryDark"
                 android:textSize="20dp"
@@ -59,27 +63,44 @@
                 android:layout_height="match_parent"
                 android:layout_marginLeft="5dp"
                 android:layout_marginTop="5dp"
+                android:hint=" Vị trí gọi yêu cầu"
                 android:drawableLeft="@drawable/ic_marker_24"
                 android:paddingBottom="15dp" />
 
-            <TextView
-                android:id="@+id/tvProblem"
+            <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="5dp"
-                android:layout_marginRight="5dp"
-                android:layout_marginTop="5dp"
-                android:drawableEnd="@drawable/ic_baseline_chevron_right_24"
-                android:padding="5dp"
-                android:text="Bạn gặp vấn đề gì ?"
-                android:textSize="20dp" />
+                android:paddingEnd="20dp">
 
-            <!--            <Spinner-->
-            <!--                android:id="@+id/spinner1"-->
-            <!--                android:layout_width="wrap_content"-->
-            <!--                android:layout_height="match_parent"-->
-            <!--                android:layout_gravity="center"-->
-            <!--                android:layout_marginBottom="10dp"/>-->
+                <TextView
+                    android:id="@+id/tvProblem"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginRight="15dp"
+                    android:drawableEnd="@drawable/ic_baseline_chevron_right_24"
+                    android:padding="5dp"
+                    android:text="Bạn gặp vấn đề gì ?"
+                    android:textSize="20dp" />
+
+                <TextView
+                    android:id="@+id/txtConfirmProblemBadge"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_gravity="right|end|top"
+                    android:layout_marginEnd="5dp"
+                    android:layout_marginRight="-5dp"
+                    android:layout_marginTop="3dp"
+                    android:background="@drawable/badge_background"
+                    android:gravity="center"
+                    android:padding="3dp"
+                    android:textColor="@android:color/white"
+                    android:text="!"
+                    android:textSize="13sp"
+                    android:visibility="gone"/>
+            </FrameLayout>
+
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
@@ -96,69 +117,116 @@
                 android:textColor="@color/colorPrimaryDark"
                 android:textSize="20dp"
                 android:textStyle="bold" />
+
             <TextView
-                android:id="@+id/tvVehicleType"
+                android:id="@+id/tvConfirmMyBike"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="20dp"
                 android:layout_marginLeft="10dp"
-                android:layout_marginEnd="20dp"
                 android:layout_marginTop="5dp"
+                android:layout_marginEnd="20dp"
                 android:background="@drawable/border_white"
                 android:drawableStart="@drawable/ic_bike_24"
                 android:drawableEnd="@drawable/ic_baseline_chevron_right_24"
                 android:gravity="center"
                 android:padding="20dp"
-                android:text="Loại xe"
+                android:text="Chọn xe"
                 android:textSize="16dp"
                 android:textStyle="bold" />
-            <TextView
-                android:id="@+id/tvBrand"
+            <!--            <TextView-->
+            <!--                android:id="@+id/tvVehicleType"-->
+            <!--                android:layout_width="match_parent"-->
+            <!--                android:layout_height="wrap_content"-->
+            <!--                android:layout_marginStart="20dp"-->
+            <!--                android:layout_marginLeft="10dp"-->
+            <!--                android:layout_marginTop="5dp"-->
+            <!--                android:layout_marginEnd="20dp"-->
+            <!--                android:background="@drawable/border_white"-->
+            <!--                android:drawableStart="@drawable/ic_bike_24"-->
+            <!--                android:drawableEnd="@drawable/ic_baseline_chevron_right_24"-->
+            <!--                android:gravity="center"-->
+            <!--                android:padding="20dp"-->
+            <!--                android:text="Loại xe"-->
+            <!--                android:textSize="16dp"-->
+            <!--                android:textStyle="bold" />-->
+
+            <!--            <TextView-->
+            <!--                android:id="@+id/tvBrand"-->
+            <!--                android:layout_width="match_parent"-->
+            <!--                android:layout_height="wrap_content"-->
+            <!--                android:layout_marginStart="20dp"-->
+            <!--                android:layout_marginLeft="10dp"-->
+            <!--                android:layout_marginTop="10dp"-->
+            <!--                android:layout_marginEnd="20dp"-->
+            <!--                android:background="@drawable/border_white"-->
+            <!--                android:drawableStart="@drawable/ic_inforrmation"-->
+            <!--                android:drawableEnd="@drawable/ic_baseline_chevron_right_24"-->
+            <!--                android:gravity="center"-->
+            <!--                android:padding="20dp"-->
+            <!--                android:text="Hãng Xe"-->
+            <!--                android:textSize="16dp"-->
+            <!--                android:textStyle="bold" />-->
+
+            <!--            <TextView-->
+            <!--                android:id="@+id/tvYear"-->
+            <!--                android:layout_width="match_parent"-->
+            <!--                android:layout_height="wrap_content"-->
+            <!--                android:layout_marginStart="20dp"-->
+            <!--                android:layout_marginLeft="10dp"-->
+            <!--                android:layout_marginTop="10dp"-->
+            <!--                android:layout_marginEnd="20dp"-->
+            <!--                android:background="@drawable/border_white"-->
+            <!--                android:drawableStart="@drawable/ic_doi_xe_24"-->
+            <!--                android:drawableEnd="@drawable/ic_baseline_chevron_right_24"-->
+            <!--                android:gravity="center"-->
+            <!--                android:padding="20dp"-->
+            <!--                android:text="Đời Xe"-->
+            <!--                android:textSize="16dp"-->
+            <!--                android:textStyle="bold" />-->
+
+            <View
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="20dp"
-                android:layout_marginLeft="10dp"
-                android:layout_marginTop="10dp"
-                android:layout_marginEnd="20dp"
-                android:background="@drawable/border_white"
-                android:drawableStart="@drawable/ic_inforrmation"
-                android:drawableEnd="@drawable/ic_baseline_chevron_right_24"
-                android:gravity="center"
-                android:padding="20dp"
-                android:text="Hãng Xe"
-                android:textSize="16dp"
-                android:textStyle="bold" />
-
-            <!--            <Spinner-->
-            <!--                android:id="@+id/spinner2"-->
-            <!--                android:layout_width="wrap_content"-->
-            <!--                android:layout_height="match_parent"-->
-            <!--                android:layout_gravity="center"-->
-            <!--                android:layout_marginLeft="30dp" />-->
+                android:layout_height="1dp"
+                android:layout_marginTop="16dp"
+                android:background="@color/grey" />
 
             <TextView
-                android:id="@+id/tvYear"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="20dp"
-                android:layout_marginLeft="10dp"
-                android:layout_marginTop="10dp"
-                android:layout_marginEnd="20dp"
-                android:background="@drawable/border_white"
-                android:drawableStart="@drawable/ic_doi_xe_24"
-                android:drawableEnd="@drawable/ic_baseline_chevron_right_24"
-                android:gravity="center"
-                android:padding="20dp"
-                android:text="Đời Xe"
-                android:textSize="16dp"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:layout_marginTop="5dp"
+                android:padding="5dp"
+                android:text="Thông tin cửa hàng"
+                android:textColor="@color/colorPrimaryDark"
+                android:textSize="20dp"
                 android:textStyle="bold" />
 
-            <!--            <Spinner-->
-            <!--                android:id="@+id/spinner3"-->
-            <!--                android:layout_width="wrap_content"-->
-            <!--                android:layout_height="match_parent"-->
-            <!--                android:layout_gravity="center"-->
-            <!--                android:layout_marginLeft="30dp" />-->
+            <EditText
+                android:id="@+id/txtConfirmShopName"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="5dp"
+                android:drawableLeft="@drawable/ic_shop_24"
+                android:hint=" Tên cửa hàng"
+                android:enabled="false"
+                android:focusable="false"
+                android:clickable="false"
+                android:cursorVisible="false"
+                android:paddingBottom="15dp" />
+            <EditText
+                android:id="@+id/txtConfirmShopAddress"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="5dp"
+                android:drawableLeft="@drawable/ic_shop_address_24"
+                android:hint=" Địa chỉ cửa hàng"
+                android:enabled="false"
+                android:focusable="false"
+                android:clickable="false"
+                android:cursorVisible="false"
+                android:paddingBottom="15dp" />
+
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
@@ -177,12 +245,13 @@
                 android:textStyle="bold" />
 
             <EditText
+                android:id="@+id/edtConfirmDescription"
                 android:layout_width="match_parent"
                 android:layout_height="100dp"
                 android:layout_marginLeft="5dp"
                 android:layout_marginRight="5dp"
                 android:background="@drawable/custom_border_text"
-                android:hint="Bạn chưa có ghi chú nào. . . ."
+                android:hint="Ví dụ: xe chạy được 200km,\ngần trường ABC,..."
                 android:inputType="text"
                 android:padding="6dp" />
 
@@ -221,6 +290,7 @@
                     android:layout_margin="5dp"
                     android:background="@drawable/custom_border_text"
                     android:src="@drawable/ic_camera_alt_24" />
+
                 <ImageButton
                     android:id="@+id/btnImg4"
                     android:layout_width="70dp"

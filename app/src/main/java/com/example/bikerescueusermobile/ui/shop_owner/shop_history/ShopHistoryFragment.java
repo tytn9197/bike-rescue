@@ -73,11 +73,11 @@ public class ShopHistoryFragment extends BaseFragment implements CustomAdapter.O
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(requests -> {
                     Log.e(TAG, "Request: " + requests);
-                    if (requests != null) {
+                    if (requests != null && requests.size() > 0) {
                         //Define
                         requestList.addAll(requests);
 
-                        customAdapter = new CustomAdapter(requestList, getContext(), this);
+                        customAdapter = new CustomAdapter(requests, getContext(), this);
                         recyclerView.setAdapter(customAdapter);
                         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
                         recyclerView.addItemDecoration(new DividerItemDecoration((getActivity()), DividerItemDecoration.VERTICAL));

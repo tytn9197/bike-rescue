@@ -44,6 +44,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.Task;
 import com.google.android.libraries.places.compat.GeoDataClient;
 import com.google.android.libraries.places.compat.PlaceDetectionClient;
+import com.google.gson.Gson;
 import com.karumi.dexter.Dexter;
 import com.karumi.dexter.MultiplePermissionsReport;
 import com.karumi.dexter.PermissionToken;
@@ -78,7 +79,7 @@ public class HomeFragment extends BaseFragment
     private PermissionsManager permissionsManager;
     private ShopServiceViewModel viewModel;
 
-    private List<Shop> listShop;
+    private List<Shop> listShop = new ArrayList<>();
 
     @Inject
     ViewModelFactory viewModelFactory;
@@ -116,7 +117,7 @@ public class HomeFragment extends BaseFragment
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(listShop -> {
                         if (listShop != null) {
-                            this.listShop = listShop;
+                            this.listShop.addAll(listShop);
                             for (int i = 0; i < listShop.size(); i++) {
                                 googleMap.addMarker(new MarkerOptions()
                                         .position(new LatLng(Double.parseDouble(listShop.get(i).getLatitude()), Double.parseDouble(listShop.get(i).getLongtitude())))
@@ -176,7 +177,7 @@ public class HomeFragment extends BaseFragment
         for (int i = 0; i < listShop.size(); i++) {
             if (Double.parseDouble(listShop.get(i).getLatitude()) == marker.getPosition().latitude
                     && Double.parseDouble(listShop.get(i).getLongtitude()) == marker.getPosition().longitude) {
-                ((MapActivity) getActivity()).setShopDetailToMapbox(listShop.get(i));
+                ((MapActivity) getActivity()).setShopDetailToMapbox(listShop.get(i), listShop.get(i).getUserNameOnly().getId());
             }
         }
         return false;

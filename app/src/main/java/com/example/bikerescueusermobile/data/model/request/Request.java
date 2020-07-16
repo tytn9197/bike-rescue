@@ -1,9 +1,11 @@
 package com.example.bikerescueusermobile.data.model.request;
 
 import com.example.bikerescueusermobile.data.model.user.User;
+import com.example.bikerescueusermobile.data.model.vehicle.Vehicle;
 import com.google.gson.annotations.SerializedName;
 
 import java.sql.Timestamp;
+import java.util.List;
 
 import lombok.Data;
 
@@ -48,14 +50,11 @@ public class Request {
     @SerializedName("accepted")
     private User accepted;
 
-    @SerializedName("vehiclesBrand")
-    private String vehiclesBrand;
+    @SerializedName("vehicle")
+    private Vehicle vehicle;
 
-    @SerializedName("vehiclesType")
-    private String vehiclesType;
-
-    @SerializedName("vehiclesYear")
-    private int vehiclesYear;
+    @SerializedName("listReqShopService")
+    List<RequestShopService> listReqShopService;
 
     public Request() {
     }

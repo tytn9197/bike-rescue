@@ -1,5 +1,7 @@
 package com.example.bikerescueusermobile.data.model.shop_services;
 
+import com.example.bikerescueusermobile.data.model.user.CurrentUser;
+
 import java.util.List;
 
 import javax.inject.Inject;
@@ -20,6 +22,14 @@ public class ShopServicesRepository {
 
     public Single<List<ShopService>> getTop3Services(String token){
         return shopServices.getTop3Services(token);
+    }
+
+    public Single<List<ShopServiceTable>> getShopServiceByShopId(int shopId,String token){
+        return shopServices.getShopServiceByShopId(shopId, token);
+    }
+
+    public Single<ShopServiceTable> getShopServiceId(int shopId, int serivceId){
+        return shopServices.getShopServiceId(CurrentUser.getInstance().getAccessToken(), shopId, serivceId);
     }
 
 }

@@ -1,5 +1,7 @@
 package com.example.bikerescueusermobile.data.model.request;
 
+import com.example.bikerescueusermobile.data.model.user.CurrentUser;
+
 import java.util.List;
 
 import javax.inject.Inject;
@@ -17,6 +19,10 @@ public class RequestRepository {
     //function
     public Single<List<Request>> getRequestByShopId(String token, int shopId){
         return iRequestService.getRequestByShopId(token, shopId);
+    }
+
+    public Single<Response<RequestDTO>> createRequest(RequestDTO request){
+        return iRequestService.createRequest(CurrentUser.getInstance().getAccessToken(), request);
     }
 
 }

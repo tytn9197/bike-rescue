@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel;
 
 import com.example.bikerescueusermobile.data.model.shop.Shop;
 import com.example.bikerescueusermobile.data.model.shop_services.ShopService;
+import com.example.bikerescueusermobile.data.model.shop_services.ShopServiceTable;
 import com.example.bikerescueusermobile.data.model.user.CurrentUser;
 import com.example.bikerescueusermobile.data.model.shop.ShopRepository;
 import com.example.bikerescueusermobile.data.model.shop_services.ShopServicesRepository;
@@ -61,4 +62,8 @@ public class ShopServiceViewModel extends ViewModel {
         return shopRepository.getShopByServiceName(CurrentUser.getInstance().getAccessToken(), serviceName);
     }
 
+    public Single<List<ShopServiceTable>> getShopServiceByShopId(int shopId){
+        loading.setValue(true);
+        return shopServicesRepository.getShopServiceByShopId(shopId, CurrentUser.getInstance().getAccessToken());
+    }
 }

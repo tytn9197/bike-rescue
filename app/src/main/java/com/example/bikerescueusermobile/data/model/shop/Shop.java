@@ -42,8 +42,11 @@ public class Shop implements Serializable {
     @SerializedName("longtitude")
     private String longtitude;
 
-//    @SerializedName("user")
+    @SerializedName("userInfoDTO")
     private User user;
+
+    @SerializedName("user")
+    private User userNameOnly;
 
     @SerializedName("numOfStart")
     private String shopRatingStar;

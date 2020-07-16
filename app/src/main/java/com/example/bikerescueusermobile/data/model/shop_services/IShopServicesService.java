@@ -7,6 +7,7 @@ import java.util.List;
 import io.reactivex.Single;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
+import retrofit2.http.Query;
 
 public interface IShopServicesService {
     @GET("/shop/getAllService")
@@ -15,4 +16,9 @@ public interface IShopServicesService {
     @GET("/shop/getTop3Service")
     Single<List<ShopService>> getTop3Services(@Header("Authorization") String token);
 
+    @GET("/shop/getShopServiceByShopId")
+    Single<List<ShopServiceTable>> getShopServiceByShopId(@Query("shopId") int shopId, @Header("Authorization")String token);
+
+    @GET("/shop/getShopIdAndServiceId")
+    Single<ShopServiceTable> getShopServiceId(@Header("Authorization") String token, @Query("shopId") int shopId, @Query("serviceId") int serivceId);
 }

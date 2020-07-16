@@ -2,14 +2,15 @@ package com.example.bikerescueusermobile.data.model.user;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.io.Serializable;
 import java.util.Date;
 
 import lombok.Data;
 
 @Data
-public class User {
+public class User implements Serializable {
 
-    @SerializedName("userId")
+    @SerializedName("id")
     private int id;
 
     @SerializedName("address")
@@ -45,6 +46,8 @@ public class User {
 
     @SerializedName("roleId")
     private int roleId;
+
+    private int chosenShopOwnerId;
 
     public User(){
 

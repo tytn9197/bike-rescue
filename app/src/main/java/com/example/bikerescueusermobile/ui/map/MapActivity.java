@@ -18,13 +18,19 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.fragment.app.FragmentManager;
+import androidx.lifecycle.ViewModelProviders;
 
 import com.example.bikerescueusermobile.R;
 import com.example.bikerescueusermobile.data.model.shop.Shop;
+import com.example.bikerescueusermobile.data.model.shop_services.ShopService;
+import com.example.bikerescueusermobile.data.model.shop_services.ShopServiceTable;
+import com.example.bikerescueusermobile.data.model.user.CurrentUser;
 import com.example.bikerescueusermobile.ui.confirm.ConfirmInfoActivity;
 import com.example.bikerescueusermobile.ui.home.HomeFragment;
+import com.example.bikerescueusermobile.ui.seach_shop_service.ShopServiceViewModel;
+import com.example.bikerescueusermobile.util.MyMethods;
+import com.example.bikerescueusermobile.util.ViewModelFactory;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.mapbox.android.core.permissions.PermissionsManager;
@@ -58,11 +64,16 @@ import com.mapbox.mapboxsdk.style.layers.PropertyFactory;
 import com.mapbox.mapboxsdk.style.layers.SymbolLayer;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.mapbox.mapboxsdk.location.LocationComponent;
 
+import javax.inject.Inject;
+
 import dagger.android.support.DaggerAppCompatActivity;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -113,6 +124,12 @@ public class MapActivity extends DaggerAppCompatActivity implements
     private double distance = -1;
     private String serviceName = "";
     private String mPlaceName = "";
+    private ArrayList<ShopServiceTable> listAllShopServices;
+
+    @Inject
+    ViewModelFactory viewModelFactory;
+
+    private ShopServiceViewModel viewModel;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -121,6 +138,8 @@ public class MapActivity extends DaggerAppCompatActivity implements
         setContentView(R.layout.activity_map);
 
         initViewID();
+
+        viewModel = ViewModelProviders.of(this, viewModelFactory).get(ShopServiceViewModel.class);
 
         //set-up map box
         mapView = findViewById(R.id.mapboxView);
@@ -137,7 +156,7 @@ public class MapActivity extends DaggerAppCompatActivity implements
         Shop shop = (Shop) getIntent().getSerializableExtra("shop");
         this.distance = getIntent().getDoubleExtra("dis", -1);
         serviceName = getIntent().getStringExtra("serviceName");
-        initShopDetail(shop);
+        initShopDetail(shop, shop.getUser().getId());
 
         //set-up cluster google map
         FragmentManager manager = getSupportFragmentManager();
@@ -150,31 +169,44 @@ public class MapActivity extends DaggerAppCompatActivity implements
         }
     }
 
-    public void setShopDetailToMapbox(Shop s) {
+    public void setShopDetailToMapbox(Shop s, int id) {
         hideClusterMap();
-        initShopDetail(s);
+        initShopDetail(s, id);
     }
 
-//    private void setupMapShopDetailBackground(){
-//        CoordinatorLayout.LayoutParams layoutParams = new CoordinatorLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, mapShopDetail.getHeight() + 20);
-//        layoutParams.setMargins(10,10,10,10);
-//        mapShopDetailBackground.setLayoutParams(layoutParams);
-//        mapShopDetailBackground.setAlpha((float)0.6);
-//        mapShopDetailBackground.setBackground(getResources().getDrawable(R.drawable.border_opacity));
-//    }
-
     @SuppressLint("DefaultLocale")
-    private void initShopDetail(Shop shop) {
+    private void initShopDetail(Shop shop, int ownerId) {
         shopLocation = new LatLng(Double.parseDouble(shop.getLatitude()), Double.parseDouble(shop.getLongtitude()));
         txtMapShopName.setText(shop.getShopName());
         txtMapShopAddress.setText(shop.getAddress());
         String start = shop.getShopRatingStar() + "/5";
         txtMapShopRatingStarNum.setText(start);
         txtShopAndCurrentLocationDistance.setText(String.format("Cách đây %.1f km", shop.getDistanceFromUser()));
-        String services = "Các dịch vụ: " + "thay bình, thay nhớt, vá lốp xe,...";
-        txtMapShopServices.setText(services);
+        viewModel.getShopServiceByShopId(shop.getId())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(listServices -> {
+                    if(listServices != null && listServices.size() > 0) {
+                        listAllShopServices = new ArrayList<>();
+                        listAllShopServices.addAll(listServices);
+                        String s1 = listServices.get(0).getServices().getName() + ", ";
+                        String s2 = "";
+                        String s3 = "";
+                        if(listServices.size() > 1) {
+                            s2 = listServices.get(1).getServices().getName() + ", ";
+                        }
+                        if(listServices.size() > 2) {
+                            s3 = listServices.get(2).getServices().getName() + ",";
+                        }
+                        String services = "Các dịch vụ: " + s1 + s2 + s3 + "...";
+                        txtMapShopServices.setText(services);
+                    }
+                });
         String price = "Giá: " + "100k ~ 200k";
         txtMapEstimatePrice.setText(price);
+
+        //set chosen shop
+        CurrentUser.getInstance().setChosenShopOwnerId(ownerId);
     }
 
     private void initViewID() {
@@ -225,6 +257,8 @@ public class MapActivity extends DaggerAppCompatActivity implements
             intent.putExtra("placeName", "" + mPlaceName);
         }
         intent.putExtra("serviceName", serviceName);
+        intent.putParcelableArrayListExtra("allServices",listAllShopServices);
+        intent.putExtra("selectedShop", listAllShopServices.get(0).getShops());
         startActivity(intent);
         finish();
     };
@@ -324,6 +358,7 @@ public class MapActivity extends DaggerAppCompatActivity implements
             mFusedLocationClient.getLastLocation().addOnSuccessListener(this, location -> {
                 if (location != null) {
                     Point origin = Point.fromLngLat(location.getLongitude(), location.getLatitude());
+                    mPlaceName = MyMethods.convertLatLngToAddress(getApplicationContext(),location.getLatitude(),location.getLongitude()) ;
                     if (shopLocation != null) {
                         Point destination = Point.fromLngLat(shopLocation.getLongitude(), shopLocation.getLatitude());
                         initSource(loadedMapStyle, origin, destination);
@@ -334,7 +369,6 @@ public class MapActivity extends DaggerAppCompatActivity implements
                                 .profile(DirectionsCriteria.PROFILE_DRIVING)
                                 .accessToken(getString(R.string.mapbox_access_token))
                                 .build();
-                        reverseGeocode(origin);
                     }
                     client.enqueueCall(new Callback<DirectionsResponse>() {
                         @Override
@@ -444,42 +478,4 @@ public class MapActivity extends DaggerAppCompatActivity implements
         mapView.onLowMemory();
     }
 
-    private void reverseGeocode(final Point point) {
-        try {
-            MapboxGeocoding client = MapboxGeocoding.builder()
-                    .accessToken(getString(R.string.mapbox_access_token))
-                    .query(Point.fromLngLat(point.longitude(), point.latitude()))
-                    .geocodingTypes(GeocodingCriteria.TYPE_ADDRESS)
-                    .build();
-
-            client.enqueueCall(new Callback<GeocodingResponse>() {
-                @Override
-                public void onResponse(Call<GeocodingResponse> call, Response<GeocodingResponse> response) {
-
-                    if (response.body() != null) {
-
-                        List<CarmenFeature> results = response.body().features();
-                        Log.e(TAG, "response.body().toJson() = " + response.body().toJson());
-
-                        if (results.size() > 0) {
-                            // If the geocoder returns a result, we take the first in the list and show a Toast with the place name.
-                            CarmenFeature feature = results.get(0);
-                            Log.e(TAG, "MY PLACE NAME: " + feature.placeName());
-                            mPlaceName = feature.placeName();
-                        } else {
-                            Log.e(TAG, "ReverseGeocode fail - results.size() <= 0!!");
-                        }
-                    }
-                }
-
-                @Override
-                public void onFailure(Call<GeocodingResponse> call, Throwable throwable) {
-                    Log.e(TAG, "Geocoding Failure: " + throwable.getMessage());
-                }
-            });
-        } catch (ServicesException servicesException) {
-            Log.e(TAG, "Geocoding Failure: " + servicesException.getMessage());
-            servicesException.printStackTrace();
-        }
-    }
 }

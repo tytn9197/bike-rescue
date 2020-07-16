@@ -25,6 +25,7 @@ import com.example.bikerescueusermobile.data.model.user.CurrentUser;
 import com.example.bikerescueusermobile.ui.map.MapActivity;
 import com.example.bikerescueusermobile.util.MyMethods;
 import com.example.bikerescueusermobile.util.ViewModelFactory;
+import com.google.gson.Gson;
 
 import java.util.ArrayList;
 import java.util.List;
