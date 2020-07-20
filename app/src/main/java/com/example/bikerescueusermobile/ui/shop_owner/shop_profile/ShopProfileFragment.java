@@ -13,6 +13,7 @@ import com.example.bikerescueusermobile.base.BaseFragment;
 import com.example.bikerescueusermobile.ui.login.LoginActivity;
 import com.example.bikerescueusermobile.ui.main.MainActivity;
 import com.example.bikerescueusermobile.ui.shop_owner.ShopUpdateInfoActivity;
+import com.example.bikerescueusermobile.util.MyInstances;
 import com.example.bikerescueusermobile.util.SharedPreferenceHelper;
 
 import butterknife.BindView;
@@ -39,7 +40,7 @@ public class ShopProfileFragment extends BaseFragment {
         tvShopLogout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                SharedPreferenceHelper.setSharedPreferenceString(getActivity(), "user", "");
+                SharedPreferenceHelper.setSharedPreferenceString(getActivity(), MyInstances.KEY_LOGGED_IN, "");
                 Intent intentLog = new Intent(getActivity(), LoginActivity.class);
                 startActivity(intentLog);
                 getActivity().finish();

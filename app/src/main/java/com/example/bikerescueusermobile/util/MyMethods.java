@@ -12,8 +12,12 @@ import android.util.Log;
 import android.util.TypedValue;
 
 
+import com.example.bikerescueusermobile.data.model.request.CurrentRequest;
+import com.example.bikerescueusermobile.data.model.request.Request;
+import com.example.bikerescueusermobile.data.model.request.RequestDTO;
 import com.example.bikerescueusermobile.data.model.shop.Shop;
 import com.example.bikerescueusermobile.data.model.user.CurrentUser;
+import com.example.bikerescueusermobile.data.model.vehicle.Vehicle;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 
 import java.io.ByteArrayOutputStream;
@@ -110,4 +114,34 @@ public class MyMethods {
         return p1;
 
     }
+
+//    public static void setRequestToCurrentRequest(Request request){
+//        CurrentRequest.getInstance().setId(request.getId());
+//        CurrentRequest.getInstance().setCreatedDate(request.getCreatedDate());
+//        CurrentRequest.getInstance().setStatus(request.getStatus());
+//        CurrentRequest.getInstance().setRequestCode(request.getRequestCode());
+//        CurrentRequest.getInstance().setLatitude(request.getLatitude());
+//        CurrentRequest.getInstance().setLongtitude(request.getLongtitude());
+//        CurrentRequest.getInstance().setAddress(request.getAddress());
+//        CurrentRequest.getInstance().setReviewComment(request.getReviewComment());
+//        CurrentRequest.getInstance().setReviewRating(request.getReviewRating());
+//        CurrentRequest.getInstance().setReviewUpdateDate(request.getReviewUpdateDate());
+//        CurrentRequest.getInstance().setVehicle(request.getVehicle());
+//        CurrentRequest.getInstance().setCreatedUser(request.getCreatedUser());
+//        CurrentRequest.getInstance().setAcceptedUser(request.getAcceptedUser());
+//        CurrentRequest.getInstance().setListReqShopService(request.getListReqShopService());
+//    }
+//
+//    public static void setRequestToCurrentRequest(RequestDTO request){
+//        CurrentRequest.getInstance().setId(request.getId());
+//        CurrentRequest.getInstance().setCreatedDate(request.getCreatedDate());
+//        CurrentRequest.getInstance().setStatus(request.getStatus());
+//        CurrentRequest.getInstance().setRequestCode(request.getCode());
+//        CurrentRequest.getInstance().setLatitude(request.getLatitude());
+//        CurrentRequest.getInstance().setLongtitude(request.getLongtitude());
+//        CurrentRequest.getInstance().setAddress(request.getAddress());
+//        CurrentRequest.getInstance().setReviewComment(request.getReviewComment());
+//        CurrentRequest.getInstance().setReviewRating(request.getReviewRating());
+//        CurrentRequest.getInstance().setReviewUpdateDate(request.getReviewUpdateDate());
+//    }
 }

@@ -12,4 +12,11 @@ public class MyInstances {
     public static final String ROLE_ADMIN = "ROLE_ADMIN";
     public static final String ROLE_SHOP = "ROLE_SHOP";
     public static final String ROLE_BIKER = "ROLE_BIKER";
+
+    //share preference key
+    public static final String KEY_BIKER_REQUEST= "bikerReq";
+    public static final String KEY_SHOP_REQUEST= "shopReq";
+    public static final String KEY_LOGGED_IN= "user";
+
+
 }

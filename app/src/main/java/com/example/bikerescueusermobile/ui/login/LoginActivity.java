@@ -22,6 +22,7 @@ import com.example.bikerescueusermobile.ui.confirm.ConfirmInfoActivity;
 import com.example.bikerescueusermobile.ui.main.MainActivity;
 import com.example.bikerescueusermobile.ui.otp_page.LoginByPhoneNumberActivity;
 import com.example.bikerescueusermobile.ui.shopMain.ShopMainActivity;
+import com.example.bikerescueusermobile.util.MyInstances;
 import com.example.bikerescueusermobile.util.SharedPreferenceHelper;
 import com.example.bikerescueusermobile.ui.register.CreatePasswordActivity;
 import com.example.bikerescueusermobile.util.SharedPreferenceHelper;
@@ -106,7 +107,7 @@ public class LoginActivity extends BaseActivity {
                         if (user != null) {
 
                             String sharedPreferenceStr = gson.toJson(user);
-                            SharedPreferenceHelper.setSharedPreferenceString(LoginActivity.this, "user", sharedPreferenceStr);
+                            SharedPreferenceHelper.setSharedPreferenceString(LoginActivity.this, MyInstances.KEY_LOGGED_IN, sharedPreferenceStr);
                             CurrentUser.getInstance().setFullName(user.getFullName());
                             CurrentUser.getInstance().setDeviceToken(this.deviceToken);
                             CurrentUser.getInstance().setAccessToken("Bearer " + user.getAccessToken());

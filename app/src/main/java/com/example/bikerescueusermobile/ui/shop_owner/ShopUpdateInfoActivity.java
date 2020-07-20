@@ -23,7 +23,7 @@ import com.example.bikerescueusermobile.base.BaseActivity;
 import com.example.bikerescueusermobile.data.model.user.CurrentUser;
 import com.example.bikerescueusermobile.data.model.user.User;
 import com.example.bikerescueusermobile.ui.confirm.ConfirmInfoActivity;
-import com.example.bikerescueusermobile.ui.create_request.CreateRequestActivity;
+import com.example.bikerescueusermobile.ui.create_request.RequestDetailActivity;
 import com.example.bikerescueusermobile.ui.main.MainActivity;
 import com.example.bikerescueusermobile.ui.shopMain.ShopMainActivity;
 import com.example.bikerescueusermobile.ui.shop_owner.shop_profile.ShopProfileFragment;
@@ -39,6 +39,11 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 
 public class ShopUpdateInfoActivity extends BaseActivity {
+
+    @Override
+    protected int layoutRes() {
+        return R.layout.activity_shop_update_info;
+    }
 
     @BindView(R.id.shopUpdateToolBar)
     Toolbar shopUpdateToolBar;
@@ -114,42 +119,39 @@ public class ShopUpdateInfoActivity extends BaseActivity {
         });
 
 
-        tvRegister.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //init new Instance
-                User userInfo = new User();
-                userInfo.setPhoneNumber(phoneNumber.getText().toString());
-                userInfo.setFullName(fullName.getText().toString());
-                userInfo.setEmail(email.getText().toString());
-                userInfo.setAddress(street.getText().toString() + "," + ward.getText().toString() + "," + district.getText().toString() + "," + city.getText().toString());
-                //update Shop Owner Information
-                Log.e(TAG, "ID: " + CurrentUser.getInstance().getId());
-                Log.e(TAG, "Address: " + userInfo.getAddress());
+        tvRegister.setOnClickListener(v -> {
+            //init new Instance
+            User userInfo = new User();
+            userInfo.setPhoneNumber(phoneNumber.getText().toString());
+            userInfo.setFullName(fullName.getText().toString());
+            userInfo.setEmail(email.getText().toString());
+            userInfo.setAddress(street.getText().toString() + "," + ward.getText().toString() + "," + district.getText().toString() + "," + city.getText().toString());
+            //update Shop Owner Information
+            Log.e(TAG, "ID: " + CurrentUser.getInstance().getId());
+            Log.e(TAG, "Address: " + userInfo.getAddress());
 
-                viewModel.updateInfo(CurrentUser.getInstance().getId(), userInfo)
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(user -> {
-                            Log.e(TAG, "User: " + user);
-                            if (user != null) {
-                                CurrentUser.getInstance().setFullName(user.getFullName());
-                                CurrentUser.getInstance().setAddress(user.getAddress());
-                                CurrentUser.getInstance().setEmail(user.getEmail());
-                                SweetAlertDialog sweetAlertDialog = new SweetAlertDialog(ShopUpdateInfoActivity.this, SweetAlertDialog.NORMAL_TYPE);
-                                sweetAlertDialog.setTitleText("Thông báo");
-                                sweetAlertDialog.setContentText("Bạn đã cập nhật thông tin thành công");
-                                sweetAlertDialog.setConfirmText("OK");
-                                sweetAlertDialog.setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
-                                    @Override
-                                    public void onClick(SweetAlertDialog sDialog) {
-                                        finish();
-                                    }
-                                });
-                                sweetAlertDialog.show();
-                            }
-                        });
-            }
+            viewModel.updateInfo(CurrentUser.getInstance().getId(), userInfo)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(user -> {
+                        Log.e(TAG, "User: " + user);
+                        if (user != null) {
+                            CurrentUser.getInstance().setFullName(user.getFullName());
+                            CurrentUser.getInstance().setAddress(user.getAddress());
+                            CurrentUser.getInstance().setEmail(user.getEmail());
+                            SweetAlertDialog sweetAlertDialog = new SweetAlertDialog(ShopUpdateInfoActivity.this, SweetAlertDialog.NORMAL_TYPE);
+                            sweetAlertDialog.setTitleText("Thông báo");
+                            sweetAlertDialog.setContentText("Bạn đã cập nhật thông tin thành công");
+                            sweetAlertDialog.setConfirmText("OK");
+                            sweetAlertDialog.setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
+                                @Override
+                                public void onClick(SweetAlertDialog sDialog) {
+                                    finish();
+                                }
+                            });
+                            sweetAlertDialog.show();
+                        }
+                    });
         });
 
     }
@@ -168,11 +170,5 @@ public class ShopUpdateInfoActivity extends BaseActivity {
             finish();
         }
         return super.onOptionsItemSelected(item);
-    }
-
-
-    @Override
-    protected int layoutRes() {
-        return R.layout.activity_shop_update_info;
     }
 }

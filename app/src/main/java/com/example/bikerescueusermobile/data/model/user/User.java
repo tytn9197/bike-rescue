@@ -13,6 +13,9 @@ public class User implements Serializable {
     @SerializedName("id")
     private int id;
 
+    @SerializedName("status")
+    private String status;
+
     @SerializedName("address")
     private String address;
 
@@ -48,6 +51,8 @@ public class User implements Serializable {
     private int roleId;
 
     private int chosenShopOwnerId;
+
+    private int sentReqId;
 
     public User(){
 

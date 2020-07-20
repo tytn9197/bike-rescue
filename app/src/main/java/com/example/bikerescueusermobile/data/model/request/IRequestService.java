@@ -16,4 +16,7 @@ public interface IRequestService {
 
     @POST("/biker/create-request")
     Single<Response<RequestDTO>> createRequest(@Header("Authorization") String token, @Body RequestDTO request);
+
+    @GET("/biker/request/{id}")
+    Single<Request> getRequestById(@Path("id") int reqId,@Header("Authorization") String token);
 }

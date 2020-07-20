@@ -35,7 +35,7 @@ public class onMessageReceived extends FirebaseMessagingService {
         if (remoteMessage.getNotification() != null) {
             Log.d(TAG, "Message Notification Body: " + remoteMessage.getNotification().getBody());
             Log.d(TAG, "Message Notification Body: " + remoteMessage.getNotification().getTitle());
-            sendMessageToActivity(remoteMessage.getNotification().getBody());
+            sendMessageToActivity(remoteMessage.getNotification().getTitle());
 
         }
 
@@ -44,12 +44,8 @@ public class onMessageReceived extends FirebaseMessagingService {
     }
 
     private void sendMessageToActivity(String msg) {
-        Intent intent = new Intent("GPSLocationUpdates");
-        // You can also include some extra data.
+        Intent intent = new Intent("BikeRescue");
         intent.putExtra("mess", msg);
-//        Bundle b = new Bundle();
-//        b.putParcelable("Location", l);
-//        intent.putExtra("Location", b);
         LocalBroadcastManager.getInstance(getBaseContext()).sendBroadcast(intent);
     }
     @Override

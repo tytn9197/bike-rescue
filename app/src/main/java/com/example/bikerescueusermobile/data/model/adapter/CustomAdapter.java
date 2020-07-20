@@ -51,11 +51,11 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.MyViewHold
 
 
         holder.imageView.setImageResource(R.drawable.ic_user);
-        holder.request_code.setText(requestList.get(position).getRequest_code());
-        holder.name.setText(requestList.get(position).getCreated().getFullName());
+        holder.request_code.setText(requestList.get(position).getRequestCode());
+        holder.name.setText(requestList.get(position).getCreatedUser().getFullName());
         holder.address.setText(requestList.get(position).getAddress());
         holder.field.setText("Sữa chữa xe máy");
-        holder.time.setText(requestList.get(position).getTime().toString());
+        holder.time.setText(requestList.get(position).getCreatedDate().toString());
         if(requestList.get(position).getStatus() == "DONE"){
             holder.ic_status.setImageResource(R.drawable.ic_complete);
         } else if(requestList.get(position).getStatus() == "CANCEL"){

@@ -15,7 +15,7 @@ public class Request {
     private int id;
 
     @SerializedName("createdDate")
-    private Timestamp time;
+    private Timestamp createdDate;
 
     @SerializedName("status")
     private String status;
@@ -24,7 +24,7 @@ public class Request {
     private String description;
 
     @SerializedName("code")
-    private String request_code;
+    private String requestCode;
 
     @SerializedName("latitude")
     private String latitude;
@@ -45,10 +45,10 @@ public class Request {
     private Timestamp reviewUpdateDate;
 
     @SerializedName("created")
-    private User created;
+    private User createdUser;
 
     @SerializedName("accepted")
-    private User accepted;
+    private User acceptedUser;
 
     @SerializedName("vehicle")
     private Vehicle vehicle;

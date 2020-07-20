@@ -38,7 +38,7 @@ import com.example.bikerescueusermobile.data.model.shop_services.ShopServiceTabl
 import com.example.bikerescueusermobile.data.model.user.CurrentUser;
 import com.example.bikerescueusermobile.data.model.user.User;
 import com.example.bikerescueusermobile.data.model.vehicle.Vehicle;
-import com.example.bikerescueusermobile.ui.create_request.CreateRequestActivity;
+import com.example.bikerescueusermobile.ui.create_request.RequestDetailActivity;
 import com.example.bikerescueusermobile.ui.login.LoginActivity;
 import com.example.bikerescueusermobile.ui.main.MainActivity;
 import com.example.bikerescueusermobile.ui.map.MapActivity;
@@ -118,7 +118,7 @@ public class ConfirmInfoActivity extends BaseActivity {
     private SweetAlertDialog errorDialog;
     private SweetAlertDialog loadingDialog;
     private int selectedService = -1;
-
+    private Intent intentReqDetail;
     @Override
     protected int layoutRes() {
         return R.layout.activity_confirm_info;
@@ -127,6 +127,7 @@ public class ConfirmInfoActivity extends BaseActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        intentReqDetail = new Intent(getApplicationContext(), RequestDetailActivity.class);
 
         //setup process dialog
         loadingDialog = new SweetAlertDialog(this, SweetAlertDialog.PROGRESS_TYPE);
@@ -223,8 +224,8 @@ public class ConfirmInfoActivity extends BaseActivity {
             tvProblem.setText("Vui lòng chọn vấn đề của bạn");
         } else {
             String s = "Tôi cần " + serviceName.toLowerCase().trim() + ".";
-            for (int i = 0; i < listAllShopServices.size(); i++){
-                if(serviceName.equals(listAllShopServices.get(i).getServices().getName())){
+            for (int i = 0; i < listAllShopServices.size(); i++) {
+                if (serviceName.equals(listAllShopServices.get(i).getServices().getName())) {
                     selectedService = i;
                     break;
                 }
@@ -235,7 +236,7 @@ public class ConfirmInfoActivity extends BaseActivity {
         tvBookService.setOnClickListener(v -> {
             txtConfirmProblemBadge.setVisibility(View.GONE);
             int serviceId = -1;
-            if(selectedService != -1) {
+            if (selectedService != -1) {
                 serviceId = listAllShopServices.get(selectedService).getServices().getId();
                 viewModel.getShopServiceId(selectedShop.getId(), serviceId)
                         .subscribeOn(Schedulers.io())
@@ -251,12 +252,8 @@ public class ConfirmInfoActivity extends BaseActivity {
                 sweetAlertDialog.setConfirmText("Xác nhận");
                 sweetAlertDialog.setContentText("Xác nhận thực hiện gọi dịch vụ lúc này?");
                 sweetAlertDialog.setConfirmClickListener(sDialog -> {
-                    sweetAlertDialog.dismiss();
                     if (shopServiceId != -1) {
                         sendReqAndSaveRequestToSharePref();
-                        Intent intent = new Intent(getApplicationContext(), CreateRequestActivity.class);
-                        startActivity(intent);
-                        finish();
                         sDialog.cancel();
                     } else {
                         sDialog.cancel();
@@ -267,7 +264,7 @@ public class ConfirmInfoActivity extends BaseActivity {
                     sDialog.dismissWithAnimation();
                 });
                 sweetAlertDialog.show();
-            }else{
+            } else {
                 errorDialog.show();
                 txtConfirmProblemBadge.setVisibility(View.VISIBLE);
             }
@@ -338,17 +335,27 @@ public class ConfirmInfoActivity extends BaseActivity {
         request.setLongtitude(userLong);
         request.setVehicleId(vehicleId);
         request.setShopServiceId(shopServiceId);
+
         Gson gson = new Gson();
-        Log.e(TAG, "request: " + gson.toJson(request));
-//        String sharedPreferenceStr = gson.toJson(user);
-//        SharedPreferenceHelper.setSharedPreferenceString(this, "request", sharedPreferenceStr);
+
         viewModel.createRequest(request)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(response -> {
-                    Log.e(TAG, "response: " + response.getMessage());
-                    Log.e(TAG, "response data: " + gson.toJson(response.getData()));
+                    Log.e(TAG, "respone data: " + gson.toJson(response.getData()));
+
+                    if(response!= null) {
+//                        CurrentUser.getInstance().setSentReqId(response.getData().getId().intValue());
+                        intentReqDetail.putExtra("reqId", response.getData().getId().intValue());
+
+                        String sharedPreferenceStr = gson.toJson(response.getData());
+                        SharedPreferenceHelper.setSharedPreferenceString(getApplicationContext(), MyInstances.KEY_BIKER_REQUEST, sharedPreferenceStr);
+
+                        startActivity(intentReqDetail);
+                        finish();
+                    }
                 });
+
 
     }
 

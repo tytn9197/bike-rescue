@@ -46,23 +46,11 @@
         <activity android:name=".ui.send_request.SendRequestActivity" />
         <activity android:name=".ui.confirm.ConfirmInfoActivity" />
         <activity android:name=".ui.update_info.UpdateInfoActivity" />
-        <activity android:name=".ui.create_request.CreateRequestActivity" />
+        <activity android:name=".ui.create_request.RequestDetailActivity" />
         <activity android:name=".ui.shop_owner.ShopRequestDetailActivity" />
         <activity android:name=".ui.shop_owner.ShopUpdateInfoActivity" />
         <activity android:name=".ui.profile.BikerUpdateInfoActivity" />
-
-
         <activity android:name=".ui.map.MapActivity" />
-
-
-        <service
-            android:name=".ui.create_request.SendNotificationService"
-            android:enabled="true"
-            android:exported="false">
-            <intent-filter>
-                <action android:name="com.google.firebase.MESSAGING_EVENT" />
-            </intent-filter>
-        </service>
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"

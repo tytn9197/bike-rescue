@@ -25,4 +25,8 @@ public class RequestRepository {
         return iRequestService.createRequest(CurrentUser.getInstance().getAccessToken(), request);
     }
 
+    public Single<Request> getRequestById(int reqId){
+        return iRequestService.getRequestById(reqId, CurrentUser.getInstance().getAccessToken());
+    }
+
 }

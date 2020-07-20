@@ -1,7 +1,7 @@
 package com.example.bikerescueusermobile.di.module;
 
 import com.example.bikerescueusermobile.ui.confirm.ConfirmInfoActivity;
-import com.example.bikerescueusermobile.ui.create_request.CreateRequestActivity;
+import com.example.bikerescueusermobile.ui.create_request.RequestDetailActivity;
 import com.example.bikerescueusermobile.ui.loading_page.LoadPageActivity;
 import com.example.bikerescueusermobile.ui.login.LoginActivity;
 import com.example.bikerescueusermobile.ui.main.MainActivity;
@@ -43,7 +43,7 @@ public abstract class ActivityBindingModule {
     abstract UpdateInfoActivity updateInfoActivity();
 
     @ContributesAndroidInjector
-    abstract CreateRequestActivity createRequestActivity();
+    abstract RequestDetailActivity requestDetailActivity();
 
     @ContributesAndroidInjector(modules = {MapFragmentBindingModule.class})
     abstract MapActivity bindMapActivity();

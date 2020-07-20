@@ -21,6 +21,7 @@ import com.example.bikerescueusermobile.data.model.user.CurrentUser;
 import com.example.bikerescueusermobile.ui.login.LoginActivity;
 import com.example.bikerescueusermobile.ui.main.MainActivity;
 import com.example.bikerescueusermobile.ui.shop_owner.ShopUpdateInfoActivity;
+import com.example.bikerescueusermobile.util.MyInstances;
 import com.example.bikerescueusermobile.util.MyMethods;
 import com.example.bikerescueusermobile.util.SharedPreferenceHelper;
 import com.github.dhaval2404.imagepicker.ImagePicker;
@@ -62,7 +63,7 @@ public class ProfileFragment extends BaseFragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         logout.setOnClickListener(v -> {
-            SharedPreferenceHelper.setSharedPreferenceString(getActivity(), "user", "");
+            SharedPreferenceHelper.setSharedPreferenceString(getActivity(), MyInstances.KEY_LOGGED_IN, "");
             Intent intentLog = new Intent(getActivity(), LoginActivity.class);
             startActivity(intentLog);
             getActivity().finish();

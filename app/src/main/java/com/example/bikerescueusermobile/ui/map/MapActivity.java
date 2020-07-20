@@ -29,7 +29,9 @@ import com.example.bikerescueusermobile.data.model.user.CurrentUser;
 import com.example.bikerescueusermobile.ui.confirm.ConfirmInfoActivity;
 import com.example.bikerescueusermobile.ui.home.HomeFragment;
 import com.example.bikerescueusermobile.ui.seach_shop_service.ShopServiceViewModel;
+import com.example.bikerescueusermobile.util.MyInstances;
 import com.example.bikerescueusermobile.util.MyMethods;
+import com.example.bikerescueusermobile.util.SharedPreferenceHelper;
 import com.example.bikerescueusermobile.util.ViewModelFactory;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
@@ -71,6 +73,7 @@ import com.mapbox.mapboxsdk.location.LocationComponent;
 
 import javax.inject.Inject;
 
+import cn.pedant.SweetAlert.SweetAlertDialog;
 import dagger.android.support.DaggerAppCompatActivity;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
@@ -250,17 +253,30 @@ public class MapActivity extends DaggerAppCompatActivity implements
     };
 
     private View.OnClickListener btnSendRequestOnClickListener = v -> {
-        Intent intent = new Intent(this, ConfirmInfoActivity.class);
-        if (mPlaceName.equals("")) {
-            intent.putExtra("placeName", "Vị trí của tôi");
-        } else {
-            intent.putExtra("placeName", "" + mPlaceName);
+        String request = SharedPreferenceHelper.getSharedPreferenceString(getApplicationContext(), MyInstances.KEY_BIKER_REQUEST,"");
+        if(!request.trim().equals("")){
+            SweetAlertDialog errorDialog = new SweetAlertDialog(this, SweetAlertDialog.ERROR_TYPE);
+            errorDialog.setTitleText("Thông báo");
+            errorDialog.setConfirmText("Xác nhận");
+            errorDialog.setContentText("Yêu cầu của bạn đang được xử lí, xin vui lòng chờ bên phía cửa hàng xác nhận!");
+            errorDialog.setConfirmClickListener(sDialog2 -> {
+                sDialog2.cancel();
+                errorDialog.dismiss();
+            });
+            errorDialog.show();
+        }else{
+            Intent intent = new Intent(this, ConfirmInfoActivity.class);
+            if (mPlaceName.equals("")) {
+                intent.putExtra("placeName", "Vị trí của tôi");
+            } else {
+                intent.putExtra("placeName", "" + mPlaceName);
+            }
+            intent.putExtra("serviceName", serviceName);
+            intent.putParcelableArrayListExtra("allServices",listAllShopServices);
+            intent.putExtra("selectedShop", listAllShopServices.get(0).getShops());
+            startActivity(intent);
+            finish();
         }
-        intent.putExtra("serviceName", serviceName);
-        intent.putParcelableArrayListExtra("allServices",listAllShopServices);
-        intent.putExtra("selectedShop", listAllShopServices.get(0).getShops());
-        startActivity(intent);
-        finish();
     };
 
     private View.OnClickListener btnGoogleMapBackOnClickListener = v -> {

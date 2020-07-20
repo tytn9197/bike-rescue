@@ -32,6 +32,7 @@ import com.example.bikerescueusermobile.ui.home.HomeFragment;
 import com.example.bikerescueusermobile.ui.login.LoginActivity;
 import com.example.bikerescueusermobile.ui.profile.ProfileFragment;
 import com.example.bikerescueusermobile.ui.seach_shop_service.SearchShopServiceFragment;
+import com.example.bikerescueusermobile.util.MyInstances;
 import com.example.bikerescueusermobile.util.MyMethods;
 import com.example.bikerescueusermobile.util.SharedPreferenceHelper;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -232,12 +233,13 @@ public class MainActivity extends BaseActivity {
                             drawer.close();
                             return true;
                         case R.id.nav_introduce:
-                            fragment = new HomeFragment();
-                            replaceFragment();
+//                            fragment = new HomeFragment();
+//                            replaceFragment();
+                            SharedPreferenceHelper.setSharedPreferenceString(getApplicationContext(), MyInstances.KEY_BIKER_REQUEST, "");
                             drawer.close();
                             return true;
                         case R.id.nav_logout:
-                            SharedPreferenceHelper.setSharedPreferenceString(MainActivity.this, "user", "");
+                            SharedPreferenceHelper.setSharedPreferenceString(MainActivity.this, MyInstances.KEY_LOGGED_IN, "");
                             Intent intentLog = new Intent(MainActivity.this, LoginActivity.class);
                             startActivity(intentLog);
                             finish();
