@@ -75,51 +75,6 @@
                         android:layout_width="30dp"
                         android:layout_height="30dp"
                         android:layout_centerHorizontal="true"
-                        android:src="@drawable/ic_request_history" />
-
-                    <TextView
-                        android:id="@+id/request"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_centerInParent="true"
-                        android:includeFontPadding="false"
-                        android:text="20"
-                        android:textColor="@color/white"
-                        android:textSize="20sp"
-                        android:textStyle="bold" />
-
-
-                    <TextView
-                        android:id="@+id/request_desc"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_below="@+id/request"
-                        android:layout_centerHorizontal="true"
-                        android:includeFontPadding="false"
-                        android:text="Lượt nhận yêu cầu"
-                        android:textColor="@color/white"
-                        android:textSize="14sp" />
-                </RelativeLayout>
-
-            </androidx.cardview.widget.CardView>
-
-            <androidx.cardview.widget.CardView
-                android:layout_width="0dp"
-                android:layout_height="125dp"
-                android:layout_margin="20dp"
-                android:layout_weight="1"
-                app:cardBackgroundColor="@color/core_color"
-                app:cardElevation="10dp">
-
-                <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:padding="5dp">
-
-                    <ImageView
-                        android:layout_width="30dp"
-                        android:layout_height="30dp"
-                        android:layout_centerHorizontal="true"
                         android:src="@drawable/ic_request_purchase" />
 
                     <TextView
@@ -129,7 +84,6 @@
                         android:layout_centerInParent="true"
                         android:includeFontPadding="false"
                         android:text="10"
-                        android:textColor="@color/white"
                         android:textSize="20sp"
                         android:textStyle="bold" />
 
@@ -142,7 +96,6 @@
                         android:layout_centerHorizontal="true"
                         android:includeFontPadding="false"
                         android:text="Yêu cầu hoàn thành"
-                        android:textColor="@color/white"
                         android:textSize="14sp" />
                 </RelativeLayout>
 

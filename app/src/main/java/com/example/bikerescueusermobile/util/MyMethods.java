@@ -21,6 +21,10 @@ import com.example.bikerescueusermobile.data.model.vehicle.Vehicle;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 
 import java.io.ByteArrayOutputStream;
+import java.sql.Timestamp;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -115,33 +119,45 @@ public class MyMethods {
 
     }
 
-//    public static void setRequestToCurrentRequest(Request request){
-//        CurrentRequest.getInstance().setId(request.getId());
-//        CurrentRequest.getInstance().setCreatedDate(request.getCreatedDate());
-//        CurrentRequest.getInstance().setStatus(request.getStatus());
-//        CurrentRequest.getInstance().setRequestCode(request.getRequestCode());
-//        CurrentRequest.getInstance().setLatitude(request.getLatitude());
-//        CurrentRequest.getInstance().setLongtitude(request.getLongtitude());
-//        CurrentRequest.getInstance().setAddress(request.getAddress());
-//        CurrentRequest.getInstance().setReviewComment(request.getReviewComment());
-//        CurrentRequest.getInstance().setReviewRating(request.getReviewRating());
-//        CurrentRequest.getInstance().setReviewUpdateDate(request.getReviewUpdateDate());
-//        CurrentRequest.getInstance().setVehicle(request.getVehicle());
-//        CurrentRequest.getInstance().setCreatedUser(request.getCreatedUser());
-//        CurrentRequest.getInstance().setAcceptedUser(request.getAcceptedUser());
-//        CurrentRequest.getInstance().setListReqShopService(request.getListReqShopService());
-//    }
-//
-//    public static void setRequestToCurrentRequest(RequestDTO request){
-//        CurrentRequest.getInstance().setId(request.getId());
-//        CurrentRequest.getInstance().setCreatedDate(request.getCreatedDate());
-//        CurrentRequest.getInstance().setStatus(request.getStatus());
-//        CurrentRequest.getInstance().setRequestCode(request.getCode());
-//        CurrentRequest.getInstance().setLatitude(request.getLatitude());
-//        CurrentRequest.getInstance().setLongtitude(request.getLongtitude());
-//        CurrentRequest.getInstance().setAddress(request.getAddress());
-//        CurrentRequest.getInstance().setReviewComment(request.getReviewComment());
-//        CurrentRequest.getInstance().setReviewRating(request.getReviewRating());
-//        CurrentRequest.getInstance().setReviewUpdateDate(request.getReviewUpdateDate());
-//    }
+    public static void setRequestToCurrentRequest(Request request){
+        CurrentRequest.getInstance().setId(request.getId());
+        CurrentRequest.getInstance().setCreatedDate(request.getCreatedDate());
+        CurrentRequest.getInstance().setStatus(request.getStatus());
+        CurrentRequest.getInstance().setRequestCode(request.getRequestCode());
+        CurrentRequest.getInstance().setLatitude(request.getLatitude());
+        CurrentRequest.getInstance().setLongtitude(request.getLongtitude());
+        CurrentRequest.getInstance().setAddress(request.getAddress());
+        CurrentRequest.getInstance().setReviewComment(request.getReviewComment());
+        CurrentRequest.getInstance().setReviewRating(request.getReviewRating());
+        CurrentRequest.getInstance().setReviewUpdateDate(request.getReviewUpdateDate());
+        CurrentRequest.getInstance().setVehicle(request.getVehicle());
+        CurrentRequest.getInstance().setCreatedUser(request.getCreatedUser());
+        CurrentRequest.getInstance().setAcceptedUser(request.getAcceptedUser());
+        CurrentRequest.getInstance().setListReqShopService(request.getListReqShopService());
+    }
+
+    public static void setRequestToCurrentRequest(RequestDTO request){
+        CurrentRequest.getInstance().setId(request.getId());
+        CurrentRequest.getInstance().setCreatedDate(request.getCreatedDate());
+        CurrentRequest.getInstance().setStatus(request.getStatus());
+        CurrentRequest.getInstance().setRequestCode(request.getCode());
+        CurrentRequest.getInstance().setLatitude(request.getLatitude());
+        CurrentRequest.getInstance().setLongtitude(request.getLongtitude());
+        CurrentRequest.getInstance().setAddress(request.getAddress());
+        CurrentRequest.getInstance().setReviewComment(request.getReviewComment());
+        CurrentRequest.getInstance().setReviewRating(request.getReviewRating());
+        CurrentRequest.getInstance().setReviewUpdateDate(request.getReviewUpdateDate());
+    }
+
+    public static String convertTimeStampToDate(Timestamp ts){
+        Date d = new Date(ts.getTime());
+        DateFormat f = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+        return f.format(d);
+    }
+
+    public static String convertTimeStampToTime(Timestamp ts){
+        Date d = new Date(ts.getTime());
+        DateFormat f = new SimpleDateFormat("HH:mm", Locale.getDefault());
+        return f.format(d);
+    }
 }

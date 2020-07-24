@@ -19,6 +19,11 @@ import butterknife.BindView;
 
 public class ShopMainActivity extends BaseActivity {
 
+    @Override
+    protected int layoutRes() {
+        return R.layout.activity_main_shop;
+    }
+
     @BindView(R.id.bottomNav)
     BottomNavigationView bottomNavigationView;
 
@@ -35,15 +40,12 @@ public class ShopMainActivity extends BaseActivity {
     }
 
 
-    private void init(){
-
+    private void init() {
 
         //Shop Owner
         shopHomeFragment = new ShopHomeFragment();
         shopHistoryFragment = new ShopHistoryFragment();
         shopProfileFragment = new ShopProfileFragment();
-
-
 
         //init a home page when login
         fragment = new ShopHomeFragment();
@@ -63,7 +65,7 @@ public class ShopMainActivity extends BaseActivity {
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
             switch (item.getItemId()) {
                 case R.id.nav_home:
-                    fragment = shopHomeFragment;
+                    fragment = new ShopHomeFragment();
                     replaceFragment();
                     return true;
                 case R.id.nav_history:
@@ -79,11 +81,4 @@ public class ShopMainActivity extends BaseActivity {
         }
     };
 
-
-
-
-    @Override
-    protected int layoutRes() {
-        return R.layout.activity_main_shop;
-    }
 }

@@ -118,6 +118,7 @@ public class LoginActivity extends BaseActivity {
                             CurrentUser.getInstance().setEmail(user.getEmail());
                             CurrentUser.getInstance().setPhoneNumber(user.getPhoneNumber());
                             CurrentUser.getInstance().setCreatedTime(user.getCreatedTime());
+                            CurrentUser.getInstance().setStatus(user.getStatus());
 //                            CurrentUser.getInstance().setProvider(user.getProvider());
 //                            CurrentUser.getInstance().setCreatedTime(user.getCreatedTime());
 //                            CurrentUser.getInstance().setIdentifyNumber(user.getIdentifyNumber());

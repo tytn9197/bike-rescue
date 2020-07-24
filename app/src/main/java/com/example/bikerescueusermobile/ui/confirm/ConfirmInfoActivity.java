@@ -342,8 +342,6 @@ public class ConfirmInfoActivity extends BaseActivity {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(response -> {
-                    Log.e(TAG, "respone data: " + gson.toJson(response.getData()));
-
                     if(response!= null) {
 //                        CurrentUser.getInstance().setSentReqId(response.getData().getId().intValue());
                         intentReqDetail.putExtra("reqId", response.getData().getId().intValue());

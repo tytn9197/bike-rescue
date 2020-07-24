@@ -87,54 +87,58 @@ public class HomeFragment extends BaseFragment
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager()
-                .findFragmentById(R.id.mapHome);
-        mapFragment.getMapAsync(this);
-        viewModel = ViewModelProviders.of(getActivity(), viewModelFactory).get(ShopServiceViewModel.class);
+        if(getActivity() != null) {
+            SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager()
+                    .findFragmentById(R.id.mapHome);
+            mapFragment.getMapAsync(this);
+            viewModel = ViewModelProviders.of(getActivity(), viewModelFactory).get(ShopServiceViewModel.class);
+        }
     }
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        mMap = googleMap;
-        if (PermissionsManager.areLocationPermissionsGranted(getActivity())) {
-            if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                return;
+        if(getActivity() != null) {
+            mMap = googleMap;
+            if (PermissionsManager.areLocationPermissionsGranted(getActivity())) {
+                if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                    return;
+                }
+                googleMap.setMyLocationEnabled(true);
+                mMap.getUiSettings().setMyLocationButtonEnabled(true);
+                getDeviceLocation();
+            } else {
+                permissionsManager = new PermissionsManager(this);
+                permissionsManager.requestLocationPermissions(getActivity());
             }
-            googleMap.setMyLocationEnabled(true);
-            mMap.getUiSettings().setMyLocationButtonEnabled(true);
-            getDeviceLocation();
-        } else {
-            permissionsManager = new PermissionsManager(this);
-            permissionsManager.requestLocationPermissions(getActivity());
-        }
-        updateLocationUI();
+            updateLocationUI();
 
-        // get shop by service name then set shop's marker
-        String serviceName = getActivity().getIntent().getStringExtra("serviceName");
-        if (!serviceName.equals("")) {
-            viewModel.getShopByServiceName(serviceName)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(listShop -> {
-                        if (listShop != null) {
-                            this.listShop.addAll(listShop);
-                            for (int i = 0; i < listShop.size(); i++) {
-                                googleMap.addMarker(new MarkerOptions()
-                                        .position(new LatLng(Double.parseDouble(listShop.get(i).getLatitude()), Double.parseDouble(listShop.get(i).getLongtitude())))
-                                        .title(listShop.get(i).getShopName()));
+            // get shop by service name then set shop's marker
+            String serviceName = getActivity().getIntent().getStringExtra("serviceName");
+            if (!serviceName.equals("")) {
+                viewModel.getShopByServiceName(serviceName)
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(listShop -> {
+                            if (listShop != null) {
+                                this.listShop.addAll(listShop);
+                                for (int i = 0; i < listShop.size(); i++) {
+                                    googleMap.addMarker(new MarkerOptions()
+                                            .position(new LatLng(Double.parseDouble(listShop.get(i).getLatitude()), Double.parseDouble(listShop.get(i).getLongtitude())))
+                                            .title(listShop.get(i).getShopName()));
+                                }
+                                MyMethods.setDistance(listShop);
                             }
-                            MyMethods.setDistance(listShop);
-                        }
-                    }, throwable -> {
-                        Log.e("SearchShopService", "getShopByServiceName: " + throwable.getMessage());
-                    });
-        }
+                        }, throwable -> {
+                            Log.e("SearchShopService", "getShopByServiceName: " + throwable.getMessage());
+                        });
+            }
 
-        googleMap.setOnMarkerClickListener(this);
-        googleMap.setOnMapClickListener(this);
-        googleMap.setOnMyLocationChangeListener(this);
-        LatLng hcm = new LatLng(10.8229002, 106.7048471);
-        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(hcm, 10));
+            googleMap.setOnMarkerClickListener(this);
+            googleMap.setOnMapClickListener(this);
+            googleMap.setOnMyLocationChangeListener(this);
+            LatLng hcm = new LatLng(10.8229002, 106.7048471);
+            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(hcm, 10));
+        }
     }
 
     @SuppressWarnings({"MissingPermission"})
@@ -152,23 +156,25 @@ public class HomeFragment extends BaseFragment
 
     @SuppressWarnings({"MissingPermission"})
     public void getDeviceLocation() {
-        if (PermissionsManager.areLocationPermissionsGranted(getActivity())) {
-            mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getActivity());
-            try {
-                Task location = mFusedLocationProviderClient.getLastLocation();
-                location.addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        currentLocation = (Location) task.getResult();
-                    } else {
-                        Toast.makeText(getActivity(), "Không thể lấy vị trí này", Toast.LENGTH_SHORT).show();
-                    }
-                });
-            } catch (SecurityException e) {
-                Log.e(TAG, "getDeviceLocation: SecurityException: " + e.getMessage());
+        if(getActivity() != null) {
+            if (PermissionsManager.areLocationPermissionsGranted(getActivity())) {
+                mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getActivity());
+                try {
+                    Task location = mFusedLocationProviderClient.getLastLocation();
+                    location.addOnCompleteListener(task -> {
+                        if (task.isSuccessful()) {
+                            currentLocation = (Location) task.getResult();
+                        } else {
+                            Toast.makeText(getActivity(), "Không thể lấy vị trí này", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                } catch (SecurityException e) {
+                    Log.e(TAG, "getDeviceLocation: SecurityException: " + e.getMessage());
+                }
+            } else {
+                permissionsManager = new PermissionsManager(this);
+                permissionsManager.requestLocationPermissions(getActivity());
             }
-        } else {
-            permissionsManager = new PermissionsManager(this);
-            permissionsManager.requestLocationPermissions(getActivity());
         }
     }
 

@@ -22,6 +22,7 @@ import com.example.bikerescueusermobile.data.model.request.Request;
 import com.example.bikerescueusermobile.data.model.user.CurrentUser;
 import com.example.bikerescueusermobile.ui.shop_owner.ShopUpdateInfoActivity;
 import com.example.bikerescueusermobile.ui.shop_owner.ShopUpdateViewModel;
+import com.example.bikerescueusermobile.util.MyInstances;
 import com.example.bikerescueusermobile.util.ViewModelFactory;
 
 import java.util.ArrayList;
@@ -35,16 +36,22 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 
 public class ShopHistoryFragment extends BaseFragment implements CustomAdapter.OnRequestListener {
+
+    @Override
+    protected int layoutRes() {
+        return R.layout.shop_history_fragment;
+    }
+
     @BindView(R.id.recycleViewId)
     RecyclerView recyclerView;
 
-
     List<Request> requestList;
+    List<Request> listHistory;
     CustomAdapter customAdapter;
 
     @BindView(R.id.shopHistoryToolbar)
     Toolbar shopHistoryToolbar;
-    private String TAG = "abc";
+    private String TAG = "ShopHistoryFragment";
 
     @Inject
     ViewModelFactory viewModelFactory;
@@ -56,15 +63,13 @@ public class ShopHistoryFragment extends BaseFragment implements CustomAdapter.O
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-
-
-
         //Toolbar
         AppCompatActivity activity = (AppCompatActivity) getActivity();
         activity.setSupportActionBar(shopHistoryToolbar);
         activity.getSupportActionBar().setTitle("Danh sách yêu cầu đã thực hiện");
 
         requestList = new ArrayList<>();
+        listHistory = new ArrayList<>();
 
         //setup viewmodel
         viewModel = ViewModelProviders.of(this, viewModelFactory).get(ShopHistoryViewModel.class);
@@ -72,24 +77,24 @@ public class ShopHistoryFragment extends BaseFragment implements CustomAdapter.O
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(requests -> {
-                    Log.e(TAG, "Request: " + requests);
                     if (requests != null && requests.size() > 0) {
                         //Define
                         requestList.addAll(requests);
+                        listHistory.addAll(requests);
 
-                        customAdapter = new CustomAdapter(requests, getContext(), this);
+                        for (int i = 0; i< listHistory.size(); i++){
+                            if(listHistory.get(i).getStatus().equals(MyInstances.STATUS_CREATED)){
+                                listHistory.remove(i);
+                            }
+                        }
+
+                        customAdapter = new CustomAdapter(listHistory, getContext(), this);
                         recyclerView.setAdapter(customAdapter);
                         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
                         recyclerView.addItemDecoration(new DividerItemDecoration((getActivity()), DividerItemDecoration.VERTICAL));
                     }
                 });
 
-    }
-
-
-    @Override
-    protected int layoutRes() {
-        return R.layout.shop_history_fragment;
     }
 
     @Override

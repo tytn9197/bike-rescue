@@ -374,7 +374,15 @@ public class MapActivity extends DaggerAppCompatActivity implements
             mFusedLocationClient.getLastLocation().addOnSuccessListener(this, location -> {
                 if (location != null) {
                     Point origin = Point.fromLngLat(location.getLongitude(), location.getLatitude());
-                    mPlaceName = MyMethods.convertLatLngToAddress(getApplicationContext(),location.getLatitude(),location.getLongitude()) ;
+
+                    String convertLatLngToAddress = MyMethods.convertLatLngToAddress(getApplicationContext(),location.getLatitude(),location.getLongitude());
+                    String[] splitedPlace = convertLatLngToAddress.split(",");
+
+                    mPlaceName = splitedPlace[0];
+                    for (int i = 1; i < splitedPlace.length - 2; i++){
+                        mPlaceName = mPlaceName.concat("," + splitedPlace[i]);
+                    }
+
                     if (shopLocation != null) {
                         Point destination = Point.fromLngLat(shopLocation.getLongitude(), shopLocation.getLatitude());
                         initSource(loadedMapStyle, origin, destination);

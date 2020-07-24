@@ -19,37 +19,39 @@ import com.example.bikerescueusermobile.util.SharedPreferenceHelper;
 import butterknife.BindView;
 
 public class ShopProfileFragment extends BaseFragment {
+
+    @Override
+    protected int layoutRes() {
+        return R.layout.shop_profile_fragment;
+    }
+
     @BindView(R.id.manageProfile)
     TextView manageProfile;
 
     @BindView(R.id.shopLogout)
     TextView tvShopLogout;
 
+    @BindView(R.id.booking)
+    TextView booking;
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        manageProfile.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(getContext(), ShopUpdateInfoActivity.class);
-                startActivity(intent);
-            }
+        manageProfile.setOnClickListener(v -> {
+            Intent intent = new Intent(getContext(), ShopUpdateInfoActivity.class);
+            startActivity(intent);
         });
-        tvShopLogout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                SharedPreferenceHelper.setSharedPreferenceString(getActivity(), MyInstances.KEY_LOGGED_IN, "");
-                Intent intentLog = new Intent(getActivity(), LoginActivity.class);
-                startActivity(intentLog);
-                getActivity().finish();
-            }
+        tvShopLogout.setOnClickListener(v -> {
+            SharedPreferenceHelper.setSharedPreferenceString(getActivity(), MyInstances.KEY_LOGGED_IN, "");
+            Intent intentLog = new Intent(getActivity(), LoginActivity.class);
+            startActivity(intentLog);
+            getActivity().finish();
+        });
+
+        booking.setOnClickListener(v -> {
+            SharedPreferenceHelper.setSharedPreferenceString(getActivity(), MyInstances.KEY_SHOP_REQUEST, "");
         });
     }
 
-    @Override
-    protected int layoutRes() {
-        return R.layout.shop_profile_fragment;
-    }
 }

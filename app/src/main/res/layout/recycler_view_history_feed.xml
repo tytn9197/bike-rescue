@@ -23,7 +23,7 @@
         android:text="Mã đơn hàng: "
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
-        android:textSize="20sp"
+        android:textSize="15sp"
         android:textStyle="bold"
         />
 
@@ -34,8 +34,8 @@
         android:layout_alignParentTop="true"
         android:layout_toStartOf="@+id/imgFeed"
         android:layout_toEndOf="@+id/txtFeedIdLabel"
-        android:text="1234567890"
-        android:textSize="20sp" />
+        android:text="123456789012345"
+        android:textSize="15sp" />
 
     <TextView
         android:id="@+id/txtFeedProblem"
@@ -47,7 +47,7 @@
         android:layout_marginBottom="5dp"
         android:layout_toStartOf="@+id/imgFeed"
         android:text="Xe thủng lốp"
-        android:textSize="25sp"
+        android:textSize="23sp"
         android:textStyle="bold" />
 
     <ImageView
@@ -59,7 +59,7 @@
         android:layout_margin="2dp"
         android:padding="3dp"
         android:contentDescription="@string/app_name"
-        android:src="@drawable/ic_color_bike" />
+        android:src="@drawable/ic_shop_100" />
 
     <TextView
         android:id="@+id/txtFeedDate"

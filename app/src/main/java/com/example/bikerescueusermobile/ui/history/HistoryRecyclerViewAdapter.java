@@ -1,52 +1,33 @@
 package com.example.bikerescueusermobile.ui.history;
 
+import android.annotation.SuppressLint;
+import android.content.Context;
 import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.FrameLayout;
-import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-
 import androidx.annotation.NonNull;
-import androidx.lifecycle.LifecycleOwner;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.example.bikerescueusermobile.R;
-import com.example.bikerescueusermobile.data.model.request.BikerRequest;
-
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
+import com.example.bikerescueusermobile.data.model.request.Request;
+import com.example.bikerescueusermobile.util.MyInstances;
+import com.example.bikerescueusermobile.util.MyMethods;
+import com.squareup.picasso.Picasso;
 import java.util.List;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class HistoryRecyclerViewAdapter extends RecyclerView.Adapter<HistoryRecyclerViewAdapter.ViewHolder> {
-    private List<BikerRequest> data = new ArrayList<>();
+    private List<Request> data;
     private HistorySelectedListener listener;
 
-    public HistoryRecyclerViewAdapter(List<BikerRequest> viewModel,
-                                      LifecycleOwner lifecycleOwner,
+    public HistoryRecyclerViewAdapter(List<Request> viewModel,
                                       HistorySelectedListener selectedListener) {
-//        viewModel.getFeedLivedata().observe(lifecycleOwner, cases -> {
-//            data.clear();
-//            if (cases != null) {
-//                data.addAll(cases);
-//                notifyDataSetChanged();
-//            }
-//        });
-//        setHasStableIds(true);
         data = viewModel;
         this.listener = selectedListener;
-
     }
 
     @NonNull
@@ -67,8 +48,6 @@ public class HistoryRecyclerViewAdapter extends RecyclerView.Adapter<HistoryRecy
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
-
-        private BikerRequest feed;
 
         @BindView(R.id.feed_wrapper)
         RelativeLayout feedWrapper;
@@ -91,52 +70,62 @@ public class HistoryRecyclerViewAdapter extends RecyclerView.Adapter<HistoryRecy
         @BindView(R.id.txtFeedStatus)
         TextView txtFeedStatus;
 
+        private Context context;
+
         public ViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
+            context = itemView.getContext();
         }
 
-        void bind(BikerRequest feed) {
-            this.feed = feed;
-            txtFeedDate.setText(feed.getCreatedTime());
-            txtFeedId.setText("0000000" + feed.getId());
-            txtFeedProblem.setText(feed.getName());
+        @SuppressLint("SetTextI18n")
+        void bind(Request request) {
+            txtFeedDate.setText(MyMethods.convertTimeStampToDate(request.getCreatedDate()) +
+                            " lúc " + MyMethods.convertTimeStampToTime(request.getCreatedDate()));
+            txtFeedId.setText(request.getRequestCode());
+            txtFeedProblem.setText(request.getListReqShopService().get(0).getShopService().getServices().getName());
 
             RelativeLayout.LayoutParams txtFeedStatusParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
             txtFeedStatusParams.addRule(RelativeLayout.BELOW,R.id.imgFeed);
 
-            if(feed.getStatus() == 2){
-                txtFeedStatus.setTextColor(Color.parseColor("#F55D30"));
-                txtFeedStatus.setText("Đang xử lí");
-                txtFeedStatusParams.setMarginEnd(50);
-            }else if(feed.getStatus() == 3){
-                txtFeedStatus.setTextColor(Color.parseColor("#dd2c00"));
-                txtFeedStatus.setText("Đã huỷ");
-                txtFeedStatusParams.setMarginEnd(70);
-
-            }else if(feed.getStatus() == 5) {
-                txtFeedStatus.setTextColor(Color.parseColor("#0EA92D"));
-                txtFeedStatus.setText("Đã hoàn thành");
-                txtFeedStatusParams.setMarginEnd(13);
+            if (request.getListReqShopService().get(0).getShopService().getShops().getAvatarUrl() != null) {
+                Picasso.with(context)
+                        .load(request.getListReqShopService().get(0).getShopService().getShops().getAvatarUrl()).placeholder(R.drawable.ic_load)
+                        .into(imgFeed);
             }
+
+            txtFeedStatus.setTextColor(Color.parseColor("#0EA92D"));
+
+            if (request.getStatus().equals(MyInstances.STATUS_CREATED)) {
+                txtFeedStatus.setTextColor(Color.BLUE);
+                txtFeedStatus.setText("Đã gửi");
+                txtFeedStatusParams.setMarginEnd(70);
+            }
+
+            if (request.getStatus().equals(MyInstances.STATUS_CANCELED)) {
+                txtFeedStatus.setText("Đã hủy");
+                txtFeedStatus.setTextColor(Color.RED);
+                txtFeedStatusParams.setMarginEnd(70);
+            }
+
+            if (request.getStatus().equals(MyInstances.STATUS_REJECTED)) {
+                txtFeedStatus.setText("Cửa hàng đã từ chối");
+                txtFeedStatus.setTextColor(Color.RED);
+                txtFeedStatusParams.setMarginEnd(0);
+            }
+
+            if (request.getStatus().equals(MyInstances.STATUS_ACCEPT)) {
+                txtFeedStatus.setText("Cửa hàng đã nhận");
+                txtFeedStatusParams.setMarginEnd(0);
+            }
+
+            if(request.getStatus().equals(MyInstances.STATUS_FINISHED)){
+                txtFeedStatus.setText("Yêu cầu đã hoàn thành");
+                txtFeedStatusParams.setMarginEnd(0);
+            }
+
             txtFeedStatus.setLayoutParams(txtFeedStatusParams);
-
-//            }else if(feed.getStatus() == 1){
-//                txtFeedStatus.setTextColor(Color.parseColor("#B3B3B3"));
-//                txtFeedStatus.setText("Chưa được xác nhận");
-//            }            }else if(feed.getStatus() == 4) {
-//                txtFeedStatus.setTextColor(Color.parseColor("#F5C330"));
-//                txtFeedStatus.setText("Cần được hỗ trợ");
-
-
-//            SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
-//            try {
-//                Date dateFromStr = df.parse(feed.getCreatedTime());
-//                txtFeedDate.setText(new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(dateFromStr));
-//            } catch (ParseException e1) {
-//                e1.printStackTrace();
-//            }
-            feedWrapper.setOnClickListener((View.OnClickListener) v -> listener.onDetailSelected(feed));
+            feedWrapper.setOnClickListener(v -> listener.onDetailSelected(request));
         }
 
     }

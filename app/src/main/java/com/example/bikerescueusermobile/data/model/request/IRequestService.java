@@ -8,6 +8,7 @@ import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.POST;
 import retrofit2.http.Path;
+import retrofit2.http.Query;
 
 public interface IRequestService {
 
@@ -19,4 +20,18 @@ public interface IRequestService {
 
     @GET("/biker/request/{id}")
     Single<Request> getRequestById(@Path("id") int reqId,@Header("Authorization") String token);
+
+    @GET("/biker/cancleRequest")
+    Single<Boolean> cancleRequest(@Query("id") int reqID, @Header("Authorization") String token);
+
+    @GET("/shop/updateStatusRequest")
+    Single<Response<RequestDTO>> updateStatusRequest(@Query("idRequest") int reqId,
+                                                     @Query("accepted") boolean isAccept,
+                                                     @Header("Authorization") String token);
+
+    @GET("/shop/finishedRequest")
+    Single<Boolean> finishedRequest(@Query("id") int reqID, @Header("Authorization") String token);
+
+    @GET("/biker/getRequestByBikerId/{bikerId}")
+    Single<List<Request>> getRequestByBikerId(@Path("bikerId") int bikerId,@Header("Authorization") String token );
 }

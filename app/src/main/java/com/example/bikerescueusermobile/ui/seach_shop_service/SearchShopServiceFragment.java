@@ -106,7 +106,7 @@ public class SearchShopServiceFragment extends BaseFragment implements TopShopSe
                                 listShops.get(i).setDistanceFromUser(4);
                             }
                         }
-                        mRecyclerView.setAdapter(new TopShopRecyclerViewAdapter(listTop5Shop, this, this));
+                        mRecyclerView.setAdapter(new TopShopRecyclerViewAdapter(listTop5Shop, this));
                         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
                         //        mRecyclerView.addItemDecoration(new DividerItemDecoration((getActivity()), DividerItemDecoration.VERTICAL));
                     }

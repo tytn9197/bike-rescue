@@ -30,6 +30,9 @@ public class Shop implements Serializable {
     @SerializedName("avatarUrl")
     private String avatarUrl;
 
+    @SerializedName("avtUrl")
+    private String avtUrl;
+
     @SerializedName("description")
     private String description;
 

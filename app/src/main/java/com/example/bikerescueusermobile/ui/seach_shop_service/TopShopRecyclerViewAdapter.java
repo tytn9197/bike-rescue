@@ -1,5 +1,6 @@
 package com.example.bikerescueusermobile.ui.seach_shop_service;
 
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.bikerescueusermobile.R;
 import com.example.bikerescueusermobile.data.model.shop.Shop;
+import com.squareup.picasso.Picasso;
 import com.willy.ratingbar.ScaleRatingBar;
 
 import java.util.ArrayList;
@@ -23,22 +25,13 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class TopShopRecyclerViewAdapter  extends RecyclerView.Adapter<TopShopRecyclerViewAdapter.ViewHolder>{
-    private List<Shop> data = new ArrayList<>();
+    private List<Shop> data;
     private TopShopSelectedListener listener;
 
     public TopShopRecyclerViewAdapter(List<Shop> viewModel,
-                                       LifecycleOwner lifecycleOwner, TopShopSelectedListener selectedListener) {
-//        viewModel.getFeedLivedata().observe(lifecycleOwner, cases -> {
-//            data.clear();
-//            if (cases != null) {
-//                data.addAll(cases);
-//                notifyDataSetChanged();
-//            }
-//        });
-//        setHasStableIds(true);
+                                      TopShopSelectedListener selectedListener) {
         data = viewModel;
         this.listener = selectedListener;
-
     }
 
     @NonNull
@@ -59,10 +52,6 @@ public class TopShopRecyclerViewAdapter  extends RecyclerView.Adapter<TopShopRec
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
-
-        private Shop shop;
-
-
         @BindView(R.id.top_shop_wrapper)
         RelativeLayout wrapper;
 
@@ -84,14 +73,15 @@ public class TopShopRecyclerViewAdapter  extends RecyclerView.Adapter<TopShopRec
         @BindView(R.id.txtDistance)
         TextView txtDistance;
 
+        private Context context;
+
         public ViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
+            context = itemView.getContext();
         }
 
         void bind(Shop shop) {
-            this.shop = shop;
-
             txtTopShopName.setText(shop.getShopName());
 
             txtTopShopShopAddress.setText(shop.getAddress());
@@ -103,6 +93,12 @@ public class TopShopRecyclerViewAdapter  extends RecyclerView.Adapter<TopShopRec
             txtDistance.setText(String.format(Locale.getDefault(),"Cách đây %.1f km", shop.getDistanceFromUser()));
 
             wrapper.setOnClickListener(v -> listener.onDetailSelected(shop));
+
+            if (shop.getAvtUrl() != null) {
+                Picasso.with(context)
+                        .load(shop.getAvtUrl()).placeholder(R.drawable.ic_load)
+                        .into(imgTopShop);
+            }
         }
 
     }

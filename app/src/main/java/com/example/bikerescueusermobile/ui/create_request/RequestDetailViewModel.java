@@ -3,7 +3,9 @@ package com.example.bikerescueusermobile.ui.create_request;
 import androidx.lifecycle.ViewModel;
 
 import com.example.bikerescueusermobile.data.model.request.Request;
+import com.example.bikerescueusermobile.data.model.request.RequestDTO;
 import com.example.bikerescueusermobile.data.model.request.RequestRepository;
+import com.example.bikerescueusermobile.data.model.request.Response;
 
 import javax.inject.Inject;
 
@@ -17,7 +19,19 @@ public class RequestDetailViewModel extends ViewModel {
         this.requestRepository = requestRepository;
     }
 
-    public Single<Request> getRequestById(int reqId){
+    public Single<Request> getRequestById(int reqId) {
         return requestRepository.getRequestById(reqId);
+    }
+
+    public Single<Boolean> cancleRequest(int reqID) {
+        return requestRepository.cancleRequest(reqID);
+    }
+
+    public Single<Response<RequestDTO>> updateStatusRequest(int reqId, boolean isAccept) {
+        return requestRepository.updateStatusRequest(reqId, isAccept);
+    }
+
+    public Single<Boolean> finishedRequest(int reqId){
+        return requestRepository.finishedRequest(reqId);
     }
 }

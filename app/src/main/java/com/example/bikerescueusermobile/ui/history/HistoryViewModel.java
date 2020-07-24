@@ -2,33 +2,26 @@ package com.example.bikerescueusermobile.ui.history;
 
 import androidx.lifecycle.ViewModel;
 
-import com.google.gson.Gson;
+import com.example.bikerescueusermobile.data.model.request.Request;
+import com.example.bikerescueusermobile.data.model.request.RequestRepository;
+
+import java.util.List;
+
 import javax.inject.Inject;
-import io.reactivex.disposables.CompositeDisposable;
+
+import io.reactivex.Single;
 
 public class HistoryViewModel extends ViewModel {
 
-//    private final UserRepository userRepository;
-//    private final CaseRepository caseRepository;
-//
-//    private CompositeDisposable disposable;
-//
-//    private Gson gson;
-//    private final MutableLiveData<List<Case>> feedLivedata = new MutableLiveData<>();
+    private final RequestRepository requestRepository;
 
-//    @Inject
-//    public HistoryViewModel(UserRepository userRepository, CaseRepository caseRepository) {
-//        this.userRepository = userRepository;
-//        this.caseRepository = caseRepository;
-//        disposable = new CompositeDisposable();
-//        gson  = new Gson();
-//    }
+    @Inject
+    public HistoryViewModel(RequestRepository requestRepository) {
+        this.requestRepository = requestRepository;
+    }
 
-//    public MutableLiveData<List<Case>> getFeedLivedata() {
-//        return feedLivedata;
-//    }
-//
-//    public Single<List<Case>> getHistoryCasesByUserId(int userId){
-//        return userRepository.getHistoryCasesByUserId(userId);
-//    }
+    public Single<List<Request>> getRequestByBikerId(int bikerId) {
+        return requestRepository.getRequestByBikerId(bikerId);
+    }
+
 }

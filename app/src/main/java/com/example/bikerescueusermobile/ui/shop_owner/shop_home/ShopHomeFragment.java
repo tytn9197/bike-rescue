@@ -6,6 +6,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -21,6 +22,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.DividerItemDecoration;
@@ -30,6 +32,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.bikerescueusermobile.R;
 import com.example.bikerescueusermobile.base.BaseFragment;
 import com.example.bikerescueusermobile.data.model.adapter.CustomAdapter;
+import com.example.bikerescueusermobile.data.model.request.MessageRequestFB;
 import com.example.bikerescueusermobile.data.model.request.Request;
 import com.example.bikerescueusermobile.data.model.request.RequestDTO;
 import com.example.bikerescueusermobile.data.model.user.CurrentUser;
@@ -128,36 +131,92 @@ public class ShopHomeFragment extends BaseFragment {
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
+            if (getActivity() != null) {
+                String message = intent.getStringExtra("message");
+                Gson gson = new Gson();
 
-            SweetAlertDialog sweetAlertDialog = new SweetAlertDialog(getActivity(), SweetAlertDialog.NORMAL_TYPE);
-            sweetAlertDialog.setTitleText("Thông báo");
-            sweetAlertDialog.setConfirmText("Xác nhận");
-            sweetAlertDialog.setContentText("Bạn có một yêu cầu mới!");
-            sweetAlertDialog.setConfirmClickListener(sDialog -> {
-                sDialog.dismiss();
-                txtNoReq.setVisibility(View.GONE);
+                MessageRequestFB responeReq = gson.fromJson(message, MessageRequestFB.class);
 
-                // Get extra data included in the Intent
-                String id = intent.getStringExtra("mess");
+                SweetAlertDialog sweetAlertDialog = new SweetAlertDialog(getBaseActivity(), SweetAlertDialog.NORMAL_TYPE);
+                sweetAlertDialog.setTitleText("Thông báo");
+                sweetAlertDialog.setConfirmText("Xác nhận");
+                sweetAlertDialog.setCanceledOnTouchOutside(false);
+                sweetAlertDialog.setCancelable(false);
 
-                viewModel.getRequestById(Integer.parseInt(id))
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(req -> {
-                            if (req != null) {
-                                setDataToView(req);
-                                String sharedPreferenceStr = gson.toJson(req);
-                                SharedPreferenceHelper.setSharedPreferenceString(getActivity(), MyInstances.KEY_SHOP_REQUEST, sharedPreferenceStr);
-                                btnCallBiker.setOnClickListener(v -> {
-                                    Intent callIntent = new Intent(Intent.ACTION_DIAL);
-                                    callIntent.setData(Uri.parse("tel:" + Uri.encode(req.getCreatedUser().getPhoneNumber())));
-                                    callIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                                    startActivity(callIntent);
+                if (responeReq.getMessage().equals(MyInstances.NOTI_CREATED)) {
+                    sweetAlertDialog.setContentText("Bạn có một yêu cầu mới!");
+                    sweetAlertDialog.setConfirmClickListener(sDialog -> {
+                        sDialog.dismiss();
+                        txtNoReq.setVisibility(View.GONE);
+
+                        viewModel.getRequestById(responeReq.getReqId())
+                                .subscribeOn(Schedulers.io())
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .subscribe(req -> {
+                                    if (req != null) {
+                                        setDataToView(req);
+                                        String sharedPreferenceStr = gson.toJson(req);
+                                        SharedPreferenceHelper.setSharedPreferenceString(getActivity(), MyInstances.KEY_SHOP_REQUEST, sharedPreferenceStr);
+
+                                        sweetAlertDialog.setCancelText("Từ chối");
+                                        sweetAlertDialog.setCancelClickListener(Dialog::dismiss);
+
+                                        btnCallBiker.setOnClickListener(v -> {
+                                            Intent callIntent = new Intent(Intent.ACTION_DIAL);
+                                            callIntent.setData(Uri.parse("tel:" + Uri.encode(req.getCreatedUser().getPhoneNumber())));
+                                            callIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                            startActivity(callIntent);
+                                        });
+
+                                        btnDecline.setOnClickListener(v -> {
+                                            sweetAlertDialog.setContentText("Từ chối yêu cầu này?");
+                                            sweetAlertDialog.setConfirmClickListener(d -> {
+                                                d.dismiss();
+                                                viewModel.updateStatusRequest(req.getId(), false)
+                                                        .subscribeOn(Schedulers.io())
+                                                        .observeOn(AndroidSchedulers.mainThread())
+                                                        .subscribe(responseDTO -> {
+                                                            SharedPreferenceHelper.setSharedPreferenceString(getActivity(), MyInstances.KEY_SHOP_REQUEST, "");
+                                                            getActivity().getSupportFragmentManager().beginTransaction()
+                                                                    .replace(R.id.frame_container, new ShopHomeFragment())
+                                                                    .commit();
+                                                        });
+                                            });
+                                            sweetAlertDialog.show();
+                                        });
+
+                                        btnAccept.setOnClickListener(v -> {
+                                            sweetAlertDialog.setContentText("Chấp nhận yêu cầu này?");
+                                            sweetAlertDialog.setConfirmClickListener(d -> {
+                                                d.dismiss();
+                                                viewModel.updateStatusRequest(req.getId(), true)
+                                                        .subscribeOn(Schedulers.io())
+                                                        .observeOn(AndroidSchedulers.mainThread())
+                                                        .subscribe(responseDTO -> {
+                                                            getActivity().getSupportFragmentManager().beginTransaction()
+                                                                    .replace(R.id.frame_container, new ShopHomeFragment())
+                                                                    .commit();
+                                                        });
+                                            });
+                                            sweetAlertDialog.show();
+                                        });
+
+                                    }
                                 });
-                            }
-                        });
-            });
-            sweetAlertDialog.show();
+                    });
+                    sweetAlertDialog.show();
+                }
+
+                if (responeReq.getMessage().equals(MyInstances.NOTI_CANELED)) {
+                    sweetAlertDialog.setContentText("Khách đã hủy yêu cầu");
+                    sweetAlertDialog.setConfirmClickListener(sDialog -> {
+                        sDialog.dismiss();
+                        txtNoReq.setVisibility(View.VISIBLE);
+                        SharedPreferenceHelper.setSharedPreferenceString(getActivity(), MyInstances.KEY_SHOP_REQUEST, "");
+                    });
+                    sweetAlertDialog.show();
+                }
+            }
 
         }
     };
@@ -166,8 +225,10 @@ public class ShopHomeFragment extends BaseFragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        Log.e(TAG, "onViewCreated start");
+
         LocalBroadcastManager.getInstance(getActivity()).registerReceiver(
-                mMessageReceiver, new IntentFilter("BikeRescue"));
+                mMessageReceiver, new IntentFilter("BikeRescueShop"));
 
         viewModel = ViewModelProviders.of(this, viewModelFactory).get(RequestDetailViewModel.class);
 
@@ -176,43 +237,46 @@ public class ShopHomeFragment extends BaseFragment {
             txtNoReq.setVisibility(View.VISIBLE);
         } else {
             txtNoReq.setVisibility(View.GONE);
-            Request requestFromPref =gson.fromJson(request, Request.class);
-            setDataToView(requestFromPref);
+            Request requestFromPref = gson.fromJson(request, Request.class);
+
+            viewModel.getRequestById(requestFromPref.getId())
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(req -> {
+                        if (req != null) {
+                            setDataToView(req);
+                        }
+                    });
+
+            btnFinish.setOnClickListener(v -> {
+                SweetAlertDialog sweetAlertDialog = new SweetAlertDialog(getBaseActivity(), SweetAlertDialog.NORMAL_TYPE);
+                sweetAlertDialog.setTitleText("Thông báo");
+                sweetAlertDialog.setConfirmText("Xác nhận");
+                sweetAlertDialog.setCanceledOnTouchOutside(false);
+                sweetAlertDialog.setCancelable(false);
+                sweetAlertDialog.setContentText("Xác nhận hoàn thành yêu cầu?");
+                sweetAlertDialog.setCancelText("Từ chối");
+                sweetAlertDialog.setCancelClickListener(Dialog::dismiss);
+                sweetAlertDialog.setConfirmClickListener(dialog -> {
+                    dialog.dismiss();
+
+                    viewModel.finishedRequest(requestFromPref.getId())
+                            .subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe(isSuccess ->{
+                                if(isSuccess){
+                                    SharedPreferenceHelper.setSharedPreferenceString(getActivity(), MyInstances.KEY_SHOP_REQUEST, "");
+                                    txtNoReq.setVisibility(View.VISIBLE);
+                                }
+                            });
+                });
+                sweetAlertDialog.show();
+            });
         }
-
-        btnFinish.setOnClickListener(onBtnFinishClick);
-        btnAccept.setOnClickListener(onBtnAcceptClick);
-        btnDecline.setOnClickListener(onBtnDeclineClick);
-        btnReqImg.setOnClickListener(onBtnReqImgClick);
-    }
-
-    private View.OnClickListener onBtnFinishClick = v -> {
-        SweetAlertDialog sweetAlertDialog = new SweetAlertDialog(getActivity(), SweetAlertDialog.NORMAL_TYPE);
-        sweetAlertDialog.setTitleText("Thông báo");
-        sweetAlertDialog.setConfirmText("Xác nhận");
-        sweetAlertDialog.setContentText("Xác nhận hoàn thành yêu cầu?");
-        sweetAlertDialog.setConfirmClickListener(sDialog -> {
-            sDialog.dismiss();
+        btnReqImg.setOnClickListener(v -> {
             SharedPreferenceHelper.setSharedPreferenceString(getActivity(), MyInstances.KEY_SHOP_REQUEST, "");
-            txtNoReq.setVisibility(View.VISIBLE);
-
         });
-        sweetAlertDialog.setCancelText("Hủy");
-        sweetAlertDialog.setCancelClickListener(Dialog::dismiss);
-        sweetAlertDialog.show();
-    };
-
-    private View.OnClickListener onBtnAcceptClick = v -> {
-        showFinishButton();
-    };
-
-    private View.OnClickListener onBtnDeclineClick = v -> {
-        showFinishButton();
-    };
-
-    private View.OnClickListener onBtnReqImgClick = v -> {
-        SharedPreferenceHelper.setSharedPreferenceString(getActivity(), MyInstances.KEY_SHOP_REQUEST, "");
-    };
+    }
 
     private void showFinishButton() {
         statusCreated.setVisibility(View.GONE);
@@ -237,24 +301,55 @@ public class ShopHomeFragment extends BaseFragment {
         txtAddress.setText(" " + request.getAddress());
         txtServiceName.setText(" Vấn đề: " + request.getListReqShopService().get(0).getShopService().getServices().getName());
         txtReqDescription.setText(" Thông tin thêm: " + request.getDescription());
-//        txtVehicle.setText(" " + request.getVehicle().getBrand() + " " + request.getVehicle().getVehiclesYear());
+        txtVehicle.setText(" Thông tin xe: " + request.getVehicle().getBrand() + " " + request.getVehicle().getVehiclesYear());
 
         //set date time
         Timestamp ts = request.getCreatedDate();
         Date d = new Date(ts.getTime());
         DateFormat f = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
         txtCreatedDate.setText(" " + f.format(d));
-        f = new SimpleDateFormat("hh:mm", Locale.getDefault());
+        f = new SimpleDateFormat("HH:mm", Locale.getDefault());
         txtCreatedTime.setText(" Vào lúc " + f.format(d));
 
+        refreshStatus(request.getStatus());
+
+        btnReqImg.setVisibility(View.GONE);
+
+    }
+
+    private void refreshStatus(String status) {
+        txtStatus.setTextColor(ContextCompat.getColor(getActivity(), R.color.core_color));
         //request moi duoc tao
-        if (request.getStatus().equals(MyInstances.STATUS_CREATED)) {
+        if (status.equals(MyInstances.STATUS_CREATED)) {
             hideFinishButton();
-        } else {
-            showFinishButton();
+            txtStatus.setVisibility(View.GONE);
+            txtNoReq.setVisibility(View.GONE);
         }
 
-        txtStatus.setVisibility(View.GONE);
+        if (status.equals(MyInstances.STATUS_ACCEPT)) {
+            showFinishButton();
+            txtStatus.setVisibility(View.VISIBLE);
+            txtStatus.setText("Đã nhận ");
+        }
+
+        if (status.equals(MyInstances.STATUS_REJECTED)) {
+            txtStatus.setVisibility(View.VISIBLE);
+            txtStatus.setText("Đã từ chối ");
+            txtStatus.setTextColor(Color.RED);
+            statusCreated.setVisibility(View.GONE);
+            btnFinish.setVisibility(View.GONE);
+            SharedPreferenceHelper.setSharedPreferenceString(getActivity(), MyInstances.KEY_SHOP_REQUEST, "");
+        }
+
+        if(status.equals(MyInstances.STATUS_CANCELED)){
+            txtNoReq.setVisibility(View.VISIBLE);
+            SharedPreferenceHelper.setSharedPreferenceString(getActivity(), MyInstances.KEY_SHOP_REQUEST, "");
+        }
+
+        if(status.equals(MyInstances.STATUS_FINISHED)){
+            txtNoReq.setVisibility(View.VISIBLE);
+            SharedPreferenceHelper.setSharedPreferenceString(getActivity(), MyInstances.KEY_SHOP_REQUEST, "");
+        }
     }
 
 }
