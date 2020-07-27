@@ -223,7 +223,7 @@ public class ConfirmInfoActivity extends BaseActivity {
         if (serviceName.equals("")) {
             tvProblem.setText("Vui lòng chọn vấn đề của bạn");
         } else {
-            String s = "Tôi cần " + serviceName.toLowerCase().trim() + ".";
+            String s = "Tôi cần " + serviceName.toLowerCase().trim();
             for (int i = 0; i < listAllShopServices.size(); i++) {
                 if (serviceName.equals(listAllShopServices.get(i).getServices().getName())) {
                     selectedService = i;

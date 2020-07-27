@@ -51,7 +51,7 @@ public class Shop implements Serializable {
     @SerializedName("user")
     private User userNameOnly;
 
-    @SerializedName("numOfStart")
+    @SerializedName("numOfStar")
     private String shopRatingStar;
 
     private double distanceFromUser;
