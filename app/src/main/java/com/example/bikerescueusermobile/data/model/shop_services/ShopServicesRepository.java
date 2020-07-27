@@ -32,4 +32,7 @@ public class ShopServicesRepository {
         return shopServices.getShopServiceId(CurrentUser.getInstance().getAccessToken(), shopId, serivceId);
     }
 
+    public Single<List<ShopServiceTable>> getShopServiceByShopOwnerId(int id,String token){
+        return shopServices.getShopServiceByShopOwnerId(id, token);
+    }
 }

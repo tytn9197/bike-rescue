@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
@@ -140,9 +141,10 @@ public class RequestDetailActivity extends BaseActivity {
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(req -> {
-                        if (req != null) {
+                        if (req != null && CurrentUser.getInstance().getRoleId() == 3) {
                             setDataToView(req);
-                        }
+                        } else
+                            setDataToViewShop(req);
                     });
 
             btnReqDetailCancel.setOnClickListener(v -> {
@@ -233,6 +235,31 @@ public class RequestDetailActivity extends BaseActivity {
         if (request.getListReqShopService().get(0).getShopService().getShops().getAvatarUrl() != null) {
             Picasso.with(this)
                     .load(request.getListReqShopService().get(0).getShopService().getShops().getAvatarUrl()).placeholder(R.drawable.ic_load)
+                    .into(imgReqDetailShopAvatar);
+        }
+    }
+
+    @SuppressLint("SetTextI18n")
+    private void setDataToViewShop(Request request) {
+        txtReqDetailCode.setText("Mã yêu cầu: ".concat(request.getRequestCode()));
+        txtReqDetailShopName.setText(request.getCreatedUser().getFullName());
+        txtReqDetailShopRatingStar.setText(request.getCreatedUser().getPhoneNumber());
+        txtReqDetailShopRatingStar.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_baseline_phone_24, 0, 0, 0);
+        txtReqDetailShopAddress.setText(request.getCreatedUser().getEmail());
+        txtReqDetailShopAddress.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_baseline_email_24, 0, 0, 0);
+        txtReqDetailAddress.setText(" " + request.getAddress());
+        txtReqDetailServiceName.setText(" Vấn đề: " + request.getListReqShopService().get(0).getShopService().getServices().getName());
+        txtReqDetailReqDescription.setText(" Thông tin thêm: " + request.getDescription());
+        txtReqDetailVehicle.setText("Thông tin xe: " + request.getVehicle().getBrand() + " " + request.getVehicle().getVehiclesYear());
+
+        refreshStatus(request.getStatus());
+
+        txtReqDetailCreatedDate.setText(" " + MyMethods.convertTimeStampToDate(request.getCreatedDate()));
+        txtReqDetailCreatedTime.setText(" Vào lúc " + MyMethods.convertTimeStampToTime(request.getCreatedDate()));
+
+        if (request.getCreatedUser().getAvatarUrl() != null) {
+            Picasso.with(this)
+                    .load(request.getCreatedUser().getAvatarUrl()).placeholder(R.drawable.ic_load)
                     .into(imgReqDetailShopAvatar);
         }
     }

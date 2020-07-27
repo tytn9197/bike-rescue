@@ -3,6 +3,8 @@ package com.example.bikerescueusermobile.data.model.shop_services;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.example.bikerescueusermobile.data.model.category.Category;
+import com.example.bikerescueusermobile.data.model.service.Service;
 import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
@@ -26,6 +28,9 @@ public class ShopService implements Parcelable {
 
     @SerializedName("status")
     private boolean status;
+
+    @SerializedName("category")
+    private Category category;
 
     public ShopService(int id, String name, boolean status) {
         this.id = id;

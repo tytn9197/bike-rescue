@@ -13,6 +13,7 @@ import com.example.bikerescueusermobile.ui.login.LoginModel;
 import com.example.bikerescueusermobile.ui.register.RegisterViewModel;
 import com.example.bikerescueusermobile.ui.seach_shop_service.ShopServiceViewModel;
 import com.example.bikerescueusermobile.ui.shop_owner.ShopUpdateViewModel;
+import com.example.bikerescueusermobile.ui.shop_owner.services.ServiceViewModel;
 import com.example.bikerescueusermobile.ui.shop_owner.shop_history.ShopHistoryViewModel;
 import com.example.bikerescueusermobile.ui.update_info.UpdateViewModel;
 import com.example.bikerescueusermobile.util.ViewModelFactory;
@@ -83,4 +84,9 @@ public abstract class ViewModelModule {
     @IntoMap
     @ViewModelKey(HistoryViewModel.class)
     abstract ViewModel bindHistoryViewModel(HistoryViewModel historyViewModel);
+
+    @Binds
+    @IntoMap
+    @ViewModelKey(ServiceViewModel.class)
+    abstract ViewModel bindServiceViewModel(ServiceViewModel ServiceViewModel);
 }

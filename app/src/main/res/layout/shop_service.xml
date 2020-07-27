@@ -15,7 +15,7 @@
         android:visibility="gone" />
 
     <RelativeLayout
-        android:id="@+id/shop_feed_wrapper"
+        android:id="@+id/shop_service_feed_wrapper"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/border_white"
@@ -23,53 +23,64 @@
         android:orientation="vertical"
         android:padding="7dp">
 
-        <TextView
-            android:id="@+id/txtShopFeedIdLabel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentTop="true"
-            android:text="Mã đơn hàng: "
-            android:textSize="15sp"
-            android:textStyle="bold" />
+
 
         <TextView
-            android:id="@+id/txtShopFeedId"
+            android:id="@+id/txtServiceName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:layout_toStartOf="@+id/imgShopFeed"
-            android:layout_toEndOf="@+id/txtShopFeedIdLabel"
-            android:text="123456789012345"
-            android:textSize="15sp" />
-
-        <TextView
-            android:id="@+id/txtShopCustomer"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/txtShopFeedIdLabel"
             android:layout_alignParentStart="true"
             android:layout_marginTop="5dp"
             android:layout_marginBottom="5dp"
-            android:layout_toStartOf="@+id/imgShopFeed"
-            android:text="Trần Ngọc Tỷ"
+            android:layout_toStartOf="@+id/imgServiceFeed"
+            android:text="Xe thủng lốp"
             android:textSize="23sp"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:textColor="@color/black"/>
         <TextView
-            android:id="@+id/txtShopFeedProblem"
+            android:id="@+id/txtCategory"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/txtShopCustomer"
+            android:layout_below="@id/txtServiceName"
             android:layout_alignParentStart="true"
             android:layout_marginTop="0dp"
             android:layout_marginBottom="5dp"
-            android:layout_toStartOf="@+id/imgShopFeed"
-            android:text="Xe thủng lốp"
+            android:layout_toStartOf="@+id/imgServiceFeed"
+            android:text="Xe số"
             android:textSize="16sp"
             android:textStyle=""
             />
+        <TextView
+            android:id="@+id/txtServicePrice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toStartOf="@+id/imgServiceFeed"
+            android:layout_toEndOf="@+id/txtServicePriceLabel"
+            android:layout_below="@+id/txtCategory"
+            android:text="50000 VND"
+            android:gravity="end"
+            android:textSize="15sp" />
+        <TextView
+            android:id="@+id/txtUnitLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Đơn vị:"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/txtServicePriceLabel"
+            android:textSize="15sp"
+            android:textStyle="bold"/>
+        <TextView
+            android:id="@+id/txtUnit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="/ Lần"
+            android:gravity="end"
+            android:layout_below="@+id/txtServicePriceLabel"
+            android:layout_toStartOf="@+id/imgServiceFeed"
+            android:layout_toEndOf="@+id/txtUnitLabel"
+            android:textSize="15sp"/>
         <ImageView
-            android:id="@+id/imgShopFeed"
+            android:id="@+id/imgServiceFeed"
             android:layout_width="100dp"
             android:layout_height="100dp"
             android:layout_alignParentTop="true"
@@ -80,25 +91,23 @@
             android:src="@drawable/ic_shop_100" />
 
         <TextView
-            android:id="@+id/txtShopFeedDate"
+            android:id="@+id/txtServicePriceLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/txtShopFeedProblem"
+            android:layout_below="@id/txtCategory"
             android:layout_alignParentStart="true"
-            android:layout_toStartOf="@+id/imgFeed"
-            android:text="27/05/2019 lúc 13:00"
-            android:textColor="@color/fadded_grey"
+            android:text="Giá dịch vụ:"
             android:textSize="15sp"
             android:textStyle="bold" />
 
         <TextView
-            android:id="@+id/txtShopFeedStatus"
+            android:id="@+id/txtStatus"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/imgShopFeed"
+            android:layout_below="@id/imgServiceFeed"
             android:layout_alignParentStart="true"
             android:layout_marginEnd="13dp"
-            android:text="-Đang xảy ra-"
+            android:text="Kích hoạt"
             android:textAlignment="textEnd"
             android:textColor="#5AA55F"
             android:textSize="17dp"
