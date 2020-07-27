@@ -32,6 +32,9 @@ public class ShopServiceTable implements Parcelable{
     @SerializedName("status")
     private boolean status;
 
+    @SerializedName("unit")
+    private String unit;
+
     @SerializedName("services")
     private ShopService services;
 

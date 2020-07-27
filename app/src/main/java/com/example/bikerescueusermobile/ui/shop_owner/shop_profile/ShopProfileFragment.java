@@ -3,6 +3,7 @@ package com.example.bikerescueusermobile.ui.shop_owner.shop_profile;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.RatingBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -13,6 +14,7 @@ import com.example.bikerescueusermobile.base.BaseFragment;
 import com.example.bikerescueusermobile.ui.login.LoginActivity;
 import com.example.bikerescueusermobile.ui.main.MainActivity;
 import com.example.bikerescueusermobile.ui.shop_owner.ShopUpdateInfoActivity;
+import com.example.bikerescueusermobile.ui.shop_owner.services.ManageServicesActivity;
 import com.example.bikerescueusermobile.util.MyInstances;
 import com.example.bikerescueusermobile.util.SharedPreferenceHelper;
 
@@ -28,16 +30,26 @@ public class ShopProfileFragment extends BaseFragment {
     @BindView(R.id.manageProfile)
     TextView manageProfile;
 
+    @BindView(R.id.shopRating)
+    RatingBar shopRating;
+
     @BindView(R.id.shopLogout)
     TextView tvShopLogout;
 
     @BindView(R.id.booking)
     TextView booking;
 
+    @BindView(R.id.manageService)
+    TextView manageService;
+
+
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
+        Float rating = (float) 3.5;
+        //init rating
+        shopRating.setStepSize((float) 0.5);
+        shopRating.setRating(rating);
         manageProfile.setOnClickListener(v -> {
             Intent intent = new Intent(getContext(), ShopUpdateInfoActivity.class);
             startActivity(intent);
@@ -51,6 +63,14 @@ public class ShopProfileFragment extends BaseFragment {
 
         booking.setOnClickListener(v -> {
             SharedPreferenceHelper.setSharedPreferenceString(getActivity(), MyInstances.KEY_SHOP_REQUEST, "");
+        });
+
+        manageService.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getContext(), ManageServicesActivity.class);
+                startActivity(intent);
+            }
         });
     }
 

@@ -28,5 +28,8 @@ public class ShopRepository {
     public Single<List<Shop>> getShopByServiceName(String token, String serviceName){
         return shopServices.getShopByServiceName(token, serviceName);
     }
+    public Single<Shop> getShopByShopOwnerId(String token, int shopOwnerId){
+        return shopServices.getShopByShopOwnerId(token, shopOwnerId);
+    }
 
 }

@@ -1,10 +1,12 @@
 package com.example.bikerescueusermobile.ui.shop_owner.shop_history;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -14,15 +16,13 @@ import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.example.bikerescueusermobile.R;
 import com.example.bikerescueusermobile.base.BaseFragment;
-import com.example.bikerescueusermobile.data.model.adapter.CustomAdapter;
 import com.example.bikerescueusermobile.data.model.request.Request;
 import com.example.bikerescueusermobile.data.model.user.CurrentUser;
-import com.example.bikerescueusermobile.ui.shop_owner.ShopUpdateInfoActivity;
-import com.example.bikerescueusermobile.ui.shop_owner.ShopUpdateViewModel;
-import com.example.bikerescueusermobile.util.MyInstances;
+import com.example.bikerescueusermobile.ui.create_request.RequestDetailActivity;
 import com.example.bikerescueusermobile.util.ViewModelFactory;
 
 import java.util.ArrayList;
@@ -35,7 +35,7 @@ import cn.pedant.SweetAlert.SweetAlertDialog;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 
-public class ShopHistoryFragment extends BaseFragment implements CustomAdapter.OnRequestListener {
+public class ShopHistoryFragment extends BaseFragment implements ShopHistorySelectedListener {
 
     @Override
     protected int layoutRes() {
@@ -43,14 +43,19 @@ public class ShopHistoryFragment extends BaseFragment implements CustomAdapter.O
     }
 
     @BindView(R.id.recycleViewId)
-    RecyclerView recyclerView;
+    RecyclerView mRecyclerView;
 
     List<Request> requestList;
     List<Request> listHistory;
-    CustomAdapter customAdapter;
+
+
+    @BindView(R.id.pullToRefreshShopReq)
+    SwipeRefreshLayout pullToRefreshShopReq;
+
 
     @BindView(R.id.shopHistoryToolbar)
     Toolbar shopHistoryToolbar;
+
     private String TAG = "ShopHistoryFragment";
 
     @Inject
@@ -76,29 +81,34 @@ public class ShopHistoryFragment extends BaseFragment implements CustomAdapter.O
         viewModel.getRequestByShopId(CurrentUser.getInstance().getId())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(requests -> {
-                    if (requests != null && requests.size() > 0) {
+                .subscribe(listReq -> {
+                    if (listReq != null && listReq.size() > 0) {
                         //Define
-                        requestList.addAll(requests);
-                        listHistory.addAll(requests);
+                        requestList.addAll(listReq);
+                        listHistory.addAll(listReq);
 
-                        for (int i = 0; i< listHistory.size(); i++){
-                            if(listHistory.get(i).getStatus().equals(MyInstances.STATUS_CREATED)){
-                                listHistory.remove(i);
-                            }
+
+                        if (getActivity() != null) {
+                            mRecyclerView.addItemDecoration(new DividerItemDecoration((getActivity()), DividerItemDecoration.VERTICAL));
+                            mRecyclerView.setAdapter(new ShopHistoryRecyclerViewAdapter(listReq, this));
+                            mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+                            pullToRefreshShopReq.setOnRefreshListener(() -> {
+                                pullToRefreshShopReq.setRefreshing(false);
+                                getActivity().getSupportFragmentManager().beginTransaction()
+                                        .replace(R.id.frame_container, new ShopHistoryFragment())
+                                        .commit();
+                            });
                         }
-
-                        customAdapter = new CustomAdapter(listHistory, getContext(), this);
-                        recyclerView.setAdapter(customAdapter);
-                        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-                        recyclerView.addItemDecoration(new DividerItemDecoration((getActivity()), DividerItemDecoration.VERTICAL));
                     }
                 });
 
     }
 
     @Override
-    public void onRequestClick(int position) {
-        Log.d(TAG, "on request click." + position);
+    public void onDetailSelected(Request request) {
+        Intent intent = new Intent(getActivity(), RequestDetailActivity.class);
+        intent.putExtra("reqId", request.getId());
+        startActivity(intent);
     }
+
 }

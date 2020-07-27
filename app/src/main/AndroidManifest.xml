@@ -22,14 +22,16 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <service android:name=".ui.shop_owner.onMessageReceived"
+        <service
+            android:name=".ui.shop_owner.onMessageReceived"
+            android:directBootAware="true"
             android:enabled="true"
-            android:exported="true"
-            android:directBootAware="true">
+            android:exported="true">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
+
         <activity android:name=".ui.otp_page.VerifyActivity" />
         <activity android:name=".ui.otp_page.LoginByPhoneNumberActivity" />
         <activity android:name=".ui.loading_page.LoadPageActivity">
@@ -50,7 +52,9 @@
         <activity android:name=".ui.shop_owner.ShopRequestDetailActivity" />
         <activity android:name=".ui.shop_owner.ShopUpdateInfoActivity" />
         <activity android:name=".ui.profile.BikerUpdateInfoActivity" />
+        <activity android:name=".ui.shop_owner.services.ManageServicesActivity" />
         <activity android:name=".ui.map.MapActivity" />
+
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
