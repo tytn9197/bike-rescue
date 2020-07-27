@@ -136,15 +136,18 @@ public class RequestDetailActivity extends BaseActivity {
 
         int reqId = getIntent().getIntExtra("reqId", -1);
 
-        if(reqId != -1) {
+        if (reqId != -1) {
             viewModel.getRequestById(reqId)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(req -> {
-                        if (req != null && CurrentUser.getInstance().getRoleId() == 3) {
-                            setDataToView(req);
-                        } else
-                            setDataToViewShop(req);
+                        if (req != null) {
+                            if (CurrentUser.getInstance().getRoleId() == 3) {
+                                setDataToView(req);
+                            } else {
+                                setDataToViewShop(req);
+                            }
+                        }
                     });
 
             btnReqDetailCancel.setOnClickListener(v -> {
@@ -210,6 +213,7 @@ public class RequestDetailActivity extends BaseActivity {
             if (responeReq.getMessage().equals(MyInstances.NOTI_FINISH)) {
                 txtReqDetailStatus.setText("Yêu cầu đã hoàn thành");
                 txtReqDetailStatus.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.core_color));
+                btnComplain.setVisibility(View.VISIBLE);
                 btnReqDetailCancel.setVisibility(View.GONE);
                 SharedPreferenceHelper.setSharedPreferenceString(getApplicationContext(), MyInstances.KEY_BIKER_REQUEST, "");
             }
@@ -262,6 +266,8 @@ public class RequestDetailActivity extends BaseActivity {
                     .load(request.getCreatedUser().getAvatarUrl()).placeholder(R.drawable.ic_load)
                     .into(imgReqDetailShopAvatar);
         }
+        btnComplain.setVisibility(View.GONE);
+
     }
 
     private void refreshStatus(String status) {

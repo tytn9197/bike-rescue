@@ -17,6 +17,7 @@ import com.example.bikerescueusermobile.ui.shop_owner.ShopUpdateInfoActivity;
 import com.example.bikerescueusermobile.ui.shop_owner.services.ManageServicesActivity;
 import com.example.bikerescueusermobile.util.MyInstances;
 import com.example.bikerescueusermobile.util.SharedPreferenceHelper;
+import com.willy.ratingbar.ScaleRatingBar;
 
 import butterknife.BindView;
 
@@ -30,8 +31,8 @@ public class ShopProfileFragment extends BaseFragment {
     @BindView(R.id.manageProfile)
     TextView manageProfile;
 
-    @BindView(R.id.shopRating)
-    RatingBar shopRating;
+//    @BindView(R.id.shopRating)
+//    RatingBar shopRating;
 
     @BindView(R.id.shopLogout)
     TextView tvShopLogout;
@@ -42,14 +43,19 @@ public class ShopProfileFragment extends BaseFragment {
     @BindView(R.id.manageService)
     TextView manageService;
 
+    @BindView(R.id.shopProfileRating)
+    ScaleRatingBar shopProfileRating;
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+//        shopProfileRating.setRating(Float.parseFloat(shop.getShopRatingStar()));
         Float rating = (float) 3.5;
         //init rating
-        shopRating.setStepSize((float) 0.5);
-        shopRating.setRating(rating);
+        shopProfileRating.setStepSize((float) 0.5);
+        shopProfileRating.setRating(rating);
+
         manageProfile.setOnClickListener(v -> {
             Intent intent = new Intent(getContext(), ShopUpdateInfoActivity.class);
             startActivity(intent);
