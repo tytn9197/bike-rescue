@@ -24,7 +24,7 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="#EEEEEE"
+                android:background="@color/backgroundGrey"
                 android:orientation="vertical">
 
                 <LinearLayout
@@ -32,13 +32,13 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
 
-                    <ImageView
-                        android:layout_width="150dp"
-                        android:layout_height="150dp"
+                    <de.hdodenhof.circleimageview.CircleImageView
+                        android:id="@+id/updateAvatar"
+                        android:layout_width="180dp"
+                        android:layout_height="180dp"
                         android:layout_gravity="center"
-                        android:layout_marginTop="20dp"
-                        android:background="@drawable/border_100"
-                        android:src="@drawable/ava" />
+                        android:layout_margin="10dp"
+                        android:src="@drawable/user" />
 
                     <LinearLayout
                         android:layout_width="200dp"
@@ -48,6 +48,7 @@
 
 
                         <TextView
+                            android:id="@+id/btnUpdateAva"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             android:background="@drawable/border_white"
@@ -90,9 +91,6 @@
                         android:orientation="horizontal"
                         android:paddingLeft="5dp">
 
-                        >
-
-
                         <EditText
                             android:id="@+id/bikerName"
                             android:layout_width="wrap_content"
@@ -133,9 +131,6 @@
                         android:layout_weight="7"
                         android:orientation="horizontal"
                         android:paddingLeft="5dp">
-
-                        >
-
 
                         <EditText
                             android:id="@+id/bikerPhone"
@@ -183,9 +178,6 @@
                         android:layout_weight="7"
                         android:orientation="horizontal"
                         android:paddingLeft="5dp">
-
-                        >
-
 
                         <EditText
                             android:id="@+id/bikerEmail"
@@ -235,8 +227,6 @@
                         android:orientation="horizontal"
                         android:paddingLeft="5dp">
 
-                        >
-
                         <EditText
                             android:id="@+id/bikerStreet"
                             android:layout_width="0dp"
@@ -270,8 +260,6 @@
                         android:layout_weight="7"
                         android:orientation="horizontal"
                         android:paddingLeft="5dp">
-
-                        >
 
                         <EditText
                             android:id="@+id/bikerWard"
@@ -307,8 +295,6 @@
                         android:orientation="horizontal"
                         android:paddingLeft="5dp">
 
-                        >
-
                         <EditText
                             android:id="@+id/bikerDistrict"
                             android:layout_width="0dp"
@@ -342,8 +328,6 @@
                         android:layout_weight="7"
                         android:orientation="horizontal"
                         android:paddingLeft="5dp">
-
-                        >
 
                         <EditText
                             android:id="@+id/bikerCity"

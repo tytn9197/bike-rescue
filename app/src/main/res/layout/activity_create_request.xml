@@ -201,26 +201,27 @@
         android:gravity="center"
         android:padding="10dp"
         android:text="Hủy yêu cầu"
-        android:textColor="@color/white"
         android:textAllCaps="false"
+        android:textColor="@color/white"
         android:textSize="17dp"
         android:textStyle="bold" />
 
-    <!--    <TextView-->
-    <!--        android:id="@+id/tvComplain"-->
-    <!--        android:layout_width="match_parent"-->
-    <!--        android:layout_height="wrap_content"-->
-    <!--        android:layout_marginLeft="20dp"-->
-    <!--        android:layout_marginTop="5dp"-->
-    <!--        android:layout_marginRight="20dp"-->
-    <!--        android:layout_marginBottom="10dp"-->
-    <!--        android:background="@drawable/red_button_background"-->
-    <!--        android:gravity="center"-->
-    <!--        android:padding="10dp"-->
-    <!--        android:text="Khiếu nại"-->
-    <!--        android:textColor="@color/white"-->
-    <!--        android:textSize="17dp"-->
-    <!--        android:textStyle="bold" />-->
+    <TextView
+        android:id="@+id/btnComplain"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginBottom="10dp"
+        android:background="@drawable/red_button_background"
+        android:gravity="center"
+        android:padding="10dp"
+        android:text="Khiếu nại"
+        android:textColor="@color/white"
+        android:textSize="17dp"
+        android:textStyle="bold"
+        android:visibility="gone" />
 
 
 </LinearLayout>

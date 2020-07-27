@@ -1,14 +1,17 @@
 package com.example.bikerescueusermobile.ui.seach_shop_service;
 
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ListView;
 import android.widget.SearchView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -22,6 +25,7 @@ import com.example.bikerescueusermobile.base.BaseFragment;
 import com.example.bikerescueusermobile.data.model.shop.Shop;
 import com.example.bikerescueusermobile.data.model.shop_services.ShopService;
 import com.example.bikerescueusermobile.data.model.user.CurrentUser;
+import com.example.bikerescueusermobile.ui.confirm.ConfirmInfoActivity;
 import com.example.bikerescueusermobile.ui.map.MapActivity;
 import com.example.bikerescueusermobile.util.MyMethods;
 import com.example.bikerescueusermobile.util.ViewModelFactory;
@@ -52,12 +56,17 @@ public class SearchShopServiceFragment extends BaseFragment implements TopShopSe
     @BindView(R.id.searchViewService)
     SearchView searchViewService;
 
+    @BindView(R.id.txtMoreService)
+    TextView txtMoreService;
+
     @BindView(R.id.btnTopOneService)
     Button btnTopOneService;
+
     @BindView(R.id.btnTopTwoService)
     Button btnTopTwoService;
-    @BindView(R.id.btnTopThreeService)
-    Button btnTopThreeService;
+
+    //    @BindView(R.id.btnTopThreeService)
+    //    Button btnTopThreeService;
 
     @BindView(R.id.homeLoading)
     FrameLayout homeLoading;
@@ -68,7 +77,6 @@ public class SearchShopServiceFragment extends BaseFragment implements TopShopSe
     private ShopServiceViewModel viewModel;
 
     private ArrayList<ShopService> listAllShopServices;
-    private ArrayList<ShopService> listTop3Services;
 
     private ArrayList<Shop> listTop5Shop;
 
@@ -88,7 +96,7 @@ public class SearchShopServiceFragment extends BaseFragment implements TopShopSe
 
         listTop5Shop = new ArrayList<>();
         listAllShopServices = new ArrayList<>();
-        listTop3Services = new ArrayList<>();
+//        listTop3Services = new ArrayList<>();
 
         //--------------------------------set up top 5 shop-------------------------------
         viewModel.getAllShop()
@@ -127,11 +135,25 @@ public class SearchShopServiceFragment extends BaseFragment implements TopShopSe
                         //set nhung dich vu thuong dung`
                         btnTopOneService.setText(listServices.get(0).getName());
                         btnTopTwoService.setText(listServices.get(1).getName());
-                        btnTopThreeService.setText(listServices.get(2).getName());
                         this.serviceName = listServices.get(0).getName();
-                        for (int i = 0; i < 3; i++){
-                            listTop3Services.add(listServices.get(i));
-                        }
+
+                        txtMoreService.setOnClickListener(v ->{
+                            ArrayAdapter<String> services = new ArrayAdapter<String>(getActivity(),
+                                    android.R.layout.simple_list_item_1);
+
+                            for (int i = 0; i < listServices.size(); i++) {
+                                services.add(listServices.get(i).getName());
+                            }
+                            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                            builder.setTitle("Danh sách dịch vụ");
+                            builder.setAdapter(services, (dialog, which) -> {
+                                clusterShopByService(services.getItem(which));
+                                dialog.dismiss();
+                            });
+                            AlertDialog alertDialog = builder.create();
+                            alertDialog.show();
+                        });
+
                     }
                 }, throwable -> {
                     viewModel.setLoading(false);
@@ -153,34 +175,11 @@ public class SearchShopServiceFragment extends BaseFragment implements TopShopSe
             }
         });
 
-
-//        //--------------------------------set up top 3 service-------------------------------
-//        listTop3Services = new ArrayList<>();
-//        viewModel.getTop3Services()
-//                .subscribeOn(Schedulers.io())
-//                .observeOn(AndroidSchedulers.mainThread())
-//                .subscribe(list3Services -> {
-//                    viewModel.setLoading(false);
-//                    if (list3Services != null) {
-//                        btnTopOneService.setText(list3Services.get(0).getName());
-//                        btnTopTwoService.setText(list3Services.get(1).getName());
-//                        btnTopThreeService.setText(list3Services.get(2).getName());
-//                        this.serviceName = list3Services.get(0).getName();
-//                        listTop3Services.addAll(list3Services);
-//                    }
-//                }, throwable -> {
-//                    viewModel.setLoading(false);
-//                    Log.e("SearchShopService", "getTop3Services: " + throwable.getMessage());
-//                });
-
         btnTopOneService.setOnClickListener(v->{
             clusterShopByService("" + btnTopOneService.getText());
         });
         btnTopTwoService.setOnClickListener(v->{
             clusterShopByService("" + btnTopTwoService.getText());
-        });
-        btnTopThreeService.setOnClickListener(v->{
-            clusterShopByService("" + btnTopThreeService.getText());
         });
 
         // set on list view select ----> set text to the search view

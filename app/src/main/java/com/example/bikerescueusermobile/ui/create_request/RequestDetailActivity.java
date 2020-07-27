@@ -102,6 +102,9 @@ public class RequestDetailActivity extends BaseActivity {
     @BindView(R.id.txtReqDetailReqDescription)
     TextView txtReqDetailReqDescription;
 
+    @BindView(R.id.btnComplain)
+    TextView btnComplain;
+
     @Inject
     ViewModelFactory viewModelFactory;
 
@@ -168,18 +171,17 @@ public class RequestDetailActivity extends BaseActivity {
             });
 
 
-            //do it when show clicked finish button
-            txtReqDetailCreatedTime.setOnClickListener(v -> {
-                SweetAlertDialog sweetAlertDialog = new SweetAlertDialog(this, SweetAlertDialog.NORMAL_TYPE);
-                sweetAlertDialog.setTitleText("Thông báo");
-                sweetAlertDialog.setContentText("Hoàn thành yêu cầu");
-                sweetAlertDialog.setConfirmText("Xác nhận");
-                sweetAlertDialog.setConfirmClickListener(sDialog -> {
-                    finish();
-                });
-                sweetAlertDialog.show();
-
-            });
+//            txtReqDetailCreatedTime.setOnClickListener(v -> {
+//                SweetAlertDialog sweetAlertDialog = new SweetAlertDialog(this, SweetAlertDialog.NORMAL_TYPE);
+//                sweetAlertDialog.setTitleText("Thông báo");
+//                sweetAlertDialog.setContentText("Hoàn thành yêu cầu");
+//                sweetAlertDialog.setConfirmText("Xác nhận");
+//                sweetAlertDialog.setConfirmClickListener(sDialog -> {
+//                    finish();
+//                });
+//                sweetAlertDialog.show();
+//
+//            });
         }
     }
 
@@ -237,6 +239,7 @@ public class RequestDetailActivity extends BaseActivity {
 
     private void refreshStatus(String status) {
         txtReqDetailStatus.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.core_color));
+        btnComplain.setVisibility(View.GONE);
 
         if (status.equals(MyInstances.STATUS_CREATED)) {
             txtReqDetailStatus.setText("Đã gửi");
@@ -263,6 +266,7 @@ public class RequestDetailActivity extends BaseActivity {
         if (status.equals(MyInstances.STATUS_FINISHED)) {
             txtReqDetailStatus.setText("Yêu cầu đã hoàn thành");
             btnReqDetailCancel.setVisibility(View.GONE);
+            btnComplain.setVisibility(View.VISIBLE);
         }
     }
 

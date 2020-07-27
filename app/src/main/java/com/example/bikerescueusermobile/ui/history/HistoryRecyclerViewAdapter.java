@@ -9,14 +9,18 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
 import com.example.bikerescueusermobile.R;
 import com.example.bikerescueusermobile.data.model.request.Request;
 import com.example.bikerescueusermobile.util.MyInstances;
 import com.example.bikerescueusermobile.util.MyMethods;
 import com.squareup.picasso.Picasso;
+
 import java.util.List;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -81,18 +85,19 @@ public class HistoryRecyclerViewAdapter extends RecyclerView.Adapter<HistoryRecy
         @SuppressLint("SetTextI18n")
         void bind(Request request) {
             txtFeedDate.setText(MyMethods.convertTimeStampToDate(request.getCreatedDate()) +
-                            " lúc " + MyMethods.convertTimeStampToTime(request.getCreatedDate()));
+                    " lúc " + MyMethods.convertTimeStampToTime(request.getCreatedDate()));
             txtFeedId.setText(request.getRequestCode());
-            txtFeedProblem.setText(request.getListReqShopService().get(0).getShopService().getServices().getName());
+            if (request.getListReqShopService().size() > 0) {
+                txtFeedProblem.setText(request.getListReqShopService().get(0).getShopService().getServices().getName());
+                if (request.getListReqShopService().get(0).getShopService().getShops().getAvatarUrl() != null) {
+                    Picasso.with(context)
+                            .load(request.getListReqShopService().get(0).getShopService().getShops().getAvatarUrl()).placeholder(R.drawable.ic_load)
+                            .into(imgFeed);
+                }
+            }
 
             RelativeLayout.LayoutParams txtFeedStatusParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
-            txtFeedStatusParams.addRule(RelativeLayout.BELOW,R.id.imgFeed);
-
-            if (request.getListReqShopService().get(0).getShopService().getShops().getAvatarUrl() != null) {
-                Picasso.with(context)
-                        .load(request.getListReqShopService().get(0).getShopService().getShops().getAvatarUrl()).placeholder(R.drawable.ic_load)
-                        .into(imgFeed);
-            }
+            txtFeedStatusParams.addRule(RelativeLayout.BELOW, R.id.imgFeed);
 
             txtFeedStatus.setTextColor(Color.parseColor("#0EA92D"));
 
@@ -119,7 +124,7 @@ public class HistoryRecyclerViewAdapter extends RecyclerView.Adapter<HistoryRecy
                 txtFeedStatusParams.setMarginEnd(0);
             }
 
-            if(request.getStatus().equals(MyInstances.STATUS_FINISHED)){
+            if (request.getStatus().equals(MyInstances.STATUS_FINISHED)) {
                 txtFeedStatus.setText("Yêu cầu đã hoàn thành");
                 txtFeedStatusParams.setMarginEnd(0);
             }

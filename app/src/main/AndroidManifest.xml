@@ -50,6 +50,7 @@
         <activity android:name=".ui.shop_owner.ShopRequestDetailActivity" />
         <activity android:name=".ui.shop_owner.ShopUpdateInfoActivity" />
         <activity android:name=".ui.profile.BikerUpdateInfoActivity" />
+        <activity android:name=".ui.profile.VehicleActivity" />
         <activity android:name=".ui.map.MapActivity" />
 
         <meta-data

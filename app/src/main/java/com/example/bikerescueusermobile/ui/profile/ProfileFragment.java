@@ -43,21 +43,30 @@ public class ProfileFragment extends BaseFragment {
 
     @BindView(R.id.txtFullName)
     TextView txtFullName;
+
     @BindView(R.id.txtUserEmail)
     TextView txtUserEmail;
+
     @BindView(R.id.txtUserPhoneNumber)
     TextView txtUserPhoneNumber;
+
     @BindView(R.id.txtUserAddress)
     TextView txtUserAddress;
+
     @BindView(R.id.txtUserCreateDate)
     TextView txtUserCreateDate;
+
     @BindView(R.id.avatar)
     CircleImageView avatar;
+
     @BindView(R.id.logout)
     TextView logout;
 
     @BindView(R.id.btnUpdateProfile)
     Button btnUpdateProfile;
+
+    @BindView(R.id.btnAddVehicle)
+    Button btnAddVehicle;
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
@@ -78,24 +87,26 @@ public class ProfileFragment extends BaseFragment {
         txtUserCreateDate.setText((date.split(" "))[0]);
 
 
-        if(CurrentUser.getInstance().getAvatarUrl().contains("imgur")) {
+        if (CurrentUser.getInstance().getAvatarUrl().contains("imgur")) {
             Picasso.with(getActivity()).load(CurrentUser.getInstance().getAvatarUrl()).placeholder(R.drawable.ic_load).into(avatar);
         }
 
         avatar.setOnClickListener(v -> {
             ImagePicker.Companion.with(getActivity())
-                    .crop()	    			//Crop image(Optional), Check Customization for more option
-                    .compress(1024)			//Final image size will be less than 1 MB(Optional)
-                    .maxResultSize(1080, 1080)	//Final image resolution will be less than 1080 x 1080(Optional)
+                    .crop()                    //Crop image(Optional), Check Customization for more option
+                    .compress(1024)            //Final image size will be less than 1 MB(Optional)
+                    .maxResultSize(1080, 1080)    //Final image resolution will be less than 1080 x 1080(Optional)
                     .start();
         });
 
-        btnUpdateProfile.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(getActivity(), ShopUpdateInfoActivity.class);
-                startActivity(intent);
-            }
+        btnUpdateProfile.setOnClickListener(v -> {
+            Intent intent = new Intent(getActivity(), ShopUpdateInfoActivity.class);
+            startActivity(intent);
+        });
+
+        btnAddVehicle.setOnClickListener(v->{
+            Intent intent = new Intent(getActivity(), VehicleActivity.class);
+            startActivity(intent);
         });
     }
 
@@ -104,7 +115,7 @@ public class ProfileFragment extends BaseFragment {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == Activity.RESULT_OK) {
             //get File object from ImagePicker
-            File file= ImagePicker.Companion.getFile(data);
+            File file = ImagePicker.Companion.getFile(data);
 
             // set path toi' hin`h do' thanh` bitmap
             Bitmap myBitmap = BitmapFactory.decodeFile(file.getAbsolutePath());

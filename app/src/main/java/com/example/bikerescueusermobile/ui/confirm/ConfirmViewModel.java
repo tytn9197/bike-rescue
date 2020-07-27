@@ -12,6 +12,7 @@ import com.example.bikerescueusermobile.data.model.shop_services.ShopServiceTabl
 import com.example.bikerescueusermobile.data.model.shop_services.ShopServicesRepository;
 import com.example.bikerescueusermobile.data.model.user.CurrentUser;
 import com.example.bikerescueusermobile.data.model.vehicle.Vehicle;
+import com.example.bikerescueusermobile.data.model.vehicle.VehicleDTO;
 import com.example.bikerescueusermobile.data.model.vehicle.VehicleRepository;
 
 import java.util.List;
@@ -69,4 +70,13 @@ public class ConfirmViewModel extends ViewModel {
         return shopServicesRepository.getShopServiceId(shopId,serivceID);
     }
 
+    public Single<Vehicle> createVehicle(VehicleDTO vehicle){
+        loading.setValue(true);
+        return vehicleRepository.createVehicle(vehicle);
+    }
+
+    public Single<Vehicle> updateVehicle(VehicleDTO vehicle, int vehicleID){
+        loading.setValue(true);
+        return vehicleRepository.updateVehicle(vehicle, vehicleID);
+    }
 }

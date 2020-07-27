@@ -1,5 +1,7 @@
 package com.example.bikerescueusermobile.data.model.vehicle;
 
+import com.example.bikerescueusermobile.data.model.user.CurrentUser;
+
 import java.util.List;
 
 import javax.inject.Inject;
@@ -22,4 +24,11 @@ public class VehicleRepository {
         return vehicleService.getVehicleByUserId(token,id);
     }
 
+    public Single<Vehicle> createVehicle(VehicleDTO vehicle){
+        return vehicleService.createVehicle(vehicle, CurrentUser.getInstance().getAccessToken());
+    }
+
+    public Single<Vehicle> updateVehicle(VehicleDTO vehicle, int vehicleID){
+        return vehicleService.updateVehicle(vehicle, vehicleID, CurrentUser.getInstance().getAccessToken());
+    }
 }
