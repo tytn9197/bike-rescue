@@ -16,6 +16,7 @@ import com.example.bikerescueusermobile.data.model.request.CurrentRequest;
 import com.example.bikerescueusermobile.data.model.request.Request;
 import com.example.bikerescueusermobile.data.model.request.RequestDTO;
 import com.example.bikerescueusermobile.data.model.shop.Shop;
+import com.example.bikerescueusermobile.data.model.shop_services.ShopServiceTable;
 import com.example.bikerescueusermobile.data.model.user.CurrentUser;
 import com.example.bikerescueusermobile.data.model.vehicle.Vehicle;
 import com.mapbox.mapboxsdk.geometry.LatLng;
@@ -119,7 +120,7 @@ public class MyMethods {
 
     }
 
-    public static void setRequestToCurrentRequest(Request request){
+    public static void setRequestToCurrentRequest(Request request) {
         CurrentRequest.getInstance().setId(request.getId());
         CurrentRequest.getInstance().setCreatedDate(request.getCreatedDate());
         CurrentRequest.getInstance().setStatus(request.getStatus());
@@ -136,7 +137,7 @@ public class MyMethods {
         CurrentRequest.getInstance().setListReqShopService(request.getListReqShopService());
     }
 
-    public static void setRequestToCurrentRequest(RequestDTO request){
+    public static void setRequestToCurrentRequest(RequestDTO request) {
         CurrentRequest.getInstance().setId(request.getId());
         CurrentRequest.getInstance().setCreatedDate(request.getCreatedDate());
         CurrentRequest.getInstance().setStatus(request.getStatus());
@@ -149,15 +150,43 @@ public class MyMethods {
         CurrentRequest.getInstance().setReviewUpdateDate(request.getReviewUpdateDate());
     }
 
-    public static String convertTimeStampToDate(Timestamp ts){
+    public static String convertTimeStampToDate(Timestamp ts) {
         Date d = new Date(ts.getTime());
         DateFormat f = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
         return f.format(d);
     }
 
-    public static String convertTimeStampToTime(Timestamp ts){
+    public static String convertTimeStampToTime(Timestamp ts) {
         Date d = new Date(ts.getTime());
         DateFormat f = new SimpleDateFormat("HH:mm", Locale.getDefault());
         return f.format(d);
+    }
+
+    public static Double findMaxPrice(List<ShopServiceTable> arr) {
+        // Initialize maximum element
+        double max = arr.get(0).getPrice();
+
+        // Traverse array elements from second and
+        // compare every element with current max
+        for (int i = 1; i < arr.size(); i++)
+            if (arr.get(i).getPrice() > 0)
+                if (arr.get(i).getPrice() > max)
+                    max = arr.get(i).getPrice();
+
+        return max;
+    }
+
+    public static Double findMinPrice(List<ShopServiceTable> arr) {
+        // Initialize maximum element
+        double min = arr.get(0).getPrice();
+
+        // Traverse array elements from second and
+        // compare every element with current max
+        for (int i = 1; i < arr.size(); i++)
+            if (arr.get(i).getPrice() > 0)
+                if (arr.get(i).getPrice() < min)
+                    min = arr.get(i).getPrice();
+
+        return min;
     }
 }

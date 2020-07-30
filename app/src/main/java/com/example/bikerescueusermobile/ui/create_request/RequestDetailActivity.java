@@ -123,7 +123,7 @@ public class RequestDetailActivity extends BaseActivity {
         notiDialog = new SweetAlertDialog(this, SweetAlertDialog.NORMAL_TYPE);
         notiDialog.setTitleText("Thông báo");
         notiDialog.setContentText("Huỷ thành công");
-        notiDialog.setConfirmText("Xác nhận");
+        notiDialog.setConfirmText("OK");
         notiDialog.setConfirmClickListener(Dialog::dismiss);
 
         //setup toolbar
@@ -148,13 +148,15 @@ public class RequestDetailActivity extends BaseActivity {
                                 setDataToViewShop(req);
                             }
                         }
+                    }, throwable -> {
+                        Log.e(TAG, "getRequestById: " + throwable.getMessage());
                     });
 
             btnReqDetailCancel.setOnClickListener(v -> {
                 SweetAlertDialog sweetAlertDialog = new SweetAlertDialog(this, SweetAlertDialog.NORMAL_TYPE);
                 sweetAlertDialog.setTitleText("Thông báo");
                 sweetAlertDialog.setContentText("Xác nhận hủy yêu cầu?");
-                sweetAlertDialog.setConfirmText("Xác nhận");
+                sweetAlertDialog.setConfirmText("OK");
                 sweetAlertDialog.setCanceledOnTouchOutside(false);
                 sweetAlertDialog.setConfirmClickListener(sDialog -> {
                     sDialog.dismiss();
@@ -169,9 +171,11 @@ public class RequestDetailActivity extends BaseActivity {
                                     txtReqDetailStatus.setTextColor(Color.RED);
                                     SharedPreferenceHelper.setSharedPreferenceString(getApplicationContext(), MyInstances.KEY_BIKER_REQUEST, "");
                                 }
+                            }, throwable -> {
+                                Log.e(TAG, "cancleRequest: " + throwable.getMessage());
                             });
                 });
-                sweetAlertDialog.setCancelButton("Từ chối", Dialog::dismiss);
+                sweetAlertDialog.setCancelButton("Hủy", Dialog::dismiss);
                 sweetAlertDialog.show();
             });
 

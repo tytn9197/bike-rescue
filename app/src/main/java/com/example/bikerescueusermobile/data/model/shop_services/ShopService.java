@@ -20,14 +20,14 @@ public class ShopService implements Parcelable {
     @SerializedName("serviceName")
     private String name;
 
-    @SerializedName("serviceUrl")
-    private String serviceUrl;
-
     @SerializedName("description")
     private String description;
 
     @SerializedName("status")
     private boolean status;
+
+    @SerializedName("unit")
+    private String unit;
 
     @SerializedName("category")
     private Category category;
@@ -49,7 +49,6 @@ public class ShopService implements Parcelable {
     protected ShopService(Parcel in) {
         id = in.readInt();
         name = in.readString();
-        serviceUrl = in.readString();
         description = in.readString();
         status = in.readByte() != 0;
     }
@@ -75,7 +74,6 @@ public class ShopService implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeInt(id);
         dest.writeString(name);
-        dest.writeString(serviceUrl);
         dest.writeString(description);
         dest.writeByte((byte) (status ? 1 : 0));
     }

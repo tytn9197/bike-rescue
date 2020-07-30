@@ -157,6 +157,19 @@
             android:text="Giá: "
             android:textColor="@color/white"
             android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/txtMapOpenTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/txtMapEstimatePrice"
+            android:layout_alignParentEnd="true"
+            android:layout_marginStart="15dp"
+            android:layout_marginTop="7dp"
+            android:layout_toEndOf="@+id/imgDistance"
+            android:text="Mở cửa từ 10h đến 24h"
+            android:textColor="@color/white"
+            android:textSize="16sp" />
     </RelativeLayout>
 
     <LinearLayout

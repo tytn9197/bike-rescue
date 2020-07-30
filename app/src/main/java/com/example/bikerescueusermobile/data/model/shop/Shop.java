@@ -54,7 +54,21 @@ public class Shop implements Serializable {
     @SerializedName("numOfStar")
     private String shopRatingStar;
 
+    @SerializedName("openTime")
+    private String openTime;
+
+    @SerializedName("closeTime")
+    private String closeTime;
+
+    /**
+     * distance from biker to shop address in km
+     */
     private double distanceFromUser;
+
+    /**
+     * time from biker to shop address in minutes
+     */
+    private double durationToBiker;
 
     public Shop(int id, String shopName, String address, String shopRatingStar) {
         this.id = id;
@@ -66,22 +80,5 @@ public class Shop implements Serializable {
     public Shop() {
     }
 
-    @Override
-    public String toString() {
-        return "Shop{" +
-                "id=" + id +
-                ", shopName='" + shopName + '\'' +
-                ", address='" + address + '\'' +
-                ", phoneNumber='" + phoneNumber + '\'' +
-                ", email='" + email + '\'' +
-                ", avatarUrl='" + avatarUrl + '\'' +
-                ", description='" + description + '\'' +
-                ", status=" + status +
-                ", latitude='" + latitude + '\'' +
-                ", longtitude='" + longtitude + '\'' +
-                ", user=" + user +
-                ", shopRatingStar='" + shopRatingStar + '\'' +
-                "}\n";
-    }
 }
 

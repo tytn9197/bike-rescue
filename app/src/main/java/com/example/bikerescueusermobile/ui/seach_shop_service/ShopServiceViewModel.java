@@ -66,4 +66,9 @@ public class ShopServiceViewModel extends ViewModel {
         loading.setValue(true);
         return shopServicesRepository.getShopServiceByShopId(shopId, CurrentUser.getInstance().getAccessToken());
     }
+
+    public Single<ShopServiceTable> getByServiceNameAndShopsId(String serviceName, int shopId){
+        loading.setValue(true);
+        return shopServicesRepository.getByServiceNameAndShopsId(serviceName, shopId);
+    }
 }

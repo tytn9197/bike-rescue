@@ -128,6 +128,8 @@ public class BikerUpdateInfoActivity extends BaseActivity {
                                 });
                                 sweetAlertDialog.show();
                             }
+                        }, throwable -> {
+                            Log.e(TAG, "updateInfo: " + throwable.getMessage());
                         });
             }
         });

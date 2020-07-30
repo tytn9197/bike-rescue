@@ -25,4 +25,7 @@ public interface IShopServicesService {
 
     @GET("/shop/getShopServiceByShopOwnerId/{shopOwnerId}")
     Single<List<ShopServiceTable>> getShopServiceByShopOwnerId(@Path("shopOwnerId") int shopOwnerId, @Header("Authorization")String token);
+
+    @GET("/shop/getByServiceNameAndShopsId")
+    Single<ShopServiceTable> getByServiceNameAndShopsId(@Query("serviceName") String serviceName, @Query("shopsId")int shopId, @Header("Authorization")String token);
 }

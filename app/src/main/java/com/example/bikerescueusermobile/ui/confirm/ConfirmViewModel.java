@@ -79,4 +79,5 @@ public class ConfirmViewModel extends ViewModel {
         loading.setValue(true);
         return vehicleRepository.updateVehicle(vehicle, vehicleID);
     }
+
 }

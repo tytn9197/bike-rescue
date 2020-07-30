@@ -138,7 +138,7 @@ public class ShopHomeFragment extends BaseFragment {
 
                 SweetAlertDialog sweetAlertDialog = new SweetAlertDialog(getBaseActivity(), SweetAlertDialog.NORMAL_TYPE);
                 sweetAlertDialog.setTitleText("Thông báo");
-                sweetAlertDialog.setConfirmText("Xác nhận");
+                sweetAlertDialog.setConfirmText("Xem thông báo");
                 sweetAlertDialog.setCanceledOnTouchOutside(false);
                 sweetAlertDialog.setCancelable(false);
 
@@ -157,7 +157,8 @@ public class ShopHomeFragment extends BaseFragment {
                                         String sharedPreferenceStr = gson.toJson(req);
                                         SharedPreferenceHelper.setSharedPreferenceString(getActivity(), MyInstances.KEY_SHOP_REQUEST, sharedPreferenceStr);
 
-                                        sweetAlertDialog.setCancelText("Từ chối");
+                                        sweetAlertDialog.setCancelText("Hủy");
+                                        sweetAlertDialog.setConfirmText("OK");
                                         sweetAlertDialog.setCancelClickListener(Dialog::dismiss);
 
                                         btnCallBiker.setOnClickListener(v -> {
@@ -207,13 +208,18 @@ public class ShopHomeFragment extends BaseFragment {
                 }
 
                 if (responeReq.getMessage().equals(MyInstances.NOTI_CANELED)) {
-                    sweetAlertDialog.setContentText("Khách đã hủy yêu cầu");
-                    sweetAlertDialog.setConfirmClickListener(sDialog -> {
+                    SweetAlertDialog cancelReq = new SweetAlertDialog(getBaseActivity(), SweetAlertDialog.NORMAL_TYPE);
+                    cancelReq.setTitleText("Thông báo");
+                    cancelReq.setConfirmText("Đóng");
+                    cancelReq.setCanceledOnTouchOutside(false);
+                    cancelReq.setCancelable(false);
+                    cancelReq.setContentText("Khách đã hủy yêu cầu");
+                    cancelReq.setConfirmClickListener(sDialog -> {
                         sDialog.dismiss();
                         txtNoReq.setVisibility(View.VISIBLE);
                         SharedPreferenceHelper.setSharedPreferenceString(getActivity(), MyInstances.KEY_SHOP_REQUEST, "");
                     });
-                    sweetAlertDialog.show();
+                    cancelReq.show();
                 }
             }
 
@@ -254,7 +260,7 @@ public class ShopHomeFragment extends BaseFragment {
                 sweetAlertDialog.setCanceledOnTouchOutside(false);
                 sweetAlertDialog.setCancelable(false);
                 sweetAlertDialog.setContentText("Xác nhận hoàn thành yêu cầu?");
-                sweetAlertDialog.setCancelText("Từ chối");
+                sweetAlertDialog.setCancelText("Hủy");
                 sweetAlertDialog.setCancelClickListener(Dialog::dismiss);
                 sweetAlertDialog.setConfirmClickListener(dialog -> {
                     dialog.dismiss();

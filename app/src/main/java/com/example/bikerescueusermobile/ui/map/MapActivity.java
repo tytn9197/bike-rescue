@@ -1,7 +1,9 @@
 package com.example.bikerescueusermobile.ui.map;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
@@ -18,7 +20,10 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
+import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProviders;
 
 import com.example.bikerescueusermobile.R;
@@ -68,6 +73,8 @@ import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Semaphore;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.mapbox.mapboxsdk.location.LocationComponent;
 
@@ -123,6 +130,7 @@ public class MapActivity extends DaggerAppCompatActivity implements
     FrameLayout mapClusterShop;
     Button btnGoogleMapBack;
     ImageView imgDistance;
+    TextView txtMapOpenTime;
 
     private double distance = -1;
     private String serviceName = "";
@@ -151,7 +159,6 @@ public class MapActivity extends DaggerAppCompatActivity implements
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
         //set-up btn on click listener
-        btnSendRequest.setOnClickListener(btnSendRequestOnClickListener);
         btnMapBack.setOnClickListener(btnMapBackOnClickListener);
         btnGoogleMapBack.setOnClickListener(btnGoogleMapBackOnClickListener);
 
@@ -159,7 +166,7 @@ public class MapActivity extends DaggerAppCompatActivity implements
         Shop shop = (Shop) getIntent().getSerializableExtra("shop");
         this.distance = getIntent().getDoubleExtra("dis", -1);
         serviceName = getIntent().getStringExtra("serviceName");
-        initShopDetail(shop, shop.getUser().getId());
+        initShopDetail(shop, shop.getUser().getId(), false);
 
         //set-up cluster google map
         FragmentManager manager = getSupportFragmentManager();
@@ -174,42 +181,82 @@ public class MapActivity extends DaggerAppCompatActivity implements
 
     public void setShopDetailToMapbox(Shop s, int id) {
         hideClusterMap();
-        initShopDetail(s, id);
+        initShopDetail(s, id, true);
     }
 
-    @SuppressLint("DefaultLocale")
-    private void initShopDetail(Shop shop, int ownerId) {
+    @SuppressLint({"DefaultLocale", "SetTextI18n"})
+    private void initShopDetail(Shop shop, int ownerId, boolean hasServiceName) {
         shopLocation = new LatLng(Double.parseDouble(shop.getLatitude()), Double.parseDouble(shop.getLongtitude()));
         txtMapShopName.setText(shop.getShopName());
         txtMapShopAddress.setText(shop.getAddress());
         String start = shop.getShopRatingStar() + "/5";
         txtMapShopRatingStarNum.setText(start);
         txtShopAndCurrentLocationDistance.setText(String.format("Cách đây %.1f km", shop.getDistanceFromUser()));
-        viewModel.getShopServiceByShopId(shop.getId())
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(listServices -> {
-                    if(listServices != null && listServices.size() > 0) {
-                        listAllShopServices = new ArrayList<>();
-                        listAllShopServices.addAll(listServices);
-                        String s1 = listServices.get(0).getServices().getName() + ", ";
-                        String s2 = "";
-                        String s3 = "";
-                        if(listServices.size() > 1) {
-                            s2 = listServices.get(1).getServices().getName() + ", ";
+
+        if (!hasServiceName) {
+            viewModel.getShopServiceByShopId(shop.getId())
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(listServices -> {
+                        if (listServices != null && listServices.size() > 0) {
+                            listAllShopServices = new ArrayList<>();
+                            listAllShopServices.addAll(listServices);
+                            String s1 = listServices.get(0).getServices().getName() + ", ";
+                            String s2 = "";
+                            String s3 = "";
+                            if (listServices.size() > 1) {
+                                s2 = listServices.get(1).getServices().getName() + ", ";
+                            }
+                            if (listServices.size() > 2) {
+                                s3 = listServices.get(2).getServices().getName() + ",";
+                            }
+                            String services = "Các dịch vụ: " + s1 + s2 + s3 + "...";
+                            txtMapShopServices.setText(services);
+
+                            Double max = MyMethods.findMaxPrice(listServices);
+                            Double min = MyMethods.findMinPrice(listServices);
+                            String price = "Giá: liên hệ";
+                            if (min != -1 && max != -1) {
+                                price = "Giá: " +
+                                        min.intValue() + "k"
+                                        + " ~ " +
+                                        max.intValue() + "k";
+                            }
+                            txtMapEstimatePrice.setText(price);
                         }
-                        if(listServices.size() > 2) {
-                            s3 = listServices.get(2).getServices().getName() + ",";
+                    }, throwable -> {
+                        Log.e(TAG, "getShopServiceByShopId: " + throwable.getMessage());
+                    });
+
+        } else {
+            String services = "Dịch vụ: " + serviceName;
+            txtMapShopServices.setText(services);
+            viewModel.getByServiceNameAndShopsId(serviceName, shop.getId())
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(shopService -> {
+                        if (shopService.getPrice() != null) {
+                            String price = "Giá: liên hệ";
+                            if (shopService.getPrice() != -1) {
+                                price = "Giá: " + shopService.getPrice().intValue() + "k/" + shopService.getServices().getUnit();
+                            }
+                            txtMapEstimatePrice.setText(price);
                         }
-                        String services = "Các dịch vụ: " + s1 + s2 + s3 + "...";
-                        txtMapShopServices.setText(services);
-                    }
-                });
-        String price = "Giá: " + "100k ~ 200k";
-        txtMapEstimatePrice.setText(price);
+                    }, throwable -> {
+                        Log.e(TAG, "getByServiceNameAndShopsId: " + throwable.getMessage());
+                    });
+
+        }
+        String open = shop.getOpenTime();
+        String close = shop.getCloseTime();
+        txtMapOpenTime.setText("Mở cửa từ " + open + "h đến " + close + "h");
 
         //set chosen shop
         CurrentUser.getInstance().setChosenShopOwnerId(ownerId);
+
+        btnSendRequest.setOnClickListener(v -> {
+            sendReqClick(shop);
+        });
     }
 
     private void initViewID() {
@@ -226,6 +273,7 @@ public class MapActivity extends DaggerAppCompatActivity implements
         mapClusterShop = findViewById(R.id.mapClusterShop);
         btnGoogleMapBack = findViewById(R.id.btnGoogleMapBack);
         imgDistance = findViewById(R.id.imgDistance);
+        txtMapOpenTime = findViewById(R.id.txtMapOpenTime);
 //        imgShopLogo = findViewById(R.id.imgShopLogo);
     }
 
@@ -252,9 +300,9 @@ public class MapActivity extends DaggerAppCompatActivity implements
         }
     };
 
-    private View.OnClickListener btnSendRequestOnClickListener = v -> {
-        String request = SharedPreferenceHelper.getSharedPreferenceString(getApplicationContext(), MyInstances.KEY_BIKER_REQUEST,"");
-        if(!request.trim().equals("")){
+    private void sendReqClick(Shop shop){
+        String request = SharedPreferenceHelper.getSharedPreferenceString(getApplicationContext(), MyInstances.KEY_BIKER_REQUEST, "");
+        if (!request.trim().equals("")) {
             SweetAlertDialog errorDialog = new SweetAlertDialog(this, SweetAlertDialog.ERROR_TYPE);
             errorDialog.setTitleText("Thông báo");
             errorDialog.setConfirmText("Xác nhận");
@@ -264,7 +312,7 @@ public class MapActivity extends DaggerAppCompatActivity implements
                 errorDialog.dismiss();
             });
             errorDialog.show();
-        }else{
+        } else {
             Intent intent = new Intent(this, ConfirmInfoActivity.class);
             if (mPlaceName.equals("")) {
                 intent.putExtra("placeName", "Vị trí của tôi");
@@ -272,12 +320,12 @@ public class MapActivity extends DaggerAppCompatActivity implements
                 intent.putExtra("placeName", "" + mPlaceName);
             }
             intent.putExtra("serviceName", serviceName);
-            intent.putParcelableArrayListExtra("allServices",listAllShopServices);
-            intent.putExtra("selectedShop", listAllShopServices.get(0).getShops());
+//            intent.putParcelableArrayListExtra("allServices", listAllShopServices);
+            intent.putExtra("selectedShop", shop);
             startActivity(intent);
             finish();
         }
-    };
+    }
 
     private View.OnClickListener btnGoogleMapBackOnClickListener = v -> {
         finish();
@@ -346,8 +394,8 @@ public class MapActivity extends DaggerAppCompatActivity implements
         loadedMapStyle.addSource(iconGeoJsonSource);
     }
 
-    private void setCameraPositon(Location location) {
-        mapboxMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), 13));
+    private void setCameraPositon(Point point) {
+        mapboxMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(point.latitude(), point.longitude()), 12));
     }
 
     @SuppressWarnings({"MissingPermission"})
@@ -374,12 +422,12 @@ public class MapActivity extends DaggerAppCompatActivity implements
             mFusedLocationClient.getLastLocation().addOnSuccessListener(this, location -> {
                 if (location != null) {
                     Point origin = Point.fromLngLat(location.getLongitude(), location.getLatitude());
-
-                    String convertLatLngToAddress = MyMethods.convertLatLngToAddress(getApplicationContext(),location.getLatitude(),location.getLongitude());
+                    setCameraPositon(origin);
+                    String convertLatLngToAddress = MyMethods.convertLatLngToAddress(getApplicationContext(), location.getLatitude(), location.getLongitude());
                     String[] splitedPlace = convertLatLngToAddress.split(",");
 
                     mPlaceName = splitedPlace[0];
-                    for (int i = 1; i < splitedPlace.length - 2; i++){
+                    for (int i = 1; i < splitedPlace.length - 2; i++) {
                         mPlaceName = mPlaceName.concat("," + splitedPlace[i]);
                     }
 

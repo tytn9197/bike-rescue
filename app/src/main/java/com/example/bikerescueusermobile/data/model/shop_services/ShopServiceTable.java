@@ -20,20 +20,11 @@ public class ShopServiceTable implements Parcelable{
     @SerializedName("price")
     private Double price;
 
-    @SerializedName("minPrice")
-    private Double minPrice;
-
-    @SerializedName("maxPrice")
-    private Double maxPrice;
-
     @SerializedName("serviceAvatar")
     private String serviceAvatar;
 
     @SerializedName("status")
     private boolean status;
-
-    @SerializedName("unit")
-    private String unit;
 
     @SerializedName("services")
     private ShopService services;
@@ -51,16 +42,6 @@ public class ShopServiceTable implements Parcelable{
             price = null;
         } else {
             price = in.readDouble();
-        }
-        if (in.readByte() == 0) {
-            minPrice = null;
-        } else {
-            minPrice = in.readDouble();
-        }
-        if (in.readByte() == 0) {
-            maxPrice = null;
-        } else {
-            maxPrice = in.readDouble();
         }
         serviceAvatar = in.readString();
         status = in.readByte() != 0;
@@ -93,18 +74,6 @@ public class ShopServiceTable implements Parcelable{
         } else {
             dest.writeByte((byte) 1);
             dest.writeDouble(price);
-        }
-        if (minPrice == null) {
-            dest.writeByte((byte) 0);
-        } else {
-            dest.writeByte((byte) 1);
-            dest.writeDouble(minPrice);
-        }
-        if (maxPrice == null) {
-            dest.writeByte((byte) 0);
-        } else {
-            dest.writeByte((byte) 1);
-            dest.writeDouble(maxPrice);
         }
         dest.writeString(serviceAvatar);
         dest.writeByte((byte) (status ? 1 : 0));

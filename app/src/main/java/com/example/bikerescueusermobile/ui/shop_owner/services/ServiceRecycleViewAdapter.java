@@ -91,7 +91,7 @@ public class ServiceRecycleViewAdapter extends RecyclerView.Adapter<ServiceRecyc
             txtServiceName.setText(shopServiceTable.getServices().getName());
             txtCategory.setText(shopServiceTable.getServices().getCategory().getCategoryName());
             txtServicePrice.setText(shopServiceTable.getPrice().toString());
-            txtUnit.setText("/ " + shopServiceTable.getUnit());
+            txtUnit.setText("/ " + shopServiceTable.getServices().getUnit());
 
             RelativeLayout.LayoutParams txtServiceFeedStatusParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
             txtServiceFeedStatusParams.addRule(RelativeLayout.BELOW, R.id.imgServiceFeed);

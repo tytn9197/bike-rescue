@@ -1,68 +1,52 @@
 package com.example.bikerescueusermobile.ui.home;
 
 import android.Manifest;
-import android.app.AlertDialog;
-import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.drawable.Drawable;
 import android.location.Location;
-import android.net.Uri;
 import android.os.Bundle;
-import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
-import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.lifecycle.ViewModelProviders;
-import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.example.bikerescueusermobile.R;
 import com.example.bikerescueusermobile.base.BaseFragment;
 import com.example.bikerescueusermobile.data.model.shop.Shop;
 import com.example.bikerescueusermobile.ui.map.MapActivity;
 import com.example.bikerescueusermobile.ui.seach_shop_service.ShopServiceViewModel;
-import com.example.bikerescueusermobile.ui.seach_shop_service.TopShopRecyclerViewAdapter;
-import com.example.bikerescueusermobile.ui.send_request.SendRequestActivity;
 import com.example.bikerescueusermobile.util.MyMethods;
 import com.example.bikerescueusermobile.util.ViewModelFactory;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.LocationSource;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.Task;
-import com.google.android.libraries.places.compat.GeoDataClient;
-import com.google.android.libraries.places.compat.PlaceDetectionClient;
-import com.google.gson.Gson;
-import com.karumi.dexter.Dexter;
-import com.karumi.dexter.MultiplePermissionsReport;
-import com.karumi.dexter.PermissionToken;
-import com.karumi.dexter.listener.PermissionRequest;
-import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
 import com.mapbox.android.core.permissions.PermissionsListener;
 import com.mapbox.android.core.permissions.PermissionsManager;
-import com.mapbox.mapboxsdk.maps.Style;
+import com.mapbox.api.directions.v5.DirectionsCriteria;
+import com.mapbox.api.directions.v5.MapboxDirections;
+import com.mapbox.api.directions.v5.models.DirectionsResponse;
+import com.mapbox.geojson.Point;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
 
-import butterknife.BindView;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
-
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class HomeFragment extends BaseFragment
         implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener, GoogleMap.OnMapClickListener, GoogleMap.OnMyLocationChangeListener, PermissionsListener {
@@ -79,7 +63,7 @@ public class HomeFragment extends BaseFragment
     private PermissionsManager permissionsManager;
     private ShopServiceViewModel viewModel;
 
-    private List<Shop> listShop = new ArrayList<>();
+    private final List<Shop> shops = new ArrayList<>();
 
     @Inject
     ViewModelFactory viewModelFactory;
@@ -87,7 +71,7 @@ public class HomeFragment extends BaseFragment
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        if(getActivity() != null) {
+        if (getActivity() != null) {
             SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager()
                     .findFragmentById(R.id.mapHome);
             mapFragment.getMapAsync(this);
@@ -95,9 +79,10 @@ public class HomeFragment extends BaseFragment
         }
     }
 
+    @SuppressWarnings({"MissingPermission"})
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        if(getActivity() != null) {
+        if (getActivity() != null) {
             mMap = googleMap;
             if (PermissionsManager.areLocationPermissionsGranted(getActivity())) {
                 if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -120,23 +105,64 @@ public class HomeFragment extends BaseFragment
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(listShop -> {
                             if (listShop != null) {
-                                this.listShop.addAll(listShop);
                                 for (int i = 0; i < listShop.size(); i++) {
                                     googleMap.addMarker(new MarkerOptions()
                                             .position(new LatLng(Double.parseDouble(listShop.get(i).getLatitude()), Double.parseDouble(listShop.get(i).getLongtitude())))
                                             .title(listShop.get(i).getShopName()));
+                                    final int j = i;
+
+                                    Point destination = Point.fromLngLat(
+                                            Double.parseDouble(listShop.get(i).getLongtitude()),
+                                            Double.parseDouble(listShop.get(i).getLatitude()));
+
+                                    final FusedLocationProviderClient mFusedLocationClient = LocationServices.getFusedLocationProviderClient(getActivity());
+
+                                    mFusedLocationClient.getLastLocation().addOnSuccessListener(getActivity(), location -> {
+                                        if (location != null) {
+                                            Point origin = Point.fromLngLat(location.getLongitude(), location.getLatitude());
+
+                                            MapboxDirections client = MapboxDirections.builder()
+                                                    .origin(origin)
+                                                    .destination(destination)
+                                                    .overview(DirectionsCriteria.OVERVIEW_FULL)
+                                                    .profile(DirectionsCriteria.PROFILE_DRIVING)
+                                                    .accessToken(getString(R.string.mapbox_access_token))
+                                                    .build();
+
+                                            client.enqueueCall(new Callback<DirectionsResponse>() {
+                                                @Override
+                                                public void onResponse(Call<DirectionsResponse> call, Response<DirectionsResponse> response) {
+
+                                                    if (response.body() == null) {
+                                                        Log.e(TAG, "getDistance & Duration - response.body() == null: No routes found, make sure you set the right user and access token.");
+                                                        return;
+                                                    } else if (response.body().routes().size() < 1) {
+                                                        Log.e(TAG, "getDistance & Duration - response.body().routes().size() < 1: No routes found");
+                                                        return;
+                                                    }
+                                                    listShop.get(j).setDistanceFromUser(response.body().routes().get(0).distance()/1000);
+                                                    listShop.get(j).setDurationToBiker(response.body().routes().get(0).duration()/60);
+                                                    shops.add(listShop.get(j));
+                                                }
+
+                                                @Override
+                                                public void onFailure(Call<DirectionsResponse> call, Throwable throwable) {
+                                                    Log.e(TAG, "getDistance & Duration - enableLocationComponent - onFailure: " + throwable.getMessage());
+                                                }
+                                            });
+                                        }
+                                    });
                                 }
-                                MyMethods.setDistance(listShop);
                             }
                         }, throwable -> {
-                            Log.e("SearchShopService", "getShopByServiceName: " + throwable.getMessage());
+                            Log.e(TAG, "getShopByServiceName: " + throwable.getMessage());
                         });
             }
 
             googleMap.setOnMarkerClickListener(this);
             googleMap.setOnMapClickListener(this);
             googleMap.setOnMyLocationChangeListener(this);
-            LatLng hcm = new LatLng(10.8229002, 106.7048471);
+            LatLng hcm = new LatLng(10.8229002, 106.7048471); //view from ho chi minh
             googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(hcm, 10));
         }
     }
@@ -156,7 +182,7 @@ public class HomeFragment extends BaseFragment
 
     @SuppressWarnings({"MissingPermission"})
     public void getDeviceLocation() {
-        if(getActivity() != null) {
+        if (getActivity() != null) {
             if (PermissionsManager.areLocationPermissionsGranted(getActivity())) {
                 mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getActivity());
                 try {
@@ -180,18 +206,23 @@ public class HomeFragment extends BaseFragment
 
     @Override
     public boolean onMarkerClick(Marker marker) {
-        for (int i = 0; i < listShop.size(); i++) {
-            if (Double.parseDouble(listShop.get(i).getLatitude()) == marker.getPosition().latitude
-                    && Double.parseDouble(listShop.get(i).getLongtitude()) == marker.getPosition().longitude) {
-                ((MapActivity) getActivity()).setShopDetailToMapbox(listShop.get(i), listShop.get(i).getUserNameOnly().getId());
+        int position = -1;
+        for (int i = 0; i < shops.size(); i++) {
+            if (Double.parseDouble(shops.get(i).getLatitude()) == marker.getPosition().latitude
+                    && Double.parseDouble(shops.get(i).getLongtitude()) == marker.getPosition().longitude) {
+                position = i;
+                break;
             }
         }
+        if (position != -1)
+            ((MapActivity) getActivity()).setShopDetailToMapbox(shops.get(position), shops.get(position).getUserNameOnly().getId());
+        else
+            Log.e(TAG, "position == -1");
         return false;
     }
 
     @Override
     public void onMapClick(LatLng latLng) {
-
     }
 
     @Override

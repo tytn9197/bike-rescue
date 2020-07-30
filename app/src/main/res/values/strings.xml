@@ -19,7 +19,7 @@
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
     <string name="title_toolbar">BR</string>
-    <string name="button_send_request_text">Gọi dịch vụ</string>
+    <string name="button_send_request_text">Đặt dịch vụ</string>
 
     <string name="map_api_key">AIzaSyCsA_sV97saxUUDQKw4WsXSeardFnW3LfE</string>
     <string name="message_need_permission">Cung cấp quyền sử dụng</string>

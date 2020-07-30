@@ -2,6 +2,7 @@ package com.example.bikerescueusermobile.ui.history;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
 
@@ -34,6 +35,8 @@ public class HistoryFragment extends BaseFragment implements HistorySelectedList
     protected int layoutRes() {
         return R.layout.biker_history_fragment;
     }
+
+    private static final String TAG = "HistoryFragment";
 
     @BindView(R.id.rvHistory)
     RecyclerView mRecyclerView;
@@ -73,6 +76,8 @@ public class HistoryFragment extends BaseFragment implements HistorySelectedList
                                     .commit();
                         });
                     }
+                }, throwable -> {
+                    Log.e(TAG, "getRequestByBikerId: " + throwable.getMessage());
                 });
 
     }

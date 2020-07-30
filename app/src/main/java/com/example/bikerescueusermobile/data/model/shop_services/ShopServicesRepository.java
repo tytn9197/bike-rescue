@@ -35,4 +35,8 @@ public class ShopServicesRepository {
     public Single<List<ShopServiceTable>> getShopServiceByShopOwnerId(int id,String token){
         return shopServices.getShopServiceByShopOwnerId(id, token);
     }
+
+    public Single<ShopServiceTable> getByServiceNameAndShopsId(String serviceName, int shopId){
+        return shopServices.getByServiceNameAndShopsId(serviceName, shopId, CurrentUser.getInstance().getAccessToken());
+    }
 }

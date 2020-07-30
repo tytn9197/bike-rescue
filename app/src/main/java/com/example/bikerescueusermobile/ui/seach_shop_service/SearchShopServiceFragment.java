@@ -1,5 +1,6 @@
 package com.example.bikerescueusermobile.ui.seach_shop_service;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -29,7 +30,15 @@ import com.example.bikerescueusermobile.ui.confirm.ConfirmInfoActivity;
 import com.example.bikerescueusermobile.ui.map.MapActivity;
 import com.example.bikerescueusermobile.util.MyMethods;
 import com.example.bikerescueusermobile.util.ViewModelFactory;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.gson.Gson;
+import com.mapbox.api.directions.v5.DirectionsCriteria;
+import com.mapbox.api.directions.v5.MapboxDirections;
+import com.mapbox.api.directions.v5.models.DirectionsResponse;
+import com.mapbox.geojson.Point;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,6 +48,9 @@ import javax.inject.Inject;
 import butterknife.BindView;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class SearchShopServiceFragment extends BaseFragment implements TopShopSelectedListener, SearchView.OnQueryTextListener {
 
@@ -46,6 +58,8 @@ public class SearchShopServiceFragment extends BaseFragment implements TopShopSe
     protected int layoutRes() {
         return R.layout.fragment_search_shop_service;
     }
+
+    private static final String TAG = "SearchShopServiceFragment";
 
     @BindView(R.id.rvTopShop)
     RecyclerView mRecyclerView;
@@ -65,9 +79,6 @@ public class SearchShopServiceFragment extends BaseFragment implements TopShopSe
     @BindView(R.id.btnTopTwoService)
     Button btnTopTwoService;
 
-    //    @BindView(R.id.btnTopThreeService)
-    //    Button btnTopThreeService;
-
     @BindView(R.id.homeLoading)
     FrameLayout homeLoading;
 
@@ -78,14 +89,16 @@ public class SearchShopServiceFragment extends BaseFragment implements TopShopSe
 
     private ArrayList<ShopService> listAllShopServices;
 
-    private ArrayList<Shop> listTop5Shop;
 
     private ShopServiceListViewAdapter adapter;
 
     private double distance = -1;
     private String serviceName = "";
     private Shop shop;
+    private final ArrayList<Shop> shops = new ArrayList<>();
 
+    @SuppressLint("LongLogTag")
+    @SuppressWarnings({"MissingPermission"})
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -94,33 +107,46 @@ public class SearchShopServiceFragment extends BaseFragment implements TopShopSe
         //isLoading => show dialog loading
         observeLoading();
 
-        listTop5Shop = new ArrayList<>();
         listAllShopServices = new ArrayList<>();
-//        listTop3Services = new ArrayList<>();
 
-        //--------------------------------set up top 5 shop-------------------------------
+        //--------------------------------set up all shop-------------------------------
         viewModel.getAllShop()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(listShops -> {
                     viewModel.setLoading(false);
                     if (listShops != null) {
-                        this.listTop5Shop.addAll(listShops);
-                        shop = listTop5Shop.get(0);
+                        shop = listShops.get(0);
                         try {
                             MyMethods.setDistance(listShops);
-                        }catch (Exception e) {
+
+                            //bubble sort
+                            List<Shop> sortedList = new ArrayList<>();
+                            sortedList.addAll(listShops);
+                            int size = sortedList.size();
+                            for (int i = 0; i < size - 1; i++)
+                                for (int j = 0; j < size - i - 1; j++)
+                                    if (sortedList.get(j).getDistanceFromUser() > sortedList.get(j + 1).getDistanceFromUser()) {
+                                        // swap arr[j+1] and arr[j]
+                                        Shop temp = sortedList.get(j);
+                                        sortedList.set(j, sortedList.get(j + 1));
+                                        sortedList.set(j + 1, temp);
+                                    }
+
+                            this.shops.addAll(sortedList);
+                        } catch (Exception e) {
+                            Log.e(TAG, "cannot generate distances: " + e.getMessage());
                             for (int i = 0; i < listShops.size(); i++) {
-                                listShops.get(i).setDistanceFromUser(4);
+                                listShops.get(i).setDistanceFromUser(2);
                             }
                         }
-                        mRecyclerView.setAdapter(new TopShopRecyclerViewAdapter(listTop5Shop, this));
+                        mRecyclerView.setAdapter(new TopShopRecyclerViewAdapter(shops, this));
                         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
                         //        mRecyclerView.addItemDecoration(new DividerItemDecoration((getActivity()), DividerItemDecoration.VERTICAL));
                     }
                 }, throwable -> {
                     viewModel.setLoading(false);
-                    Log.e("SearchShopService", "getTop5Shop: " + throwable.getMessage());
+                    Log.e(TAG, "getAllShop: " + throwable.getMessage());
                 });
 
         //-----------------------------------search service---------------------------------------
@@ -137,7 +163,7 @@ public class SearchShopServiceFragment extends BaseFragment implements TopShopSe
                         btnTopTwoService.setText(listServices.get(1).getName());
                         this.serviceName = listServices.get(0).getName();
 
-                        txtMoreService.setOnClickListener(v ->{
+                        txtMoreService.setOnClickListener(v -> {
                             ArrayAdapter<String> services = new ArrayAdapter<String>(getActivity(),
                                     android.R.layout.simple_list_item_1);
 
@@ -157,7 +183,7 @@ public class SearchShopServiceFragment extends BaseFragment implements TopShopSe
                     }
                 }, throwable -> {
                     viewModel.setLoading(false);
-                    Log.e("SearchShopService", "getAllServices: " + throwable.getMessage());
+                    Log.e(TAG, "getAllServices: " + throwable.getMessage());
                 });
 
         // Pass results to ListViewAdapter Class
@@ -175,10 +201,10 @@ public class SearchShopServiceFragment extends BaseFragment implements TopShopSe
             }
         });
 
-        btnTopOneService.setOnClickListener(v->{
+        btnTopOneService.setOnClickListener(v -> {
             clusterShopByService("" + btnTopOneService.getText());
         });
-        btnTopTwoService.setOnClickListener(v->{
+        btnTopTwoService.setOnClickListener(v -> {
             clusterShopByService("" + btnTopTwoService.getText());
         });
 
@@ -192,7 +218,7 @@ public class SearchShopServiceFragment extends BaseFragment implements TopShopSe
 
     }
 
-    private void observeLoading(){
+    private void observeLoading() {
         viewModel.getLoading().observe(getViewLifecycleOwner(), isLoading -> {
             if (isLoading != null) {
                 if (isLoading) {
@@ -210,7 +236,7 @@ public class SearchShopServiceFragment extends BaseFragment implements TopShopSe
         intent.putExtra("serviceName", this.serviceName);
         intent.putExtra("shop", shop);
         intent.putExtra("dis", -1);
-        intent.putExtra("listShop", listTop5Shop);
+        intent.putExtra("listShop", shops);
         startActivity(intent);
     }
 
@@ -221,7 +247,7 @@ public class SearchShopServiceFragment extends BaseFragment implements TopShopSe
         intent.putExtra("shop", shop);
         distance = shop.getDistanceFromUser();
         intent.putExtra("dis", distance);
-        intent.putExtra("listShop", listTop5Shop);
+        intent.putExtra("listShop", shops);
         startActivity(intent);
     }
 
@@ -233,8 +259,8 @@ public class SearchShopServiceFragment extends BaseFragment implements TopShopSe
 
     @Override
     public boolean onQueryTextChange(String newText) {
-        adapter.filter(newText,listAllShopServices);
-        if(searchViewListAllShopService.getVisibility() == View.GONE){
+        adapter.filter(newText, listAllShopServices);
+        if (searchViewListAllShopService.getVisibility() == View.GONE) {
             searchViewListAllShopService.setVisibility(View.VISIBLE);
         }
         return false;

@@ -67,9 +67,6 @@ public class VehicleActivity extends BaseActivity implements VehicleSelectedList
     @BindView(R.id.updateContainer)
     LinearLayout updateContainer;
 
-//    @BindView(R.id.listBrand)
-//    Spinner listBrand;
-
     @BindView(R.id.edtBrand)
     EditText edtBrand;
 
@@ -121,6 +118,8 @@ public class VehicleActivity extends BaseActivity implements VehicleSelectedList
                     rvVehicle.setAdapter(new VehicleRecyclerViewAdapter(listVehicles, this));
                     rvVehicle.setLayoutManager(new LinearLayoutManager(this));
                     pullToRefreshVehicle.setOnRefreshListener(() -> pullToRefreshVehicle.setRefreshing(false));
+                }, throwable -> {
+                    Log.e(TAG, "getVehicleByUserId: " + throwable.getMessage());
                 });
 
         //get all vehicle title
@@ -149,6 +148,8 @@ public class VehicleActivity extends BaseActivity implements VehicleSelectedList
                         listType.setAdapter(types);
                         listYear.setAdapter(years);
                     }
+                }, throwable -> {
+                    Log.e(TAG, "getAllConfig: " + throwable.getMessage());
                 });
 
         rvVehicle.addOnScrollListener(new RecyclerView.OnScrollListener() {
@@ -199,6 +200,8 @@ public class VehicleActivity extends BaseActivity implements VehicleSelectedList
                         Log.e(TAG, "createVehicle respone: " + respone.toString());
                         finish();
                         startActivity(getIntent());
+                    }, throwable -> {
+                        Log.e(TAG, "createVehicle: " + throwable.getMessage());
                     });
         });
 
@@ -226,6 +229,8 @@ public class VehicleActivity extends BaseActivity implements VehicleSelectedList
                         Log.e(TAG, "updateVehicle respone: " + respone.toString());
                         finish();
                         startActivity(getIntent());
+                    }, throwable -> {
+                        Log.e(TAG, "updateVehicle: " + throwable.getMessage());
                     });
         });
     }
