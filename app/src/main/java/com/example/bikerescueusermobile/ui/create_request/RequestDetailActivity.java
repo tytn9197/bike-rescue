@@ -1,6 +1,7 @@
 package com.example.bikerescueusermobile.ui.create_request;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -10,9 +11,13 @@ import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ListAdapter;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -29,22 +34,15 @@ import com.example.bikerescueusermobile.data.model.request.MessageRequestFB;
 import com.example.bikerescueusermobile.data.model.request.Request;
 import com.example.bikerescueusermobile.data.model.user.CurrentUser;
 import com.example.bikerescueusermobile.ui.confirm.ConfirmInfoActivity;
-import com.example.bikerescueusermobile.ui.main.MainActivity;
-import com.example.bikerescueusermobile.ui.map.MapActivity;
-import com.example.bikerescueusermobile.ui.seach_shop_service.ShopServiceViewModel;
+import com.example.bikerescueusermobile.ui.confirm.ConfirmViewModel;
+import com.example.bikerescueusermobile.ui.tracking_map.TrackingMapActivity;
 import com.example.bikerescueusermobile.util.MyInstances;
 import com.example.bikerescueusermobile.util.MyMethods;
 import com.example.bikerescueusermobile.util.SharedPreferenceHelper;
 import com.example.bikerescueusermobile.util.ViewModelFactory;
 import com.google.gson.Gson;
+import com.jaredrummler.materialspinner.MaterialSpinner;
 import com.squareup.picasso.Picasso;
-
-import java.sql.Timestamp;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
-
 import javax.inject.Inject;
 
 import butterknife.BindView;
@@ -106,6 +104,12 @@ public class RequestDetailActivity extends BaseActivity {
     @BindView(R.id.btnComplain)
     TextView btnComplain;
 
+    @BindView(R.id.txtReqDetailCancelReason)
+    TextView txtReqDetailCancelReason;
+
+    @BindView(R.id.btnReqDetailTracking)
+    Button btnReqDetailTracking;
+
     @Inject
     ViewModelFactory viewModelFactory;
 
@@ -151,46 +155,6 @@ public class RequestDetailActivity extends BaseActivity {
                     }, throwable -> {
                         Log.e(TAG, "getRequestById: " + throwable.getMessage());
                     });
-
-            btnReqDetailCancel.setOnClickListener(v -> {
-                SweetAlertDialog sweetAlertDialog = new SweetAlertDialog(this, SweetAlertDialog.NORMAL_TYPE);
-                sweetAlertDialog.setTitleText("Thông báo");
-                sweetAlertDialog.setContentText("Xác nhận hủy yêu cầu?");
-                sweetAlertDialog.setConfirmText("OK");
-                sweetAlertDialog.setCanceledOnTouchOutside(false);
-                sweetAlertDialog.setConfirmClickListener(sDialog -> {
-                    sDialog.dismiss();
-                    viewModel.cancleRequest(reqId)
-                            .subscribeOn(Schedulers.io())
-                            .observeOn(AndroidSchedulers.mainThread())
-                            .subscribe(isSuccess -> {
-                                if (isSuccess) {
-                                    notiDialog.show();
-                                    btnReqDetailCancel.setVisibility(View.GONE);
-                                    txtReqDetailStatus.setText("Đã hủy");
-                                    txtReqDetailStatus.setTextColor(Color.RED);
-                                    SharedPreferenceHelper.setSharedPreferenceString(getApplicationContext(), MyInstances.KEY_BIKER_REQUEST, "");
-                                }
-                            }, throwable -> {
-                                Log.e(TAG, "cancleRequest: " + throwable.getMessage());
-                            });
-                });
-                sweetAlertDialog.setCancelButton("Hủy", Dialog::dismiss);
-                sweetAlertDialog.show();
-            });
-
-
-//            txtReqDetailCreatedTime.setOnClickListener(v -> {
-//                SweetAlertDialog sweetAlertDialog = new SweetAlertDialog(this, SweetAlertDialog.NORMAL_TYPE);
-//                sweetAlertDialog.setTitleText("Thông báo");
-//                sweetAlertDialog.setContentText("Hoàn thành yêu cầu");
-//                sweetAlertDialog.setConfirmText("Xác nhận");
-//                sweetAlertDialog.setConfirmClickListener(sDialog -> {
-//                    finish();
-//                });
-//                sweetAlertDialog.show();
-//
-//            });
         }
     }
 
@@ -201,10 +165,13 @@ public class RequestDetailActivity extends BaseActivity {
             Gson gson = new Gson();
             MessageRequestFB responeReq = gson.fromJson(message, MessageRequestFB.class);
 
+            btnReqDetailTracking.setVisibility(View.GONE);
+
             if (responeReq.getMessage().equals(MyInstances.NOTI_ACCEPT)) {
                 txtReqDetailStatus.setText("Cửa hàng đã nhận");
                 txtReqDetailStatus.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.core_color));
                 btnReqDetailCancel.setVisibility(View.VISIBLE);
+                btnReqDetailTracking.setVisibility(View.VISIBLE);
             }
 
             if (responeReq.getMessage().equals(MyInstances.NOTI_REJECTED)) {
@@ -221,11 +188,24 @@ public class RequestDetailActivity extends BaseActivity {
                 btnReqDetailCancel.setVisibility(View.GONE);
                 SharedPreferenceHelper.setSharedPreferenceString(getApplicationContext(), MyInstances.KEY_BIKER_REQUEST, "");
             }
+
+            if (responeReq.getMessage().equals(MyInstances.NOTI_CANELED)) {
+                txtReqDetailStatus.setText("Cửa hàng đã hủy");
+                txtReqDetailStatus.setTextColor(Color.RED);
+                btnReqDetailCancel.setVisibility(View.GONE);
+                txtReqDetailCancelReason.setVisibility(View.VISIBLE);
+                if(responeReq.getReason() != null){
+                    txtReqDetailCancelReason.setText(" Lý do hủy: " + responeReq.getReason());
+                }
+                SharedPreferenceHelper.setSharedPreferenceString(getApplicationContext(), MyInstances.KEY_BIKER_REQUEST, "");
+
+            }
         }
     };
 
     @SuppressLint("SetTextI18n")
     private void setDataToView(Request request) {
+        txtReqDetailCancelReason.setVisibility(View.GONE);
         txtReqDetailCode.setText("Mã yêu cầu: ".concat(request.getRequestCode()));
         txtReqDetailShopName.setText(request.getListReqShopService().get(0).getShopService().getShops().getShopName());
         txtReqDetailShopRatingStar.setText(request.getListReqShopService().get(0).getShopService().getShops().getShopRatingStar().concat("/5"));
@@ -245,6 +225,19 @@ public class RequestDetailActivity extends BaseActivity {
                     .load(request.getListReqShopService().get(0).getShopService().getShops().getAvatarUrl()).placeholder(R.drawable.ic_load)
                     .into(imgReqDetailShopAvatar);
         }
+
+        if(request.getCancelReason() != null && request.getStatus().equals(MyInstances.STATUS_CANCELED)){
+            txtReqDetailCancelReason.setText(" Lý do hủy: " + request.getCancelReason());
+            txtReqDetailCancelReason.setVisibility(View.VISIBLE);
+        }
+
+        setCancelButtonClick(request.getId(),true);
+        btnReqDetailTracking.setOnClickListener(v -> {
+            Intent intent = new Intent(this, TrackingMapActivity.class);
+            intent.putExtra("isBikerTracking", true);
+            intent.putExtra("reqId", request.getId());
+            startActivity(intent);
+        });
     }
 
     @SuppressLint("SetTextI18n")
@@ -271,12 +264,70 @@ public class RequestDetailActivity extends BaseActivity {
                     .into(imgReqDetailShopAvatar);
         }
         btnComplain.setVisibility(View.GONE);
+        if(request.getCancelReason() != null && request.getStatus().equals(MyInstances.STATUS_CANCELED)){
+            txtReqDetailCancelReason.setText(" Lý do hủy: " + request.getCancelReason());
+            txtReqDetailCancelReason.setVisibility(View.VISIBLE);
+        }
 
+        setCancelButtonClick(request.getId(), false);
+    }
+
+    @SuppressLint("SetTextI18n")
+    private void setCancelButtonClick(int reqId, boolean isSendToShop){
+        btnReqDetailCancel.setOnClickListener(v -> {
+            LayoutInflater factory = LayoutInflater.from(this);
+            final View editDialogView = factory.inflate(R.layout.activity_cancel_reason, null);
+            final AlertDialog editDialog = new AlertDialog.Builder(this).create();
+            editDialog.setView(editDialogView);
+            MaterialSpinner spinner = editDialogView.findViewById(R.id.confirm_spinner);
+            spinner.setDropdownHeight(100);
+            ConfirmViewModel confirmViewModel = ViewModelProviders.of(this, viewModelFactory).get(ConfirmViewModel.class);
+            confirmViewModel.getAllConfig()
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(listConfig -> {
+                        if (listConfig != null) {
+
+                            ArrayAdapter listAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item);
+                            for (int i = 0; i < listConfig.size(); i++) {
+                                if (listConfig.get(i).getName().equals("biker cancel reason"))
+                                    listAdapter.add(listConfig.get(i).getValue());
+                            }
+                            spinner.setAdapter(listAdapter);
+                        }
+                    }, throwable -> {
+                        Log.e(TAG, "getAllConfig: " + throwable.getMessage());
+                    });
+
+            editDialogView.findViewById(R.id.btn_confirm).setOnClickListener(confirmView -> {
+                editDialog.dismiss();
+                String reason = spinner.getText().toString();
+                viewModel.cancleRequest(reqId, isSendToShop, reason)
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(isSuccess -> {
+                            if (isSuccess) {
+                                notiDialog.show();
+                                btnReqDetailCancel.setVisibility(View.GONE);
+                                txtReqDetailStatus.setText("Đã hủy");
+                                txtReqDetailStatus.setTextColor(Color.RED);
+                                txtReqDetailCancelReason.setVisibility(View.VISIBLE);
+                                txtReqDetailCancelReason.setText(" Lý do hủy: " + reason);
+                                SharedPreferenceHelper.setSharedPreferenceString(getApplicationContext(), MyInstances.KEY_BIKER_REQUEST, "");
+                            }
+                        }, throwable -> {
+                            Log.e(TAG, "cancleRequest: " + throwable.getMessage());
+                        });
+            });
+            editDialogView.findViewById(R.id.btn_return).setOnClickListener(v1 -> editDialog.dismiss());
+            editDialog.show();
+        });
     }
 
     private void refreshStatus(String status) {
         txtReqDetailStatus.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.core_color));
         btnComplain.setVisibility(View.GONE);
+        btnReqDetailTracking.setVisibility(View.GONE);
 
         if (status.equals(MyInstances.STATUS_CREATED)) {
             txtReqDetailStatus.setText("Đã gửi");
@@ -298,6 +349,7 @@ public class RequestDetailActivity extends BaseActivity {
         if (status.equals(MyInstances.STATUS_ACCEPT)) {
             txtReqDetailStatus.setText("Cửa hàng đã nhận");
             btnReqDetailCancel.setVisibility(View.VISIBLE);
+            btnReqDetailTracking.setVisibility(View.VISIBLE);
         }
 
         if (status.equals(MyInstances.STATUS_FINISHED)) {

@@ -22,7 +22,10 @@ public interface IRequestService {
     Single<Request> getRequestById(@Path("id") int reqId,@Header("Authorization") String token);
 
     @GET("/biker/cancleRequest")
-    Single<Boolean> cancleRequest(@Query("id") int reqID, @Header("Authorization") String token);
+    Single<Boolean> cancleRequest(@Query("id") int reqID,
+                                  @Query("isSendToShop") boolean isSendToShop,
+                                  @Query("reason") String reason,
+                                  @Header("Authorization") String token);
 
     @GET("/shop/updateStatusRequest")
     Single<Response<RequestDTO>> updateStatusRequest(@Query("idRequest") int reqId,

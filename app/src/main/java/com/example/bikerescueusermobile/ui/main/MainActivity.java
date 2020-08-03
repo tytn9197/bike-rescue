@@ -36,8 +36,6 @@ import com.example.bikerescueusermobile.util.MyInstances;
 import com.example.bikerescueusermobile.util.MyMethods;
 import com.example.bikerescueusermobile.util.SharedPreferenceHelper;
 import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
 import com.karumi.dexter.Dexter;
@@ -90,7 +88,6 @@ public class MainActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         init();
         initGrantAppPermission();
-        getCurrentLocation();
         searchShopServiceFragment = new SearchShopServiceFragment();
         // set header image & name
         View header =navigation.getHeaderView(0);
@@ -113,18 +110,6 @@ public class MainActivity extends BaseActivity {
         if (fragment != null) {
             fragment.onActivityResult(requestCode, resultCode, data);
         }
-    }
-
-    @SuppressWarnings({"MissingPermission"})
-    private void getCurrentLocation(){
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-        fusedLocationClient.getLastLocation()
-                .addOnSuccessListener(this, location -> {
-                    if (location != null) {
-                        CurrentUser.getInstance().setLatitude(""+location.getLatitude());
-                        CurrentUser.getInstance().setLongtitude(""+location.getLongitude());
-                    }
-                });
     }
 
     private void initGrantAppPermission(){

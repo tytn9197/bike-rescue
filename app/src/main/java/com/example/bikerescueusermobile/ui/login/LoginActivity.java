@@ -18,6 +18,7 @@ import com.example.bikerescueusermobile.R;
 import com.example.bikerescueusermobile.base.BaseActivity;
 import com.example.bikerescueusermobile.data.model.login.LoginData;
 import com.example.bikerescueusermobile.data.model.user.CurrentUser;
+import com.example.bikerescueusermobile.data.model.user.UserLatLong;
 import com.example.bikerescueusermobile.ui.confirm.ConfirmInfoActivity;
 import com.example.bikerescueusermobile.ui.main.MainActivity;
 import com.example.bikerescueusermobile.ui.otp_page.LoginByPhoneNumberActivity;
@@ -27,8 +28,8 @@ import com.example.bikerescueusermobile.util.SharedPreferenceHelper;
 import com.example.bikerescueusermobile.ui.register.CreatePasswordActivity;
 import com.example.bikerescueusermobile.util.SharedPreferenceHelper;
 import com.example.bikerescueusermobile.util.ViewModelFactory;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.InstanceIdResult;
 import com.google.gson.Gson;
@@ -45,6 +46,8 @@ public class LoginActivity extends BaseActivity {
     protected int layoutRes() {
         return R.layout.activity_login_by_username_password;
     }
+
+    private static final String TAG = "LoginActivity";
 
     @BindView(R.id.viewRegister)
     TextView viewRegister;
@@ -75,6 +78,7 @@ public class LoginActivity extends BaseActivity {
     private LoginModel viewModel;
     private String deviceToken = "";
 
+    @SuppressWarnings({"MissingPermission"})
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -100,7 +104,8 @@ public class LoginActivity extends BaseActivity {
         btnLogin.setOnClickListener(view -> {
             hideErrorText();
             LoginData loginData = new LoginData(edtName.getText().toString(), edtPass.getText().toString(), this.deviceToken);
-            viewModel.login(loginData).subscribeOn(Schedulers.io())
+            viewModel.login(loginData)
+                    .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(user -> {
                         viewModel.setLoading(false);
@@ -120,10 +125,32 @@ public class LoginActivity extends BaseActivity {
                             CurrentUser.getInstance().setCreatedTime(user.getCreatedTime());
                             CurrentUser.getInstance().setStatus(user.getStatus());
                             CurrentUser.getInstance().setRoleId(user.getRoleId());
-//                            CurrentUser.getInstance().setProvider(user.getProvider());
-//                            CurrentUser.getInstance().setCreatedTime(user.getCreatedTime());
-//                            CurrentUser.getInstance().setIdentifyNumber(user.getIdentifyNumber());
-//                            CurrentUser.getInstance().setRoleId(user.getRoleId());
+
+                            //login success -> set user latlong
+                            final FusedLocationProviderClient mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+
+                            mFusedLocationClient.getLastLocation().addOnSuccessListener(this, location -> {
+                                if (location != null) {
+                                    UserLatLong userLatln = new UserLatLong(
+                                            user.getId(),
+                                            "" + location.getLatitude(),
+                                            "" + location.getLongitude());
+
+                                    viewModel.setUserLatLong(userLatln, "Bearer " + user.getAccessToken())
+                                            .subscribeOn(Schedulers.io())
+                                            .observeOn(AndroidSchedulers.mainThread())
+                                            .subscribe(uLatlng -> {
+                                                CurrentUser.getInstance().setLatitude(""+uLatlng.getLatitude());
+                                                CurrentUser.getInstance().setLongtitude(""+uLatlng.getLongtitude());
+
+//                                                Intent serviceIntent = new Intent(this, UpdateLocationService.class);
+//                                                startService(serviceIntent);
+                                            }, throwable -> {
+                                                Log.e(TAG, "setUserLatLong: " + throwable.getMessage());
+                                            });
+                                }
+                            });
+
 
                             if(user.getRoleId() == 3){
                                 Intent intent = new Intent(LoginActivity.this, MainActivity.class);

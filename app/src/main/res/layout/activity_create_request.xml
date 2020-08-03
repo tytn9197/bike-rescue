@@ -55,7 +55,7 @@
                     android:layout_height="wrap_content"
                     android:text="Sửa xe Đức"
                     android:textSize="23sp"
-                    android:textStyle="bold"/>
+                    android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/txtReqDetailShopRatingStar"
@@ -128,6 +128,18 @@
         android:text="10/104 A Hẻm 10 Xa Lộ Hà Nội, P. Hiệp Phú, Quận 9"
         android:textColor="@color/black" />
 
+    <Button
+        android:id="@+id/btnReqDetailTracking"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp"
+        android:padding="10dp"
+        android:background="@drawable/border"
+        android:text="Xem bản đồ"
+        android:textAllCaps="false"
+        android:textColor="@color/black"
+        android:visibility="gone"/>
+
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
@@ -179,6 +191,15 @@
         android:layout_height="wrap_content"
         android:layout_margin="5dp"
         android:text="Thông tin thêm:"
+        android:textColor="@color/black"
+        android:textSize="17sp" />
+
+    <TextView
+        android:id="@+id/txtReqDetailCancelReason"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp"
+        android:text="Lý do hủy:"
         android:textColor="@color/black"
         android:textSize="17sp" />
     <!--    <TextView-->

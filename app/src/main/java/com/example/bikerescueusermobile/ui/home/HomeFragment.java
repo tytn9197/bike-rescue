@@ -16,6 +16,7 @@ import androidx.lifecycle.ViewModelProviders;
 import com.example.bikerescueusermobile.R;
 import com.example.bikerescueusermobile.base.BaseFragment;
 import com.example.bikerescueusermobile.data.model.shop.Shop;
+import com.example.bikerescueusermobile.data.model.user.CurrentUser;
 import com.example.bikerescueusermobile.ui.map.MapActivity;
 import com.example.bikerescueusermobile.ui.seach_shop_service.ShopServiceViewModel;
 import com.example.bikerescueusermobile.util.MyMethods;
@@ -119,6 +120,13 @@ public class HomeFragment extends BaseFragment
 
                                     mFusedLocationClient.getLastLocation().addOnSuccessListener(getActivity(), location -> {
                                         if (location != null) {
+                                            //move camera to current location
+                                            LatLng hcm = new LatLng(location.getLatitude(), location.getLongitude());
+                                            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(hcm, 11));
+
+                                            CurrentUser.getInstance().setLatitude("" + location.getLatitude());
+                                            CurrentUser.getInstance().setLongtitude("" + location.getLongitude());
+
                                             Point origin = Point.fromLngLat(location.getLongitude(), location.getLatitude());
 
                                             MapboxDirections client = MapboxDirections.builder()
@@ -162,8 +170,8 @@ public class HomeFragment extends BaseFragment
             googleMap.setOnMarkerClickListener(this);
             googleMap.setOnMapClickListener(this);
             googleMap.setOnMyLocationChangeListener(this);
-            LatLng hcm = new LatLng(10.8229002, 106.7048471); //view from ho chi minh
-            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(hcm, 10));
+//            LatLng hcm = new LatLng(10.8229002, 106.7048471); //view from ho chi minh
+//            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(hcm, 10));
         }
     }
 

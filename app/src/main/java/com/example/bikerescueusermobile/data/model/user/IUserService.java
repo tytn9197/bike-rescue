@@ -7,6 +7,7 @@ import io.reactivex.Single;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import retrofit2.http.Body;
+import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.Multipart;
 import retrofit2.http.POST;
@@ -28,4 +29,11 @@ public interface IUserService {
     @POST("/biker/update/{id}")
     Single<User> updateInfo(@Header("Authorization") String token, @Path("id") int userId, @Body User user);
 
+    @PUT("/biker/userLatLong")
+    Single<UserLatLong> setUserLatLong(@Body UserLatLong input, @Header("Authorization") String token);
+
+    @GET("/biker/getLatLongFromReqId/{id}")
+    Single<UserLatLong> getUserLatLongByReqId(@Path("id") int userId,
+                                              @Query("isBikerTracking") boolean isBikerTracking,
+                                              @Header("Authorization") String token);
 }

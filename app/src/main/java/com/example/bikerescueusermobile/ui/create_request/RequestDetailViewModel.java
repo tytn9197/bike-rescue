@@ -23,8 +23,8 @@ public class RequestDetailViewModel extends ViewModel {
         return requestRepository.getRequestById(reqId);
     }
 
-    public Single<Boolean> cancleRequest(int reqID) {
-        return requestRepository.cancleRequest(reqID);
+    public Single<Boolean> cancleRequest(int reqID, boolean isSendToShop, String reason) {
+        return requestRepository.cancleRequest(reqID, isSendToShop, reason);
     }
 
     public Single<Response<RequestDTO>> updateStatusRequest(int reqId, boolean isAccept) {

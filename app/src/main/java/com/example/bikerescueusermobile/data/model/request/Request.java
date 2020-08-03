@@ -53,9 +53,16 @@ public class Request {
     @SerializedName("vehicle")
     private Vehicle vehicle;
 
+    @SerializedName("cancelReason")
+    private String cancelReason;
+
     @SerializedName("listReqShopService")
     List<RequestShopService> listReqShopService;
 
     public Request() {
+    }
+
+    public Request(int id) {
+        this.id = id;
     }
 }

@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel;
 
 import com.example.bikerescueusermobile.data.model.login.LoginData;
 import com.example.bikerescueusermobile.data.model.user.User;
+import com.example.bikerescueusermobile.data.model.user.UserLatLong;
 import com.example.bikerescueusermobile.data.model.user.UserRepository;
 
 import javax.inject.Inject;
@@ -44,5 +45,11 @@ public class LoginModel extends ViewModel {
         return userRepository.login(loginData);
     }
 
+    public Single<UserLatLong> setUserLatLong(UserLatLong input, String token){
+        return userRepository.setUserLatLong(input, token);
+    }
 
+    public Single<UserLatLong> getUserLatLongByReqId(int reqId, boolean isBikerTracking){
+        return userRepository.getUserLatLongByReqId(reqId, isBikerTracking);
+    }
 }

@@ -2,6 +2,7 @@ package com.example.bikerescueusermobile.ui.seach_shop_service;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
@@ -26,19 +27,13 @@ import com.example.bikerescueusermobile.base.BaseFragment;
 import com.example.bikerescueusermobile.data.model.shop.Shop;
 import com.example.bikerescueusermobile.data.model.shop_services.ShopService;
 import com.example.bikerescueusermobile.data.model.user.CurrentUser;
+import com.example.bikerescueusermobile.data.model.user.UserLatLong;
 import com.example.bikerescueusermobile.ui.confirm.ConfirmInfoActivity;
 import com.example.bikerescueusermobile.ui.map.MapActivity;
 import com.example.bikerescueusermobile.util.MyMethods;
 import com.example.bikerescueusermobile.util.ViewModelFactory;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.gson.Gson;
-import com.mapbox.api.directions.v5.DirectionsCriteria;
-import com.mapbox.api.directions.v5.MapboxDirections;
-import com.mapbox.api.directions.v5.models.DirectionsResponse;
-import com.mapbox.geojson.Point;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,11 +41,9 @@ import java.util.List;
 import javax.inject.Inject;
 
 import butterknife.BindView;
+import cn.pedant.SweetAlert.SweetAlertDialog;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 public class SearchShopServiceFragment extends BaseFragment implements TopShopSelectedListener, SearchView.OnQueryTextListener {
 
@@ -110,44 +103,50 @@ public class SearchShopServiceFragment extends BaseFragment implements TopShopSe
         listAllShopServices = new ArrayList<>();
 
         //--------------------------------set up all shop-------------------------------
-        viewModel.getAllShop()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(listShops -> {
-                    viewModel.setLoading(false);
-                    if (listShops != null) {
-                        shop = listShops.get(0);
-                        try {
-                            MyMethods.setDistance(listShops);
+        final FusedLocationProviderClient mFusedLocationClient = LocationServices.getFusedLocationProviderClient(getActivity());
+        mFusedLocationClient.getLastLocation().addOnSuccessListener(getActivity(), location -> {
+            if (location != null) {
+                CurrentUser.getInstance().setLatitude("" + location.getLatitude());
+                CurrentUser.getInstance().setLongtitude("" + location.getLongitude());
 
-                            //bubble sort
-                            List<Shop> sortedList = new ArrayList<>();
-                            sortedList.addAll(listShops);
-                            int size = sortedList.size();
-                            for (int i = 0; i < size - 1; i++)
-                                for (int j = 0; j < size - i - 1; j++)
-                                    if (sortedList.get(j).getDistanceFromUser() > sortedList.get(j + 1).getDistanceFromUser()) {
-                                        // swap arr[j+1] and arr[j]
-                                        Shop temp = sortedList.get(j);
-                                        sortedList.set(j, sortedList.get(j + 1));
-                                        sortedList.set(j + 1, temp);
-                                    }
+                viewModel.getAllShop()
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(listShops -> {
+                            viewModel.setLoading(false);
+                            if (listShops != null) {
+                                shop = listShops.get(0);
+                                try {
+                                    MyMethods.setDistance(listShops);
 
-                            this.shops.addAll(sortedList);
-                        } catch (Exception e) {
-                            Log.e(TAG, "cannot generate distances: " + e.getMessage());
-                            for (int i = 0; i < listShops.size(); i++) {
-                                listShops.get(i).setDistanceFromUser(2);
+                                    //bubble sort
+                                    List<Shop> sortedList = new ArrayList<>();
+                                    sortedList.addAll(listShops);
+                                    int size = sortedList.size();
+                                    for (int i = 0; i < size - 1; i++)
+                                        for (int j = 0; j < size - i - 1; j++)
+                                            if (sortedList.get(j).getDistanceFromUser() > sortedList.get(j + 1).getDistanceFromUser()) {
+                                                // swap arr[j+1] and arr[j]
+                                                Shop temp = sortedList.get(j);
+                                                sortedList.set(j, sortedList.get(j + 1));
+                                                sortedList.set(j + 1, temp);
+                                            }
+
+                                    this.shops.addAll(sortedList);
+                                    mRecyclerView.setAdapter(new TopShopRecyclerViewAdapter(sortedList, this));
+                                    mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+                                    //        mRecyclerView.addItemDecoration(new DividerItemDecoration((getActivity()), DividerItemDecoration.VERTICAL));
+                                } catch (Exception e) {
+                                    Log.e(TAG, "cannot generate distances: " + e.getMessage());
+                                }
                             }
-                        }
-                        mRecyclerView.setAdapter(new TopShopRecyclerViewAdapter(shops, this));
-                        mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-                        //        mRecyclerView.addItemDecoration(new DividerItemDecoration((getActivity()), DividerItemDecoration.VERTICAL));
-                    }
-                }, throwable -> {
-                    viewModel.setLoading(false);
-                    Log.e(TAG, "getAllShop: " + throwable.getMessage());
-                });
+                        }, throwable -> {
+                            viewModel.setLoading(false);
+                            Log.e(TAG, "getAllShop: " + throwable.getMessage());
+                        });
+            }
+        });
+
 
         //-----------------------------------search service---------------------------------------
         viewModel.getAllServices()
@@ -253,7 +252,23 @@ public class SearchShopServiceFragment extends BaseFragment implements TopShopSe
 
     @Override
     public boolean onQueryTextSubmit(String query) {
-        clusterShopByService("" + searchViewService.getQuery());
+        boolean isOk = false;
+        for (int i = 0; i < listAllShopServices.size(); i++) {
+            if (listAllShopServices.get(i).getName().equals("" + searchViewService.getQuery())) {
+                isOk = true;
+                break;
+            }
+        }
+        if (isOk) {
+            clusterShopByService("" + searchViewService.getQuery());
+        } else {
+            SweetAlertDialog errorDialog = new SweetAlertDialog(getActivity(), SweetAlertDialog.ERROR_TYPE);
+            errorDialog.setTitleText("Thông báo");
+            errorDialog.setContentText("Không tìm thấy dịch vụ!");
+            errorDialog.setConfirmText("OK");
+            errorDialog.setConfirmClickListener(Dialog::dismiss);
+            errorDialog.show();
+        }
         return false;
     }
 

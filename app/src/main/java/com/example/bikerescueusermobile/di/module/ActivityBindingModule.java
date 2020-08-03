@@ -16,6 +16,7 @@ import com.example.bikerescueusermobile.ui.shopMain.ShopMainFragmentBindingModul
 import com.example.bikerescueusermobile.ui.shop_owner.ShopRequestDetailActivity;
 import com.example.bikerescueusermobile.ui.shop_owner.ShopUpdateInfoActivity;
 import com.example.bikerescueusermobile.ui.shop_owner.services.ManageServicesActivity;
+import com.example.bikerescueusermobile.ui.tracking_map.TrackingMapActivity;
 import com.example.bikerescueusermobile.ui.update_info.UpdateInfoActivity;
 import com.example.bikerescueusermobile.ui.map.MapActivity;
 import dagger.Module;
@@ -65,5 +66,9 @@ public abstract class ActivityBindingModule {
 
     @ContributesAndroidInjector(modules = {VehicleFragmentBindingModule.class})
     abstract VehicleActivity vehicleActivity();
+
+    @ContributesAndroidInjector
+    abstract TrackingMapActivity trackingMapActivity();
+
 
 }

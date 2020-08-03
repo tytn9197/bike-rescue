@@ -30,4 +30,12 @@ public class UserRepository {
     public Single<User> updateInfo(String token, int userId, User user){
         return userService.updateInfo(token, userId, user);
     }
+
+    public Single<UserLatLong> setUserLatLong(UserLatLong input, String token){
+        return userService.setUserLatLong(input, token);
+    }
+
+    public Single<UserLatLong> getUserLatLongByReqId(int userId, boolean isBikerTracking){
+        return userService.getUserLatLongByReqId(userId, isBikerTracking, CurrentUser.getInstance().getAccessToken());
+    }
 }
