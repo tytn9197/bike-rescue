@@ -52,6 +52,8 @@ public class User implements Serializable {
 
     private int chosenShopOwnerId;
 
+    private int currentBikerId;
+
     private int sentReqId;
 
     public User(){

@@ -142,9 +142,6 @@ public class LoginActivity extends BaseActivity {
                                             .subscribe(uLatlng -> {
                                                 CurrentUser.getInstance().setLatitude(""+uLatlng.getLatitude());
                                                 CurrentUser.getInstance().setLongtitude(""+uLatlng.getLongtitude());
-
-//                                                Intent serviceIntent = new Intent(this, UpdateLocationService.class);
-//                                                startService(serviceIntent);
                                             }, throwable -> {
                                                 Log.e(TAG, "setUserLatLong: " + throwable.getMessage());
                                             });

@@ -35,6 +35,7 @@ import com.example.bikerescueusermobile.data.model.request.Request;
 import com.example.bikerescueusermobile.data.model.user.CurrentUser;
 import com.example.bikerescueusermobile.ui.confirm.ConfirmInfoActivity;
 import com.example.bikerescueusermobile.ui.confirm.ConfirmViewModel;
+import com.example.bikerescueusermobile.ui.login.UpdateLocationService;
 import com.example.bikerescueusermobile.ui.tracking_map.TrackingMapActivity;
 import com.example.bikerescueusermobile.util.MyInstances;
 import com.example.bikerescueusermobile.util.MyMethods;
@@ -237,6 +238,13 @@ public class RequestDetailActivity extends BaseActivity {
             intent.putExtra("isBikerTracking", true);
             intent.putExtra("reqId", request.getId());
             startActivity(intent);
+
+            //mac dinh la thang biker vao activity nay
+            Intent serviceIntent = new Intent(this, UpdateLocationService.class);
+            CurrentRequest.getInstance().setRequestCode(request.getRequestCode());
+            CurrentUser.getInstance().setCurrentBikerId(CurrentUser.getInstance().getId());
+            CurrentUser.getInstance().setChosenShopOwnerId(request.getAcceptedUser().getId());
+            startService(serviceIntent);
         });
     }
 

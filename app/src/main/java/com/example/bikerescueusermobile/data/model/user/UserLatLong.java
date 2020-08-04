@@ -1,10 +1,12 @@
 package com.example.bikerescueusermobile.data.model.user;
 
+import com.google.firebase.database.IgnoreExtraProperties;
 import com.google.gson.annotations.SerializedName;
 
 import lombok.Data;
 
 @Data
+@IgnoreExtraProperties
 public class UserLatLong {
 
     @SerializedName("id")
@@ -22,4 +24,6 @@ public class UserLatLong {
         this.longtitude = longtitude;
     }
 
+    public UserLatLong() {
+    }
 }

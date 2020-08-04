@@ -21,16 +21,24 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.example.bikerescueusermobile.R;
 import com.example.bikerescueusermobile.base.BaseActivity;
+import com.example.bikerescueusermobile.data.model.request.CurrentRequest;
 import com.example.bikerescueusermobile.data.model.request.MessageRequestFB;
 import com.example.bikerescueusermobile.data.model.user.CurrentUser;
 import com.example.bikerescueusermobile.data.model.user.UserLatLong;
 import com.example.bikerescueusermobile.ui.login.LoginModel;
+import com.example.bikerescueusermobile.ui.login.UpdateLocationService;
 import com.example.bikerescueusermobile.ui.shop_owner.shop_home.ShopHomeFragment;
 import com.example.bikerescueusermobile.util.MyInstances;
 import com.example.bikerescueusermobile.util.SharedPreferenceHelper;
 import com.example.bikerescueusermobile.util.ViewModelFactory;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.gson.Gson;
 import com.mapbox.api.directions.v5.DirectionsCriteria;
 import com.mapbox.api.directions.v5.MapboxDirections;
@@ -57,6 +65,11 @@ import com.mapbox.mapboxsdk.style.layers.PropertyFactory;
 import com.mapbox.mapboxsdk.style.layers.SymbolLayer;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
 import com.mapbox.mapboxsdk.style.sources.Source;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import javax.inject.Inject;
 
@@ -99,6 +112,7 @@ public class TrackingMapActivity extends DaggerAppCompatActivity implements
     private MapboxDirections client;
     private DirectionsRoute currentRoute;
     private LatLng destination;
+    private GeoJsonSource source;
 
     @BindView(R.id.btnTrackingMapBack)
     Button btnBack;
@@ -109,50 +123,139 @@ public class TrackingMapActivity extends DaggerAppCompatActivity implements
     private LoginModel viewModel;
     private boolean isBikerTracking;
     private Style style;
+    private DatabaseReference mDatabase;
+    private List<UserLatLong> userLatLongList = new ArrayList<>();
 
-//    private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
-//        @Override
-//        public void onReceive(Context context, Intent intent) {
-//            if (context != null) {
-//                double latitude = intent.getDoubleExtra("latitude", -1);
-//                double longitude = intent.getDoubleExtra("longitude", -1);
-//                Log.e(TAG, "lat long: " + latitude + " --" + longitude);
-//
-//                if(latitude != -1 && longitude != -1) {
-//                    UserLatLong userLatln = new UserLatLong(
-//                            CurrentUser.getInstance().getId(),
-//                            "" + latitude,
-//                            "" + longitude);
-//
-//                    viewModel.setUserLatLong(userLatln, CurrentUser.getInstance().getAccessToken())
-//                            .subscribeOn(Schedulers.io())
-//                            .observeOn(AndroidSchedulers.mainThread())
-//                            .subscribe(uLatlng -> {
-//                                CurrentUser.getInstance().setLatitude(uLatlng.getLatitude());
-//                                CurrentUser.getInstance().setLatitude(uLatlng.getLongtitude());
-//                                Log.e(TAG, "set lat long OK");
-//                            }, throwable -> {
-//                                Log.e(TAG, "setUserLatLong: " + throwable.getMessage());
-//                            });
-//                    updateRoute(style);
-//                }
-//            }
-//        }
-//    };
+    @SuppressWarnings({"MissingPermission"})
+    private void updateRoute() {
+        if (mapboxMap != null) {
+            mapboxMap.setStyle(Style.LIGHT,
+                    style -> {
+                        this.style = style;
+                        initLayers(style);
+                        // Get an instance of the component
+                        LocationComponent locationComponent = mapboxMap.getLocationComponent();
+
+                        // Activate with options
+                        locationComponent.activateLocationComponent(
+                                LocationComponentActivationOptions.builder(this, style).build());
+
+                        // Enable to make component visible
+                        locationComponent.setLocationComponentEnabled(true);
+
+                        // Set the component's camera mode
+                        locationComponent.setCameraMode(CameraMode.TRACKING);
+
+                        // Set the component's render mode
+                        locationComponent.setRenderMode(RenderMode.COMPASS);
+
+                        if (style.isFullyLoaded())
+                            updateRoute(style);
+                        //Add marker
+                        if (isBikerTracking) {
+                            style.addImage("marker-icon-id",
+                                    BitmapFactory.decodeResource(
+                                            this.getResources(), R.drawable.ic_shop_location));
+                        } else {
+                            style.addImage("marker-icon-id",
+                                    BitmapFactory.decodeResource(
+                                            this.getResources(), R.drawable.mapbox_marker_icon_default));
+                        }
+                        if (destination != null) {
+                            GeoJsonSource geoJsonSource = new GeoJsonSource("source-id", Feature.fromGeometry(
+                                    Point.fromLngLat(destination.getLongitude(), destination.getLatitude())));
+                            style.addSource(geoJsonSource);
+                        }
+                        SymbolLayer symbolLayer = new SymbolLayer("layer-id", "source-id");
+                        symbolLayer.withProperties(
+                                PropertyFactory.iconImage("marker-icon-id")
+                        );
+                        style.addLayer(symbolLayer);
+                    });
+        }
+    }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-//        LocalBroadcastManager.getInstance(this).registerReceiver(
-//                mMessageReceiver, new IntentFilter("BikeRescueLocation"));
-
-        //set destination
         viewModel = ViewModelProviders.of(this, viewModelFactory).get(LoginModel.class);
 
         isBikerTracking = getIntent().getBooleanExtra("isBikerTracking", true);
         int reqId = getIntent().getIntExtra("reqId", -1);
 
+        mDatabase = FirebaseDatabase.getInstance().getReference(MyInstances.APP);
+        mDatabase.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                userLatLongList.clear();
+                for (DataSnapshot listUserLatlng : dataSnapshot.getChildren()) {
+                    Log.e(TAG, "value is biker: " + listUserLatlng.getValue().toString() + "---- shop id:" + CurrentUser.getInstance().getChosenShopOwnerId());
+                    userLatLongList.add(listUserLatlng.getValue(UserLatLong.class));
+                }
+                if (userLatLongList.size() > 0) {
+                    if (isBikerTracking) {
+                        Log.e(TAG, "list size: " + userLatLongList.size());
+                        int pos = -1;
+                        for (int i = 0; i < userLatLongList.size(); i++) {
+                            if (userLatLongList.get(i).getId() == CurrentUser.getInstance().getChosenShopOwnerId())
+                                pos = i;
+                        }
+                        if (pos > -1) {
+                            Log.e(TAG, "pos: " + pos);
+                            UserLatLong newUser = userLatLongList.get(pos);
+                            Log.e(TAG, "onChildChanged: " + newUser.toString());
+                            destination = new LatLng(Double.parseDouble(newUser.getLatitude()), Double.parseDouble(newUser.getLongtitude()));
+                            updateRoute();
+                        }
+                    } else {
+                        Log.e(TAG, "list size: " + userLatLongList.size());
+                        int pos = -1;
+                        for (int i = 0; i < userLatLongList.size(); i++) {
+                            if (userLatLongList.get(i).getId() == CurrentUser.getInstance().getCurrentBikerId())
+                                pos = i;
+                        }
+                        if (pos > -1) {
+                            Log.e(TAG, "pos: " + pos);
+                            UserLatLong newUser = userLatLongList.get(pos);
+                            Log.e(TAG, "onChildChanged: " + newUser.toString());
+                            destination = new LatLng(Double.parseDouble(newUser.getLatitude()), Double.parseDouble(newUser.getLongtitude()));
+                            updateRoute();
+                        }
+                    }
+
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError error) {
+                // Failed to read value
+                Log.e(TAG, "Failed to read value." + error.toException());
+            }
+        });
+//        if (isBikerTracking) {
+//            // Read from the database
+//
+//        } else {
+//            // Read from the database
+//            mDatabase
+//                    .addValueEventListener(new ValueEventListener() {
+//                        @Override
+//                        public void onDataChange(DataSnapshot dataSnapshot) {
+//                            for (DataSnapshot listUserLatlng : dataSnapshot.getChildren()) {
+//                                Log.e(TAG, "value: " + listUserLatlng.getValue().toString() + "---- biker id:" + CurrentUser.getInstance().getCurrentBikerId());
+//                                userLatLongList.add(listUserLatlng.getValue(UserLatLong.class));
+//                            }
+//                        }
+//
+//                        @Override
+//                        public void onCancelled(DatabaseError error) {
+//                            // Failed to read value
+//                            Log.e(TAG, "Failed to read value." + error.toException());
+//                        }
+//                    });
+//        }
+        //set destination
         if (reqId == -1) {
             Log.e(TAG, "onCreate: cannot get reqId");
         } else {
@@ -173,6 +276,7 @@ public class TrackingMapActivity extends DaggerAppCompatActivity implements
 
                         btnBack.setOnClickListener(v -> {
                             finish();
+                            Log.e(TAG, "list user latlong: " + userLatLongList.toString());
                         });
                     }, throwable -> {
                         Log.e(TAG, "getUserLatLong fail: " + throwable.getMessage());
@@ -216,27 +320,6 @@ public class TrackingMapActivity extends DaggerAppCompatActivity implements
                 });
     }
 
-    private void initLayers(@NonNull Style loadedMapStyle) {
-        LineLayer routeLayer = new LineLayer(ROUTE_LAYER_ID, ROUTE_SOURCE_ID);
-
-        // Add the LineLayer to the map. This layer will display the directions route.
-        routeLayer.setProperties(
-                lineCap(Property.LINE_CAP_ROUND),
-                lineJoin(Property.LINE_JOIN_ROUND),
-                lineWidth(5f),
-                lineColor(Color.parseColor("#009688"))
-        );
-        loadedMapStyle.addLayer(routeLayer);
-
-
-        // Add the red marker icon SymbolLayer to the map
-        loadedMapStyle.addLayer(new SymbolLayer(ICON_LAYER_ID, ICON_SOURCE_ID).withProperties(
-                iconImage(RED_PIN_ICON_ID),
-                iconIgnorePlacement(true),
-                iconIgnorePlacement(true),
-                iconOffset(new Float[]{0f, -4f})));
-    }
-
     private void setCameraPositon(Point point) {
         mapboxMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(point.latitude(), point.longitude()), 12));
     }
@@ -270,8 +353,6 @@ public class TrackingMapActivity extends DaggerAppCompatActivity implements
                 setCameraPositon(origin);
 
                 if (destination != null) {
-                    Log.e(TAG, "destination onmap ready: " + destination.getLatitude() + "  --- " + destination.getLongitude());
-
                     Point destinationPoint = Point.fromLngLat(destination.getLongitude(), destination.getLatitude());
                     initSource(loadedMapStyle, origin, destinationPoint);
                     client = MapboxDirections.builder()
@@ -298,7 +379,7 @@ public class TrackingMapActivity extends DaggerAppCompatActivity implements
                         currentRoute = response.body().routes().get(0);
                         if (loadedMapStyle.isFullyLoaded()) {
                             // Retrieve and update the source designated for showing the directions route
-                            GeoJsonSource source = loadedMapStyle.getSourceAs(ROUTE_SOURCE_ID);
+                            source = loadedMapStyle.getSourceAs(ROUTE_SOURCE_ID);
 
                             // Create a LineString with the directions route's geometry and
                             // reset the GeoJSON source for the route LineLayer source
@@ -329,6 +410,27 @@ public class TrackingMapActivity extends DaggerAppCompatActivity implements
                 Feature.fromGeometry(Point.fromLngLat(origin.longitude(), origin.latitude())),
                 Feature.fromGeometry(Point.fromLngLat(destination.longitude(), destination.latitude()))}));
         loadedMapStyle.addSource(iconGeoJsonSource);
+    }
+
+    private void initLayers(@NonNull Style loadedMapStyle) {
+        LineLayer routeLayer = new LineLayer(ROUTE_LAYER_ID, ROUTE_SOURCE_ID);
+
+        // Add the LineLayer to the map. This layer will display the directions route.
+        routeLayer.setProperties(
+                lineCap(Property.LINE_CAP_ROUND),
+                lineJoin(Property.LINE_JOIN_ROUND),
+                lineWidth(5f),
+                lineColor(Color.parseColor("#009688"))
+        );
+        loadedMapStyle.addLayer(routeLayer);
+
+
+        // Add the red marker icon SymbolLayer to the map
+        loadedMapStyle.addLayer(new SymbolLayer(ICON_LAYER_ID, ICON_SOURCE_ID).withProperties(
+                iconImage(RED_PIN_ICON_ID),
+                iconIgnorePlacement(true),
+                iconIgnorePlacement(true),
+                iconOffset(new Float[]{0f, -4f})));
     }
 
     @Override
@@ -370,6 +472,8 @@ public class TrackingMapActivity extends DaggerAppCompatActivity implements
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        Intent serviceIntent = new Intent(this, UpdateLocationService.class);
+        stopService(serviceIntent);
         if (mapView != null)
             mapView.onDestroy();
     }

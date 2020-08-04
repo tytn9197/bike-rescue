@@ -15,11 +15,18 @@ import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
+import com.example.bikerescueusermobile.data.model.request.CurrentRequest;
 import com.example.bikerescueusermobile.data.model.user.CurrentUser;
 import com.example.bikerescueusermobile.data.model.user.UserLatLong;
+import com.example.bikerescueusermobile.util.MyInstances;
 import com.example.bikerescueusermobile.util.ViewModelFactory;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.gson.Gson;
 
 import javax.inject.Inject;
@@ -40,40 +47,42 @@ public class UpdateLocationService extends Service {
     private LocationManager mLocationManager = null;
     private static final int LOCATION_INTERVAL = 1000;
     private static final float LOCATION_DISTANCE = 10f;
+    private DatabaseReference mDatabase;
+    private String reqCode = "";
 
     private class LocationListener implements android.location.LocationListener {
         Location mLastLocation;
 
         public LocationListener(String provider) {
-            Log.e(TAG, "LocationListener " + provider);
+            Log.d(TAG, "LocationListener " + provider);
             mLastLocation = new Location(provider);
         }
 
         @Override
         public void onLocationChanged(Location location) {
-            Log.e(TAG, "onLocationChanged: " + location);
+            Log.d(TAG, "onLocationChanged: " + location);
 
-            Intent intent = new Intent("BikeRescueLocation");
-            intent.putExtra("latitude", location.getLatitude());
-            intent.putExtra("longitude", location.getLongitude());
-            LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
+            UserLatLong userLatLong = new UserLatLong(CurrentUser.getInstance().getId(),
+                    "" + location.getLatitude(),
+                    "" + location.getLongitude());
+            mDatabase.child(""+userLatLong.getId()).setValue(userLatLong);
 
             mLastLocation.set(location);
         }
 
         @Override
         public void onProviderDisabled(String provider) {
-            Log.e(TAG, "onProviderDisabled: " + provider);
+            Log.d(TAG, "onProviderDisabled: " + provider);
         }
 
         @Override
         public void onProviderEnabled(String provider) {
-            Log.e(TAG, "onProviderEnabled: " + provider);
+            Log.d(TAG, "onProviderEnabled: " + provider);
         }
 
         @Override
         public void onStatusChanged(String provider, int status, Bundle extras) {
-            Log.e(TAG, "onStatusChanged: " + provider);
+            Log.d(TAG, "onStatusChanged: " + provider);
         }
     }
 
@@ -89,7 +98,7 @@ public class UpdateLocationService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.e(TAG, "onStartCommand");
+        Log.d(TAG, "onStartCommand");
         super.onStartCommand(intent, flags, startId);
         return START_STICKY;
     }
@@ -97,32 +106,36 @@ public class UpdateLocationService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        Log.e(TAG, "onCreate");
+        Log.d(TAG, "onCreate");
+
+        mDatabase = FirebaseDatabase.getInstance().getReference(MyInstances.APP);
+        reqCode = CurrentRequest.getInstance().getRequestCode();
+
         initializeLocationManager();
         try {
             mLocationManager.requestLocationUpdates(
                     LocationManager.NETWORK_PROVIDER, LOCATION_INTERVAL, LOCATION_DISTANCE,
                     mLocationListeners[1]);
         } catch (java.lang.SecurityException ex) {
-            Log.i(TAG, "fail to request location update, ignore", ex);
+            Log.e(TAG, "fail to request location update, ignore", ex);
         } catch (IllegalArgumentException ex) {
-            Log.d(TAG, "network provider does not exist, " + ex.getMessage());
+            Log.e(TAG, "network provider does not exist, " + ex.getMessage());
         }
         try {
             mLocationManager.requestLocationUpdates(
                     LocationManager.GPS_PROVIDER, LOCATION_INTERVAL, LOCATION_DISTANCE,
                     mLocationListeners[0]);
         } catch (java.lang.SecurityException ex) {
-            Log.i(TAG, "fail to request location update, ignore", ex);
+            Log.e(TAG, "fail to request location update, ignore", ex);
         } catch (IllegalArgumentException ex) {
-            Log.d(TAG, "gps provider does not exist " + ex.getMessage());
+            Log.e(TAG, "gps provider does not exist " + ex.getMessage());
         }
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        Log.e(TAG, "onDestroy");
+        Log.d(TAG, "onDestroy");
         if (mLocationManager != null) {
             for (int i = 0; i < mLocationListeners.length; i++) {
                 try {
@@ -135,7 +148,7 @@ public class UpdateLocationService extends Service {
     }
 
     private void initializeLocationManager() {
-        Log.e(TAG, "initializeLocationManager");
+        Log.d(TAG, "initializeLocationManager");
         if (mLocationManager == null) {
             mLocationManager = (LocationManager) getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
         }

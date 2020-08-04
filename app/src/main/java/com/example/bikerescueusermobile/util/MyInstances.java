@@ -2,6 +2,8 @@ package com.example.bikerescueusermobile.util;
 
 public class MyInstances {
 
+    public static final String APP = "BikeRescue";
+
     //user status
     public static final int USER_STATUS_DEACTIVE = 0;
     public static final int USER_STATUS_FREE = 1;

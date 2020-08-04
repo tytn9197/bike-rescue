@@ -28,10 +28,13 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.example.bikerescueusermobile.R;
 import com.example.bikerescueusermobile.base.BaseFragment;
+import com.example.bikerescueusermobile.data.model.request.CurrentRequest;
 import com.example.bikerescueusermobile.data.model.request.MessageRequestFB;
 import com.example.bikerescueusermobile.data.model.request.Request;
+import com.example.bikerescueusermobile.data.model.user.CurrentUser;
 import com.example.bikerescueusermobile.ui.confirm.ConfirmViewModel;
 import com.example.bikerescueusermobile.ui.create_request.RequestDetailViewModel;
+import com.example.bikerescueusermobile.ui.login.UpdateLocationService;
 import com.example.bikerescueusermobile.ui.tracking_map.TrackingMapActivity;
 import com.example.bikerescueusermobile.util.MyInstances;
 import com.example.bikerescueusermobile.util.SharedPreferenceHelper;
@@ -154,7 +157,6 @@ public class ShopHomeFragment extends BaseFragment {
                     sweetAlertDialog.setConfirmClickListener(sDialog -> {
                         sDialog.dismiss();
                         txtNoReq.setVisibility(View.GONE);
-
                         viewModel.getRequestById(responeReq.getReqId())
                                 .subscribeOn(Schedulers.io())
                                 .observeOn(AndroidSchedulers.mainThread())
@@ -255,18 +257,24 @@ public class ShopHomeFragment extends BaseFragment {
             txtNoReq.setVisibility(View.GONE);
             Request requestFromPref = gson.fromJson(request, Request.class);
 
-            btnTracking.setOnClickListener(v -> {
-                Intent intent = new Intent(getActivity(), TrackingMapActivity.class);
-                intent.putExtra("isBikerTracking", false);
-                intent.putExtra("reqId", requestFromPref.getId());
-                startActivity(intent);
-            });
-
             viewModel.getRequestById(requestFromPref.getId())
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(req -> {
                         if (req != null) {
+                            btnTracking.setOnClickListener(v -> {
+                                Intent intent = new Intent(getActivity(), TrackingMapActivity.class);
+                                intent.putExtra("isBikerTracking", false);
+                                intent.putExtra("reqId", req.getId());
+                                startActivity(intent);
+
+                                Intent serviceIntent = new Intent(getActivity(), UpdateLocationService.class);
+                                CurrentRequest.getInstance().setRequestCode(req.getRequestCode());
+                                CurrentUser.getInstance().setCurrentBikerId(req.getCreatedUser().getId());
+                                CurrentUser.getInstance().setChosenShopOwnerId(CurrentUser.getInstance().getId());
+                                getActivity().startService(serviceIntent);
+                            });
+
                             if (req.getStatus().equals(MyInstances.STATUS_ACCEPT) || req.getStatus().equals(MyInstances.STATUS_CREATED)) {
                                 SweetAlertDialog sweetAlertDialog = new SweetAlertDialog(getBaseActivity(), SweetAlertDialog.NORMAL_TYPE);
                                 sweetAlertDialog.setTitleText("Thông báo");
@@ -410,6 +418,7 @@ public class ShopHomeFragment extends BaseFragment {
             hideFinishButton();
             txtStatus.setVisibility(View.GONE);
             txtNoReq.setVisibility(View.GONE);
+            btnTracking.setVisibility(View.VISIBLE);
         }
 
         if (status.equals(MyInstances.STATUS_ACCEPT)) {
