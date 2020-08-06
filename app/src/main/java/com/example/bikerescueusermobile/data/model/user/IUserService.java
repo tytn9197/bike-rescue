@@ -2,6 +2,9 @@ package com.example.bikerescueusermobile.data.model.user;
 
 import com.example.bikerescueusermobile.data.model.login.LoginData;
 import com.example.bikerescueusermobile.data.model.login.UpdateDevice;
+import com.example.bikerescueusermobile.data.model.shop.StatusSuccessDTO;
+
+import java.util.List;
 
 import io.reactivex.Single;
 import okhttp3.MultipartBody;
@@ -36,4 +39,7 @@ public interface IUserService {
     Single<UserLatLong> getUserLatLongByReqId(@Path("id") int userId,
                                               @Query("isBikerTracking") boolean isBikerTracking,
                                               @Header("Authorization") String token);
+
+    @GET("/shop/requestSuccess/{id}")
+    Single<List<StatusSuccessDTO>> getSuccessReq(@Path("id") int id, @Header("Authorization") String token);
 }

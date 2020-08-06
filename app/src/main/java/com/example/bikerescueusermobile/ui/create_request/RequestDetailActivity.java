@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -16,6 +17,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.TextView;
@@ -36,6 +38,7 @@ import com.example.bikerescueusermobile.data.model.user.CurrentUser;
 import com.example.bikerescueusermobile.ui.confirm.ConfirmInfoActivity;
 import com.example.bikerescueusermobile.ui.confirm.ConfirmViewModel;
 import com.example.bikerescueusermobile.ui.login.UpdateLocationService;
+import com.example.bikerescueusermobile.ui.shop_owner.shop_home.ShopHomeFragment;
 import com.example.bikerescueusermobile.ui.tracking_map.TrackingMapActivity;
 import com.example.bikerescueusermobile.util.MyInstances;
 import com.example.bikerescueusermobile.util.MyMethods;
@@ -111,6 +114,9 @@ public class RequestDetailActivity extends BaseActivity {
     @BindView(R.id.btnReqDetailTracking)
     Button btnReqDetailTracking;
 
+    @BindView(R.id.btnReqDetailCallShop)
+    Button btnReqDetailCallShop;
+
     @Inject
     ViewModelFactory viewModelFactory;
 
@@ -162,44 +168,55 @@ public class RequestDetailActivity extends BaseActivity {
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            String message = intent.getStringExtra("message");
-            Gson gson = new Gson();
-            MessageRequestFB responeReq = gson.fromJson(message, MessageRequestFB.class);
+            if(context != null) {
+                String message = intent.getStringExtra("message");
+                Gson gson = new Gson();
+                MessageRequestFB responeReq = gson.fromJson(message, MessageRequestFB.class);
 
-            btnReqDetailTracking.setVisibility(View.GONE);
-
-            if (responeReq.getMessage().equals(MyInstances.NOTI_ACCEPT)) {
-                txtReqDetailStatus.setText("Cửa hàng đã nhận");
+                btnReqDetailTracking.setVisibility(View.GONE);
                 txtReqDetailStatus.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.core_color));
-                btnReqDetailCancel.setVisibility(View.VISIBLE);
-                btnReqDetailTracking.setVisibility(View.VISIBLE);
-            }
 
-            if (responeReq.getMessage().equals(MyInstances.NOTI_REJECTED)) {
-                txtReqDetailStatus.setText("Cửa hàng đã từ chối");
-                txtReqDetailStatus.setTextColor(Color.RED);
-                btnReqDetailCancel.setVisibility(View.GONE);
-                SharedPreferenceHelper.setSharedPreferenceString(getApplicationContext(), MyInstances.KEY_BIKER_REQUEST, "");
-            }
-
-            if (responeReq.getMessage().equals(MyInstances.NOTI_FINISH)) {
-                txtReqDetailStatus.setText("Yêu cầu đã hoàn thành");
-                txtReqDetailStatus.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.core_color));
-                btnComplain.setVisibility(View.VISIBLE);
-                btnReqDetailCancel.setVisibility(View.GONE);
-                SharedPreferenceHelper.setSharedPreferenceString(getApplicationContext(), MyInstances.KEY_BIKER_REQUEST, "");
-            }
-
-            if (responeReq.getMessage().equals(MyInstances.NOTI_CANELED)) {
-                txtReqDetailStatus.setText("Cửa hàng đã hủy");
-                txtReqDetailStatus.setTextColor(Color.RED);
-                btnReqDetailCancel.setVisibility(View.GONE);
-                txtReqDetailCancelReason.setVisibility(View.VISIBLE);
-                if(responeReq.getReason() != null){
-                    txtReqDetailCancelReason.setText(" Lý do hủy: " + responeReq.getReason());
+                if (responeReq.getMessage().equals(MyInstances.NOTI_ACCEPT)) {
+                    txtReqDetailStatus.setText("Cửa hàng đã nhận");
+                    btnReqDetailCancel.setVisibility(View.VISIBLE);
+                    btnReqDetailTracking.setVisibility(View.VISIBLE);
                 }
-                SharedPreferenceHelper.setSharedPreferenceString(getApplicationContext(), MyInstances.KEY_BIKER_REQUEST, "");
 
+                if (responeReq.getMessage().equals(MyInstances.NOTI_REJECTED)) {
+                    txtReqDetailStatus.setText("Cửa hàng đã từ chối");
+                    txtReqDetailStatus.setTextColor(Color.RED);
+                    btnReqDetailCancel.setVisibility(View.GONE);
+                    txtReqDetailCancelReason.setVisibility(View.VISIBLE);
+                    if (responeReq.getReason() != null && !responeReq.getReason().equals("")) {
+                        txtReqDetailCancelReason.setText(" Lý do hủy: " + responeReq.getReason());
+                    }
+                    SharedPreferenceHelper.setSharedPreferenceString(getApplicationContext(), MyInstances.KEY_BIKER_REQUEST, "");
+                }
+
+                if (responeReq.getMessage().equals(MyInstances.NOTI_FINISH)) {
+                    txtReqDetailStatus.setText("Yêu cầu đã hoàn thành");
+                    btnComplain.setVisibility(View.VISIBLE);
+                    btnReqDetailCancel.setVisibility(View.GONE);
+                    SharedPreferenceHelper.setSharedPreferenceString(getApplicationContext(), MyInstances.KEY_BIKER_REQUEST, "");
+                }
+
+                if (responeReq.getMessage().equals(MyInstances.NOTI_CANELED)) {
+                    txtReqDetailStatus.setText("Cửa hàng đã hủy");
+                    txtReqDetailStatus.setTextColor(Color.RED);
+                    btnReqDetailCancel.setVisibility(View.GONE);
+                    txtReqDetailCancelReason.setVisibility(View.VISIBLE);
+                    if (responeReq.getReason() != null) {
+                        txtReqDetailCancelReason.setText(" Lý do hủy: " + responeReq.getReason());
+                    }
+                    SharedPreferenceHelper.setSharedPreferenceString(getApplicationContext(), MyInstances.KEY_BIKER_REQUEST, "");
+
+                }
+
+                if (responeReq.getMessage().equals(MyInstances.NOTI_ARRIVED)) {
+                    txtReqDetailStatus.setText("Thợ sửa xe đã đến nơi");
+                    btnReqDetailCancel.setVisibility(View.VISIBLE);
+                    btnReqDetailTracking.setVisibility(View.VISIBLE);
+                }
             }
         }
     };
@@ -227,17 +244,14 @@ public class RequestDetailActivity extends BaseActivity {
                     .into(imgReqDetailShopAvatar);
         }
 
-        if(request.getCancelReason() != null && request.getStatus().equals(MyInstances.STATUS_CANCELED)){
+        if(request.getCancelReason() != null){
+            if(request.getStatus().equals(MyInstances.STATUS_CANCELED) || request.getStatus().equals(MyInstances.STATUS_REJECTED))
             txtReqDetailCancelReason.setText(" Lý do hủy: " + request.getCancelReason());
             txtReqDetailCancelReason.setVisibility(View.VISIBLE);
         }
 
         setCancelButtonClick(request.getId(),true);
         btnReqDetailTracking.setOnClickListener(v -> {
-            Intent intent = new Intent(this, TrackingMapActivity.class);
-            intent.putExtra("isBikerTracking", true);
-            intent.putExtra("reqId", request.getId());
-            startActivity(intent);
 
             //mac dinh la thang biker vao activity nay
             Intent serviceIntent = new Intent(this, UpdateLocationService.class);
@@ -245,6 +259,19 @@ public class RequestDetailActivity extends BaseActivity {
             CurrentUser.getInstance().setCurrentBikerId(CurrentUser.getInstance().getId());
             CurrentUser.getInstance().setChosenShopOwnerId(request.getAcceptedUser().getId());
             startService(serviceIntent);
+
+            Intent intent = new Intent(this, TrackingMapActivity.class);
+            intent.putExtra("isBikerTracking", true);
+            intent.putExtra("reqId", request.getId());
+            startActivity(intent);
+        });
+
+        btnReqDetailCallShop.setVisibility(View.VISIBLE);
+        btnReqDetailCallShop.setOnClickListener(v->{
+            Intent callIntent = new Intent(Intent.ACTION_DIAL);
+            callIntent.setData(Uri.parse("tel:" + Uri.encode(request.getAcceptedUser().getPhoneNumber())));
+            callIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(callIntent);
         });
     }
 
@@ -278,6 +305,12 @@ public class RequestDetailActivity extends BaseActivity {
         }
 
         setCancelButtonClick(request.getId(), false);
+
+        txtReqDetailCancelReason.setVisibility(View.GONE);
+        if (request.getStatus().equals(MyInstances.STATUS_CANCELED) || request.getStatus().equals(MyInstances.STATUS_REJECTED)) {
+            txtReqDetailCancelReason.setVisibility(View.VISIBLE);
+            txtReqDetailCancelReason.setText(" Lý do hủy: " + request.getCancelReason());
+        }
     }
 
     @SuppressLint("SetTextI18n")
@@ -288,6 +321,7 @@ public class RequestDetailActivity extends BaseActivity {
             final AlertDialog editDialog = new AlertDialog.Builder(this).create();
             editDialog.setView(editDialogView);
             MaterialSpinner spinner = editDialogView.findViewById(R.id.confirm_spinner);
+            EditText txtReasonDetail = editDialogView.findViewById(R.id.txtReasonDetail);
             spinner.setDropdownHeight(100);
             ConfirmViewModel confirmViewModel = ViewModelProviders.of(this, viewModelFactory).get(ConfirmViewModel.class);
             confirmViewModel.getAllConfig()
@@ -295,7 +329,6 @@ public class RequestDetailActivity extends BaseActivity {
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(listConfig -> {
                         if (listConfig != null) {
-
                             ArrayAdapter listAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item);
                             for (int i = 0; i < listConfig.size(); i++) {
                                 if (listConfig.get(i).getName().equals("biker cancel reason"))
@@ -307,9 +340,21 @@ public class RequestDetailActivity extends BaseActivity {
                         Log.e(TAG, "getAllConfig: " + throwable.getMessage());
                     });
 
+
+            spinner.setOnItemSelectedListener((view, position, id, item) -> {
+                if(spinner.getText().toString().equals("Lý do khác")){
+                    txtReasonDetail.setVisibility(View.VISIBLE);
+                }
+            });
+
             editDialogView.findViewById(R.id.btn_confirm).setOnClickListener(confirmView -> {
                 editDialog.dismiss();
                 String reason = spinner.getText().toString();
+                if(reason.equals("Lý do khác")){
+                    reason = txtReasonDetail.getText().toString();
+                }
+
+                final String finalReason = reason;
                 viewModel.cancleRequest(reqId, isSendToShop, reason)
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
@@ -320,7 +365,7 @@ public class RequestDetailActivity extends BaseActivity {
                                 txtReqDetailStatus.setText("Đã hủy");
                                 txtReqDetailStatus.setTextColor(Color.RED);
                                 txtReqDetailCancelReason.setVisibility(View.VISIBLE);
-                                txtReqDetailCancelReason.setText(" Lý do hủy: " + reason);
+                                txtReqDetailCancelReason.setText(" Lý do hủy: " + finalReason);
                                 SharedPreferenceHelper.setSharedPreferenceString(getApplicationContext(), MyInstances.KEY_BIKER_REQUEST, "");
                             }
                         }, throwable -> {

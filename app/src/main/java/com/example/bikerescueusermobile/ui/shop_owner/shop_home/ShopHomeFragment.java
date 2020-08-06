@@ -10,12 +10,15 @@ import android.content.IntentFilter;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.CountDownTimer;
+import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -132,10 +135,17 @@ public class ShopHomeFragment extends BaseFragment {
     @BindView(R.id.btnShopHomeTracking)
     Button btnTracking;
 
+    @BindView(R.id.txtShopHomeCountdown)
+    TextView txtCountdown;
+
+    @BindView(R.id.btnShopHomeArrived)
+    Button btnArrived;
+
     @Inject
     ViewModelFactory viewModelFactory;
 
     private RequestDetailViewModel viewModel;
+    private CountDownTimer countDownTimer;
 
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
         @Override
@@ -152,6 +162,8 @@ public class ShopHomeFragment extends BaseFragment {
                 sweetAlertDialog.setCanceledOnTouchOutside(false);
                 sweetAlertDialog.setCancelable(false);
 
+                allButtonGone();
+
                 if (responeReq.getMessage().equals(MyInstances.NOTI_CREATED)) {
                     sweetAlertDialog.setContentText("Bạn có một yêu cầu mới!");
                     sweetAlertDialog.setConfirmClickListener(sDialog -> {
@@ -163,6 +175,7 @@ public class ShopHomeFragment extends BaseFragment {
                                 .subscribe(req -> {
                                     if (req != null) {
                                         setDataToView(req);
+
                                         String sharedPreferenceStr = gson.toJson(req);
                                         SharedPreferenceHelper.setSharedPreferenceString(getActivity(), MyInstances.KEY_SHOP_REQUEST, sharedPreferenceStr);
 
@@ -181,7 +194,7 @@ public class ShopHomeFragment extends BaseFragment {
                                             sweetAlertDialog.setContentText("Từ chối yêu cầu này?");
                                             sweetAlertDialog.setConfirmClickListener(d -> {
                                                 d.dismiss();
-                                                viewModel.updateStatusRequest(req.getId(), false)
+                                                viewModel.updateStatusRequest(req.getId(), MyInstances.STATUS_REJECTED)
                                                         .subscribeOn(Schedulers.io())
                                                         .observeOn(AndroidSchedulers.mainThread())
                                                         .subscribe(responseDTO -> {
@@ -198,7 +211,7 @@ public class ShopHomeFragment extends BaseFragment {
                                             sweetAlertDialog.setContentText("Chấp nhận yêu cầu này?");
                                             sweetAlertDialog.setConfirmClickListener(d -> {
                                                 d.dismiss();
-                                                viewModel.updateStatusRequest(req.getId(), true)
+                                                viewModel.updateStatusRequest(req.getId(), MyInstances.STATUS_ACCEPT)
                                                         .subscribeOn(Schedulers.io())
                                                         .observeOn(AndroidSchedulers.mainThread())
                                                         .subscribe(responseDTO -> {
@@ -207,10 +220,40 @@ public class ShopHomeFragment extends BaseFragment {
                                                                     .commit();
                                                         });
                                                 btnCancelReq.setVisibility(View.VISIBLE);
+                                                btnArrived.setVisibility(View.VISIBLE);
                                             });
                                             sweetAlertDialog.show();
                                         });
 
+                                        //run cown down timer
+                                        countDownTimer = new CountDownTimer(15000, 1000) {
+
+                                            @SuppressLint("DefaultLocale")
+                                            @Override
+                                            public void onTick(long millisUntilFinished) {
+                                                if (millisUntilFinished != 0) {
+                                                    txtCountdown.setText(String.format(" Hệ thống sẽ từ chối yêu cầu sau %d giây", millisUntilFinished / 1000));
+                                                }
+                                            }
+
+                                            @Override
+                                            public void onFinish() {
+                                                if (countDownTimer != null) {
+                                                    countDownTimer.cancel();
+                                                    txtCountdown.setText("");
+                                                    viewModel.updateStatusRequest(req.getId(), MyInstances.NOTI_AUTO_REJECTED)
+                                                            .subscribeOn(Schedulers.io())
+                                                            .observeOn(AndroidSchedulers.mainThread())
+                                                            .subscribe(responseDTO -> {
+                                                                SharedPreferenceHelper.setSharedPreferenceString(getActivity(), MyInstances.KEY_SHOP_REQUEST, "");
+                                                                getActivity().getSupportFragmentManager().beginTransaction()
+                                                                        .replace(R.id.frame_container, new ShopHomeFragment())
+                                                                        .commit();
+                                                            });
+                                                }
+                                            }
+                                        };
+                                        countDownTimer.start();
                                     } else {
                                         SharedPreferenceHelper.setSharedPreferenceString(getActivity(), MyInstances.KEY_SHOP_REQUEST, "");
                                         txtNoReq.setVisibility(View.VISIBLE);
@@ -226,7 +269,7 @@ public class ShopHomeFragment extends BaseFragment {
                     cancelReq.setConfirmText("Đóng");
                     cancelReq.setCanceledOnTouchOutside(false);
                     cancelReq.setCancelable(false);
-                    cancelReq.setContentText("Khách đã hủy yêu cầu");
+                    cancelReq.setContentText("Khách đã hủy yêu cầu." + " Lý do hủy: " + responeReq.getReason());
                     cancelReq.setConfirmClickListener(sDialog -> {
                         sDialog.dismiss();
                         txtNoReq.setVisibility(View.VISIBLE);
@@ -234,8 +277,7 @@ public class ShopHomeFragment extends BaseFragment {
                     });
                     cancelReq.show();
                 }
-            }
-
+            }//end getactivity != null
         }
     };
 
@@ -249,90 +291,80 @@ public class ShopHomeFragment extends BaseFragment {
                 mMessageReceiver, new IntentFilter("BikeRescueShop"));
 
         viewModel = ViewModelProviders.of(this, viewModelFactory).get(RequestDetailViewModel.class);
-
         String request = SharedPreferenceHelper.getSharedPreferenceString(getActivity(), MyInstances.KEY_SHOP_REQUEST, "");
-        if (request.trim().equals("")) {
-            txtNoReq.setVisibility(View.VISIBLE);
-        } else {
-            txtNoReq.setVisibility(View.GONE);
+
+        txtNoReq.setVisibility(View.VISIBLE);
+
+        if (!request.trim().equals("")) {
             Request requestFromPref = gson.fromJson(request, Request.class);
 
             viewModel.getRequestById(requestFromPref.getId())
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(req -> {
-                        if (req != null) {
-                            btnTracking.setOnClickListener(v -> {
-                                Intent intent = new Intent(getActivity(), TrackingMapActivity.class);
-                                intent.putExtra("isBikerTracking", false);
-                                intent.putExtra("reqId", req.getId());
-                                startActivity(intent);
+                        if (req != null && getActivity() != null) {
+                            if (req.getAcceptedUser().getId() == CurrentUser.getInstance().getId()) {
+                                txtNoReq.setVisibility(View.GONE);
 
-                                Intent serviceIntent = new Intent(getActivity(), UpdateLocationService.class);
-                                CurrentRequest.getInstance().setRequestCode(req.getRequestCode());
-                                CurrentUser.getInstance().setCurrentBikerId(req.getCreatedUser().getId());
-                                CurrentUser.getInstance().setChosenShopOwnerId(CurrentUser.getInstance().getId());
-                                getActivity().startService(serviceIntent);
-                            });
+                                if (req.getStatus().equals(MyInstances.STATUS_ACCEPT) || req.getStatus().equals(MyInstances.STATUS_CREATED)) {
+                                    SweetAlertDialog sweetAlertDialog = new SweetAlertDialog(getBaseActivity(), SweetAlertDialog.NORMAL_TYPE);
+                                    sweetAlertDialog.setTitleText("Thông báo");
+                                    sweetAlertDialog.setConfirmText("Xem thông báo");
+                                    sweetAlertDialog.setCanceledOnTouchOutside(false);
+                                    sweetAlertDialog.setCancelable(false);
+                                    sweetAlertDialog.setCancelText("Hủy");
+                                    sweetAlertDialog.setConfirmText("OK");
+                                    sweetAlertDialog.setCancelClickListener(Dialog::dismiss);
 
-                            if (req.getStatus().equals(MyInstances.STATUS_ACCEPT) || req.getStatus().equals(MyInstances.STATUS_CREATED)) {
-                                SweetAlertDialog sweetAlertDialog = new SweetAlertDialog(getBaseActivity(), SweetAlertDialog.NORMAL_TYPE);
-                                sweetAlertDialog.setTitleText("Thông báo");
-                                sweetAlertDialog.setConfirmText("Xem thông báo");
-                                sweetAlertDialog.setCanceledOnTouchOutside(false);
-                                sweetAlertDialog.setCancelable(false);
-                                sweetAlertDialog.setCancelText("Hủy");
-                                sweetAlertDialog.setConfirmText("OK");
-                                sweetAlertDialog.setCancelClickListener(Dialog::dismiss);
+                                    setDataToView(req);
 
-                                setDataToView(req);
+                                    String sharedPreferenceStr = gson.toJson(req);
+                                    SharedPreferenceHelper.setSharedPreferenceString(getActivity(), MyInstances.KEY_SHOP_REQUEST, sharedPreferenceStr);
 
-                                String sharedPreferenceStr = gson.toJson(req);
-                                SharedPreferenceHelper.setSharedPreferenceString(getActivity(), MyInstances.KEY_SHOP_REQUEST, sharedPreferenceStr);
-
-                                btnCallBiker.setOnClickListener(v -> {
-                                    Intent callIntent = new Intent(Intent.ACTION_DIAL);
-                                    callIntent.setData(Uri.parse("tel:" + Uri.encode(req.getCreatedUser().getPhoneNumber())));
-                                    callIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                                    startActivity(callIntent);
-                                });
-
-                                btnDecline.setOnClickListener(v -> {
-                                    sweetAlertDialog.setContentText("Từ chối yêu cầu này?");
-                                    sweetAlertDialog.setConfirmClickListener(d -> {
-                                        d.dismiss();
-                                        viewModel.updateStatusRequest(req.getId(), false)
-                                                .subscribeOn(Schedulers.io())
-                                                .observeOn(AndroidSchedulers.mainThread())
-                                                .subscribe(responseDTO -> {
-                                                    SharedPreferenceHelper.setSharedPreferenceString(getActivity(), MyInstances.KEY_SHOP_REQUEST, "");
-                                                    getActivity().getSupportFragmentManager().beginTransaction()
-                                                            .replace(R.id.frame_container, new ShopHomeFragment())
-                                                            .commit();
-                                                });
+                                    btnCallBiker.setOnClickListener(v -> {
+                                        Intent callIntent = new Intent(Intent.ACTION_DIAL);
+                                        callIntent.setData(Uri.parse("tel:" + Uri.encode(req.getCreatedUser().getPhoneNumber())));
+                                        callIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                        startActivity(callIntent);
                                     });
-                                    sweetAlertDialog.show();
-                                });
 
-                                btnAccept.setOnClickListener(v -> {
-                                    sweetAlertDialog.setContentText("Chấp nhận yêu cầu này?");
-                                    sweetAlertDialog.setConfirmClickListener(d -> {
-                                        d.dismiss();
-                                        viewModel.updateStatusRequest(req.getId(), true)
-                                                .subscribeOn(Schedulers.io())
-                                                .observeOn(AndroidSchedulers.mainThread())
-                                                .subscribe(responseDTO -> {
-                                                    getActivity().getSupportFragmentManager().beginTransaction()
-                                                            .replace(R.id.frame_container, new ShopHomeFragment())
-                                                            .commit();
-                                                });
-                                        btnCancelReq.setVisibility(View.VISIBLE);
+                                    btnDecline.setOnClickListener(v -> {
+                                        sweetAlertDialog.setContentText("Từ chối yêu cầu này?");
+                                        sweetAlertDialog.setConfirmClickListener(d -> {
+                                            d.dismiss();
+                                            viewModel.updateStatusRequest(req.getId(), MyInstances.STATUS_REJECTED)
+                                                    .subscribeOn(Schedulers.io())
+                                                    .observeOn(AndroidSchedulers.mainThread())
+                                                    .subscribe(responseDTO -> {
+                                                        SharedPreferenceHelper.setSharedPreferenceString(getActivity(), MyInstances.KEY_SHOP_REQUEST, "");
+                                                        getActivity().getSupportFragmentManager().beginTransaction()
+                                                                .replace(R.id.frame_container, new ShopHomeFragment())
+                                                                .commit();
+                                                    });
+                                        });
+                                        sweetAlertDialog.show();
                                     });
-                                    sweetAlertDialog.show();
-                                });
-                            } else {
-                                SharedPreferenceHelper.setSharedPreferenceString(getActivity(), MyInstances.KEY_SHOP_REQUEST, "");
-                                txtNoReq.setVisibility(View.VISIBLE);
+
+                                    btnAccept.setOnClickListener(v -> {
+                                        sweetAlertDialog.setContentText("Chấp nhận yêu cầu này?");
+                                        sweetAlertDialog.setConfirmClickListener(d -> {
+                                            d.dismiss();
+                                            viewModel.updateStatusRequest(req.getId(), MyInstances.STATUS_ACCEPT)
+                                                    .subscribeOn(Schedulers.io())
+                                                    .observeOn(AndroidSchedulers.mainThread())
+                                                    .subscribe(responseDTO -> {
+                                                        getActivity().getSupportFragmentManager().beginTransaction()
+                                                                .replace(R.id.frame_container, new ShopHomeFragment())
+                                                                .commit();
+                                                    });
+                                            btnCancelReq.setVisibility(View.VISIBLE);
+                                        });
+                                        sweetAlertDialog.show();
+                                    });
+                                } else {
+                                    SharedPreferenceHelper.setSharedPreferenceString(getActivity(), MyInstances.KEY_SHOP_REQUEST, "");
+                                    txtNoReq.setVisibility(View.VISIBLE);
+                                }
                             }
                         }
                     });
@@ -361,36 +393,50 @@ public class ShopHomeFragment extends BaseFragment {
                 });
                 sweetAlertDialog.show();
             });
-        } //end of else
-
-
+        }//end of else
         btnReqImg.setOnClickListener(v -> {
             SharedPreferenceHelper.setSharedPreferenceString(getActivity(), MyInstances.KEY_SHOP_REQUEST, "");
         });
     }
 
-    private void showFinishButton() {
-        statusCreated.setVisibility(View.GONE);
-        btnFinish.setVisibility(View.VISIBLE);
-    }
-
-    private void hideFinishButton() {
-        statusCreated.setVisibility(View.VISIBLE);
-        btnFinish.setVisibility(View.GONE);
-    }
-
     @SuppressLint("SetTextI18n")
     private void setDataToView(Request request) {
-        btnCancelReq.setVisibility(View.GONE);
-        btnTracking.setVisibility(View.GONE);
+        allButtonGone();
+
+        btnTracking.setOnClickListener(v -> {
+            Intent intent = new Intent(getActivity(), TrackingMapActivity.class);
+            intent.putExtra("isBikerTracking", false);
+            intent.putExtra("reqId", request.getId());
+            startActivity(intent);
+
+            Intent serviceIntent = new Intent(getActivity(), UpdateLocationService.class);
+            CurrentRequest.getInstance().setRequestCode(request.getRequestCode());
+            CurrentUser.getInstance().setCurrentBikerId(request.getCreatedUser().getId());
+            CurrentUser.getInstance().setChosenShopOwnerId(CurrentUser.getInstance().getId());
+            getActivity().startService(serviceIntent);
+        });
+
+        btnArrived.setOnClickListener(view -> {
+            viewModel.updateStatusRequest(request.getId(), MyInstances.STATUS_ARRIVED)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(responseDTO -> {
+                        btnArrived.setVisibility(View.GONE);
+                        btnFinish.setVisibility(View.VISIBLE);
+                        txtStatus.setText("Đã đến nơi ");
+                    });
+        });
+
         txtCode.setText("Mã yêu cầu: ".concat(request.getRequestCode()));
         txtBikeName.setText(request.getCreatedUser().getFullName());
         txtBikerPhone.setText(request.getCreatedUser().getPhoneNumber());
+
         if (request.getCreatedUser().getAvatarUrl().contains("imgur")) {
             Picasso.with(getActivity())
                     .load(request.getCreatedUser().getAvatarUrl()).placeholder(R.drawable.ic_load)
                     .into(imgBikerAvatar);
         }
+
         txtAddress.setText(" " + request.getAddress());
         txtServiceName.setText(" Vấn đề: " + request.getListReqShopService().get(0).getShopService().getServices().getName());
         txtReqDescription.setText(" Thông tin thêm: " + request.getDescription());
@@ -406,8 +452,10 @@ public class ShopHomeFragment extends BaseFragment {
 
         refreshStatus(request.getStatus(), request.getId());
 
-        btnReqImg.setVisibility(View.GONE);
-
+        if (request.getStatus().equals(MyInstances.STATUS_CANCELED) || request.getStatus().equals(MyInstances.STATUS_REJECTED)) {
+            txtReqCancelReason.setVisibility(View.VISIBLE);
+            txtReqCancelReason.setText(" Lý do hủy: " + request.getCancelReason());
+        }
     }
 
     @SuppressLint("SetTextI18n")
@@ -415,24 +463,44 @@ public class ShopHomeFragment extends BaseFragment {
         txtStatus.setTextColor(ContextCompat.getColor(getActivity(), R.color.core_color));
         //request moi duoc tao
         if (status.equals(MyInstances.STATUS_CREATED)) {
-            hideFinishButton();
-            txtStatus.setVisibility(View.GONE);
-            txtNoReq.setVisibility(View.GONE);
+            statusCreated.setVisibility(View.VISIBLE);
             btnTracking.setVisibility(View.VISIBLE);
         }
 
-        if (status.equals(MyInstances.STATUS_ACCEPT)) {
-            showFinishButton();
+        if (status.equals(MyInstances.STATUS_ARRIVED)) {
+            btnFinish.setVisibility(View.VISIBLE);
             btnTracking.setVisibility(View.VISIBLE);
-            txtStatus.setVisibility(View.VISIBLE);
-            txtStatus.setText("Đã nhận ");
             btnCancelReq.setVisibility(View.VISIBLE);
+            txtStatus.setVisibility(View.VISIBLE);
+            txtStatus.setText("Đã đến nơi ");
+        }
+
+        if (status.equals(MyInstances.STATUS_ACCEPT)) {
+            btnTracking.setVisibility(View.VISIBLE);
+            btnArrived.setVisibility(View.VISIBLE);
+            txtStatus.setVisibility(View.VISIBLE);
+            btnCancelReq.setVisibility(View.VISIBLE);
+
+            txtStatus.setText("Đã nhận ");
+
+            btnArrived.setOnClickListener(v -> {
+                viewModel.updateStatusRequest(reqId, MyInstances.STATUS_ARRIVED)
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(responseDTO -> {
+                            btnArrived.setVisibility(View.GONE);
+                            btnFinish.setVisibility(View.VISIBLE);
+                            txtStatus.setText("Đã đến nơi ");
+                        });
+            });
+
             btnCancelReq.setOnClickListener(v -> {
                 LayoutInflater factory = LayoutInflater.from(getActivity());
                 final View editDialogView = factory.inflate(R.layout.activity_cancel_reason, null);
                 final AlertDialog editDialog = new AlertDialog.Builder(getActivity()).create();
                 editDialog.setView(editDialogView);
                 MaterialSpinner spinner = editDialogView.findViewById(R.id.confirm_spinner);
+                EditText txtReasonDetail = editDialogView.findViewById(R.id.txtReasonDetail);
 
                 ConfirmViewModel confirmViewModel = ViewModelProviders.of(getActivity(), viewModelFactory).get(ConfirmViewModel.class);
                 confirmViewModel.getAllConfig()
@@ -440,7 +508,6 @@ public class ShopHomeFragment extends BaseFragment {
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(listConfig -> {
                             if (listConfig != null) {
-
                                 ArrayAdapter listAdapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_dropdown_item);
                                 for (int i = 0; i < listConfig.size(); i++) {
                                     if (listConfig.get(i).getName().equals("shop cancel reason"))
@@ -452,9 +519,18 @@ public class ShopHomeFragment extends BaseFragment {
                             Log.e(TAG, "getAllConfig: " + throwable.getMessage());
                         });
 
+                spinner.setOnItemSelectedListener((view, position, id, item) -> {
+                    if (spinner.getText().toString().equals("Lý do khác")) {
+                        txtReasonDetail.setVisibility(View.VISIBLE);
+                    }
+                });
+
                 editDialogView.findViewById(R.id.btn_confirm).setOnClickListener(confirmView -> {
                     editDialog.dismiss();
                     String reason = spinner.getText().toString();
+                    if (reason.equals("Lý do khác")) {
+                        reason = txtReasonDetail.getText().toString();
+                    }
                     viewModel.cancleRequest(reqId, false, reason)
                             .subscribeOn(Schedulers.io())
                             .observeOn(AndroidSchedulers.mainThread())
@@ -464,16 +540,12 @@ public class ShopHomeFragment extends BaseFragment {
                                     notiDialog.setTitleText("Thông báo");
                                     notiDialog.setContentText("Huỷ thành công");
                                     notiDialog.setConfirmText("OK");
-                                    notiDialog.setConfirmClickListener(Dialog::dismiss);
+                                    notiDialog.setConfirmClickListener(sweetAlertDialog -> {
+                                        sweetAlertDialog.dismiss();
+                                        SharedPreferenceHelper.setSharedPreferenceString(getActivity(), MyInstances.KEY_BIKER_REQUEST, "");
+                                        txtNoReq.setVisibility(View.VISIBLE);
+                                    });
                                     notiDialog.show();
-                                    txtStatus.setVisibility(View.VISIBLE);
-                                    txtStatus.setText("Đã hủy");
-                                    txtStatus.setTextColor(Color.RED);
-                                    btnCancelReq.setVisibility(View.GONE);
-                                    txtNoReq.setVisibility(View.VISIBLE);
-                                    txtReqCancelReason.setVisibility(View.VISIBLE);
-                                    txtReqCancelReason.setText(" Lý do hủy: " + reason);
-                                    SharedPreferenceHelper.setSharedPreferenceString(getActivity(), MyInstances.KEY_BIKER_REQUEST, "");
                                 }
                             }, throwable -> {
                                 Log.e(TAG, "cancleRequest: " + throwable.getMessage());
@@ -484,24 +556,28 @@ public class ShopHomeFragment extends BaseFragment {
             });
         }
 
-        if (status.equals(MyInstances.STATUS_REJECTED)) {
-            txtStatus.setVisibility(View.VISIBLE);
-            txtStatus.setText("Đã từ chối ");
-            txtStatus.setTextColor(Color.RED);
-            statusCreated.setVisibility(View.GONE);
-            btnFinish.setVisibility(View.GONE);
-            SharedPreferenceHelper.setSharedPreferenceString(getActivity(), MyInstances.KEY_SHOP_REQUEST, "");
-        }
-
-        if (status.equals(MyInstances.STATUS_CANCELED)) {
+        if (status.equals(MyInstances.STATUS_CANCELED) || status.equals(MyInstances.STATUS_REJECTED) || status.equals(MyInstances.STATUS_FINISHED)) {
             txtNoReq.setVisibility(View.VISIBLE);
             SharedPreferenceHelper.setSharedPreferenceString(getActivity(), MyInstances.KEY_SHOP_REQUEST, "");
         }
+    }
 
-        if (status.equals(MyInstances.STATUS_FINISHED)) {
-            txtNoReq.setVisibility(View.VISIBLE);
-            SharedPreferenceHelper.setSharedPreferenceString(getActivity(), MyInstances.KEY_SHOP_REQUEST, "");
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if (countDownTimer != null) {
+            countDownTimer.cancel();
         }
+    }
+
+    private void allButtonGone() {
+        btnCancelReq.setVisibility(View.GONE);
+        btnReqImg.setVisibility(View.GONE);
+        statusCreated.setVisibility(View.GONE);
+        btnFinish.setVisibility(View.GONE);
+        btnArrived.setVisibility(View.GONE);
+        btnTracking.setVisibility(View.GONE);
+        txtReqCancelReason.setVisibility(View.GONE);
     }
 
 }

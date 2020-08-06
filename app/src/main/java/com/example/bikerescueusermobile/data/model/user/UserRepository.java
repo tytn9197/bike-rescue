@@ -4,6 +4,9 @@ package com.example.bikerescueusermobile.data.model.user;
 
 import com.example.bikerescueusermobile.data.model.login.LoginData;
 import com.example.bikerescueusermobile.data.model.login.UpdateDevice;
+import com.example.bikerescueusermobile.data.model.shop.StatusSuccessDTO;
+
+import java.util.List;
 
 import javax.inject.Inject;
 
@@ -37,5 +40,9 @@ public class UserRepository {
 
     public Single<UserLatLong> getUserLatLongByReqId(int userId, boolean isBikerTracking){
         return userService.getUserLatLongByReqId(userId, isBikerTracking, CurrentUser.getInstance().getAccessToken());
+    }
+
+    public Single<List<StatusSuccessDTO>> getSuccessReq(int id){
+        return userService.getSuccessReq(id, CurrentUser.getInstance().getAccessToken());
     }
 }

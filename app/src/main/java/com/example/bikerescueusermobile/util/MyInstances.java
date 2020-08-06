@@ -15,6 +15,7 @@ public class MyInstances {
     public static final String STATUS_ACCEPT = "ACCEPT";
     public static final String STATUS_REJECTED = "REJECTED";
     public static final String STATUS_FINISHED = "FINISHED";
+    public static final String STATUS_ARRIVED = "ARRIVED";
 
     // role name
     public static final String ROLE_ADMIN = "ROLE_ADMIN";
@@ -34,6 +35,8 @@ public class MyInstances {
     public static final String NOTI_FINISH = "NOTI_FINISH";
     public static final String TITTLE_SHOP = "TITTLE_SHOP";
     public static final String TITTLE_BIKER = "TITTLE_BIKER";
+    public static final String NOTI_AUTO_REJECTED = "NOTI_AUTO_REJECTED";
+    public static final String NOTI_ARRIVED = "NOTI_ARRIVED";
 
 //    //for biker's request detail
 //    public static final String SENT_FROM_HISTORY = "SENT_FROM_HISTORY";

@@ -128,18 +128,6 @@
         android:text="10/104 A Hẻm 10 Xa Lộ Hà Nội, P. Hiệp Phú, Quận 9"
         android:textColor="@color/black" />
 
-    <Button
-        android:id="@+id/btnReqDetailTracking"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="5dp"
-        android:padding="10dp"
-        android:background="@drawable/border"
-        android:text="Xem bản đồ"
-        android:textAllCaps="false"
-        android:textColor="@color/black"
-        android:visibility="gone"/>
-
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
@@ -201,7 +189,8 @@
         android:layout_margin="5dp"
         android:text="Lý do hủy:"
         android:textColor="@color/black"
-        android:textSize="17sp" />
+        android:textSize="17sp"
+        android:visibility="gone"/>
     <!--    <TextView-->
     <!--        android:layout_width="match_parent"-->
     <!--        android:layout_height="wrap_content"-->
@@ -210,6 +199,40 @@
     <!--        android:paddingBottom="5dp"-->
     <!--        android:text="Thanh toán tiền mặt"-->
     <!--        android:textColor="@color/light_red" />-->
+
+    <Button
+        android:id="@+id/btnReqDetailTracking"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginBottom="10dp"
+        android:padding="10dp"
+        android:background="@drawable/border"
+        android:text="Xem bản đồ"
+        android:textSize="17dp"
+        android:textAllCaps="false"
+        android:textColor="@color/black"
+        android:visibility="gone"/>
+
+    <Button
+        android:id="@+id/btnReqDetailCallShop"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginBottom="10dp"
+        android:background="@drawable/border"
+        android:gravity="center"
+        android:padding="10dp"
+        android:text="Gọi điện thoại cho shop"
+        android:textAllCaps="false"
+        android:textColor="@color/black"
+        android:textSize="17dp"
+        android:visibility="gone"
+        />
 
     <Button
         android:id="@+id/btnReqDetailCancel"

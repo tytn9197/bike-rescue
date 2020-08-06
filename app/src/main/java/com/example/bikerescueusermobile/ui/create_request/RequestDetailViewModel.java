@@ -27,8 +27,8 @@ public class RequestDetailViewModel extends ViewModel {
         return requestRepository.cancleRequest(reqID, isSendToShop, reason);
     }
 
-    public Single<Response<RequestDTO>> updateStatusRequest(int reqId, boolean isAccept) {
-        return requestRepository.updateStatusRequest(reqId, isAccept);
+    public Single<Response<RequestDTO>> updateStatusRequest(int reqId, String status) {
+        return requestRepository.updateStatusRequest(reqId, status);
     }
 
     public Single<Boolean> finishedRequest(int reqId){

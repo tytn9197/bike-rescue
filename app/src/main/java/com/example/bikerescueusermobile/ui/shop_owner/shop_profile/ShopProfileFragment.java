@@ -2,6 +2,7 @@ package com.example.bikerescueusermobile.ui.shop_owner.shop_profile;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RatingBar;
@@ -9,6 +10,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.lifecycle.ViewModelProviders;
 
 import com.example.bikerescueusermobile.R;
 import com.example.bikerescueusermobile.base.BaseFragment;
@@ -16,13 +18,21 @@ import com.example.bikerescueusermobile.data.model.user.CurrentUser;
 import com.example.bikerescueusermobile.ui.login.LoginActivity;
 import com.example.bikerescueusermobile.ui.main.MainActivity;
 import com.example.bikerescueusermobile.ui.shop_owner.ShopUpdateInfoActivity;
+import com.example.bikerescueusermobile.ui.shop_owner.ShopUpdateViewModel;
 import com.example.bikerescueusermobile.ui.shop_owner.services.ManageServicesActivity;
 import com.example.bikerescueusermobile.util.MyInstances;
 import com.example.bikerescueusermobile.util.SharedPreferenceHelper;
+import com.example.bikerescueusermobile.util.ViewModelFactory;
+import com.github.dhaval2404.imagepicker.ImagePicker;
 import com.squareup.picasso.Picasso;
 import com.willy.ratingbar.ScaleRatingBar;
 
+import javax.inject.Inject;
+
 import butterknife.BindView;
+import cn.pedant.SweetAlert.SweetAlertDialog;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 
 public class ShopProfileFragment extends BaseFragment {
 
@@ -57,6 +67,11 @@ public class ShopProfileFragment extends BaseFragment {
 
     @BindView(R.id.phone_number)
     TextView txtPhoneNumber;
+
+    @Inject
+    ViewModelFactory viewModelFactory;
+
+    private ShopUpdateViewModel viewModel;
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
@@ -99,6 +114,20 @@ public class ShopProfileFragment extends BaseFragment {
                 startActivity(intent);
             }
         });
+
+        //setup viewmodel
+        viewModel = ViewModelProviders.of(this, viewModelFactory).get(ShopUpdateViewModel.class);
+
+        viewModel.getSuccessReq(CurrentUser.getInstance().getId())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(listReq -> {
+                    if(listReq != null && listReq.size() > 0){
+                        booking.setText("" + listReq.size());
+                    }else{
+                        booking.setText("0");
+                    }
+                });
     }
 
 }

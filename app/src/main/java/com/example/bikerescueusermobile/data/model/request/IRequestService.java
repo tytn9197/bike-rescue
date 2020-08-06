@@ -29,7 +29,7 @@ public interface IRequestService {
 
     @GET("/shop/updateStatusRequest")
     Single<Response<RequestDTO>> updateStatusRequest(@Query("idRequest") int reqId,
-                                                     @Query("accepted") boolean isAccept,
+                                                     @Query("status") String status,
                                                      @Header("Authorization") String token);
 
     @GET("/shop/finishedRequest")

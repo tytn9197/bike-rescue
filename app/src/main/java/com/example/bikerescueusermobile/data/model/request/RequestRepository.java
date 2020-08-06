@@ -33,8 +33,8 @@ public class RequestRepository {
         return iRequestService.cancleRequest(reqID, isSendToShop, reason, CurrentUser.getInstance().getAccessToken());
     }
 
-    public Single<Response<RequestDTO>> updateStatusRequest(int reqId, boolean isAccept) {
-        return iRequestService.updateStatusRequest(reqId, isAccept, CurrentUser.getInstance().getAccessToken());
+    public Single<Response<RequestDTO>> updateStatusRequest(int reqId, String status) {
+        return iRequestService.updateStatusRequest(reqId, status, CurrentUser.getInstance().getAccessToken());
     }
 
     public Single<Boolean> finishedRequest(int reqID) {

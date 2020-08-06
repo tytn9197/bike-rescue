@@ -178,11 +178,12 @@ public class TrackingMapActivity extends DaggerAppCompatActivity implements
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        Log.e(TAG, "onCreate");
         viewModel = ViewModelProviders.of(this, viewModelFactory).get(LoginModel.class);
 
         isBikerTracking = getIntent().getBooleanExtra("isBikerTracking", true);
         int reqId = getIntent().getIntExtra("reqId", -1);
+        Log.e(TAG, "isBikerTracking: " + isBikerTracking + ".... req id" + reqId);
 
         mDatabase = FirebaseDatabase.getInstance().getReference(MyInstances.APP);
         mDatabase.addValueEventListener(new ValueEventListener() {
@@ -190,7 +191,7 @@ public class TrackingMapActivity extends DaggerAppCompatActivity implements
             public void onDataChange(DataSnapshot dataSnapshot) {
                 userLatLongList.clear();
                 for (DataSnapshot listUserLatlng : dataSnapshot.getChildren()) {
-                    Log.e(TAG, "value is biker: " + listUserLatlng.getValue().toString() + "---- shop id:" + CurrentUser.getInstance().getChosenShopOwnerId());
+                    Log.e(TAG, "value is biker: " + listUserLatlng.getValue().toString() + "---- getChosenShopOwnerId id:" + CurrentUser.getInstance().getChosenShopOwnerId());
                     userLatLongList.add(listUserLatlng.getValue(UserLatLong.class));
                 }
                 if (userLatLongList.size() > 0) {
@@ -233,36 +234,18 @@ public class TrackingMapActivity extends DaggerAppCompatActivity implements
                 Log.e(TAG, "Failed to read value." + error.toException());
             }
         });
-//        if (isBikerTracking) {
-//            // Read from the database
-//
-//        } else {
-//            // Read from the database
-//            mDatabase
-//                    .addValueEventListener(new ValueEventListener() {
-//                        @Override
-//                        public void onDataChange(DataSnapshot dataSnapshot) {
-//                            for (DataSnapshot listUserLatlng : dataSnapshot.getChildren()) {
-//                                Log.e(TAG, "value: " + listUserLatlng.getValue().toString() + "---- biker id:" + CurrentUser.getInstance().getCurrentBikerId());
-//                                userLatLongList.add(listUserLatlng.getValue(UserLatLong.class));
-//                            }
-//                        }
-//
-//                        @Override
-//                        public void onCancelled(DatabaseError error) {
-//                            // Failed to read value
-//                            Log.e(TAG, "Failed to read value." + error.toException());
-//                        }
-//                    });
-//        }
+
         //set destination
         if (reqId == -1) {
             Log.e(TAG, "onCreate: cannot get reqId");
         } else {
+            Log.e(TAG, "else reqId == -1");
             viewModel.getUserLatLongByReqId(reqId, isBikerTracking)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(uLatlng -> {
+                        Log.e(TAG, "getUserLatLongByReqId");
+
                         destination = new LatLng(Double.parseDouble(uLatlng.getLatitude()), Double.parseDouble(uLatlng.getLongtitude()));
 
                         Mapbox.getInstance(this, getString(R.string.mapbox_access_token));
@@ -276,7 +259,6 @@ public class TrackingMapActivity extends DaggerAppCompatActivity implements
 
                         btnBack.setOnClickListener(v -> {
                             finish();
-                            Log.e(TAG, "list user latlong: " + userLatLongList.toString());
                         });
                     }, throwable -> {
                         Log.e(TAG, "getUserLatLong fail: " + throwable.getMessage());

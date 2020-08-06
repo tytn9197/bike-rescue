@@ -16,7 +16,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 @Module(includes = ViewModelModule.class)
 public class ApplicationModule {
-    private static final String BASE_URL = "https://30fe507240e2.jp.ngrok.io";
+    private static final String BASE_URL = "https://1681f4e5352d.jp.ngrok.io";
 
     @Singleton
     @Provides
