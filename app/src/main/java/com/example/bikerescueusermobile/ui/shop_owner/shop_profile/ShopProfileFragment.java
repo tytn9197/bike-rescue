@@ -77,12 +77,6 @@ public class ShopProfileFragment extends BaseFragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-//        shopProfileRating.setRating(Float.parseFloat(shop.getShopRatingStar()));
-        Float rating = (float) 3.5;
-        //init rating
-        shopProfileRating.setStepSize((float) 0.5);
-        shopProfileRating.setRating(rating);
-
         txtFullName.setText(CurrentUser.getInstance().getFullName());
         txtPhoneNumber.setText("Số điện thoại: " + CurrentUser.getInstance().getPhoneNumber());
 
@@ -127,6 +121,15 @@ public class ShopProfileFragment extends BaseFragment {
                     }else{
                         booking.setText("0");
                     }
+                });
+
+        viewModel.getNumOfStarByShopOwnerId(CurrentUser.getInstance().getId())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(numOfStar -> {
+                    //init rating
+                    shopProfileRating.setStepSize((float) 0.5);
+                    shopProfileRating.setRating(numOfStar.floatValue());
                 });
     }
 

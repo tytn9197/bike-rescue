@@ -34,6 +34,7 @@ import com.example.bikerescueusermobile.base.BaseActivity;
 import com.example.bikerescueusermobile.data.model.request.CurrentRequest;
 import com.example.bikerescueusermobile.data.model.request.MessageRequestFB;
 import com.example.bikerescueusermobile.data.model.request.Request;
+import com.example.bikerescueusermobile.data.model.request.ReviewRequestDTO;
 import com.example.bikerescueusermobile.data.model.user.CurrentUser;
 import com.example.bikerescueusermobile.ui.confirm.ConfirmInfoActivity;
 import com.example.bikerescueusermobile.ui.confirm.ConfirmViewModel;
@@ -47,6 +48,8 @@ import com.example.bikerescueusermobile.util.ViewModelFactory;
 import com.google.gson.Gson;
 import com.jaredrummler.materialspinner.MaterialSpinner;
 import com.squareup.picasso.Picasso;
+import com.willy.ratingbar.ScaleRatingBar;
+
 import javax.inject.Inject;
 
 import butterknife.BindView;
@@ -122,6 +125,7 @@ public class RequestDetailActivity extends BaseActivity {
 
     private RequestDetailViewModel viewModel;
     private SweetAlertDialog notiDialog;
+    private AlertDialog reviewDialog;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -162,13 +166,14 @@ public class RequestDetailActivity extends BaseActivity {
                     }, throwable -> {
                         Log.e(TAG, "getRequestById: " + throwable.getMessage());
                     });
+//            setupReviewView(reqId);
         }
     }
 
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if(context != null) {
+            if (context != null) {
                 String message = intent.getStringExtra("message");
                 Gson gson = new Gson();
                 MessageRequestFB responeReq = gson.fromJson(message, MessageRequestFB.class);
@@ -198,6 +203,10 @@ public class RequestDetailActivity extends BaseActivity {
                     btnComplain.setVisibility(View.VISIBLE);
                     btnReqDetailCancel.setVisibility(View.GONE);
                     SharedPreferenceHelper.setSharedPreferenceString(getApplicationContext(), MyInstances.KEY_BIKER_REQUEST, "");
+
+                    //review reruest
+                    setupReviewView(responeReq.getReqId());
+                    reviewDialog.show();
                 }
 
                 if (responeReq.getMessage().equals(MyInstances.NOTI_CANELED)) {
@@ -220,6 +229,44 @@ public class RequestDetailActivity extends BaseActivity {
             }
         }
     };
+
+    private void setupReviewView(int reqId){
+        //set up review dialog
+        LayoutInflater factory = LayoutInflater.from(this);
+        final View reviewView = factory.inflate(R.layout.dialog_review_request, null);
+        reviewDialog = new AlertDialog.Builder(this).create();
+
+        ScaleRatingBar ratingBar = reviewView.findViewById(R.id.reviewRatingBar);
+        EditText edtComment = reviewView.findViewById(R.id.edtCommentDetail);
+
+        reviewDialog.setView(reviewView);
+        reviewView.findViewById(R.id.btn_confirm).setOnClickListener(confirmView -> {
+            reviewDialog.dismiss();
+
+            String comment = edtComment.getText().toString();
+            double star = ratingBar.getRating();
+
+            ReviewRequestDTO reviewDTO = new ReviewRequestDTO(comment, star);
+            Log.e(TAG, "review: " + reviewDTO.toString());
+
+            viewModel.reviewRequest(reqId, reviewDTO)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(respone -> {
+                        if (respone != null) {
+                            SweetAlertDialog notiDialog = new SweetAlertDialog(this, SweetAlertDialog.SUCCESS_TYPE);
+                            notiDialog.setTitleText("Thông báo");
+                            notiDialog.setContentText("Đánh giá thành công");
+                            notiDialog.setConfirmText("OK");
+                            notiDialog.setConfirmClickListener(Dialog::dismiss);
+                            notiDialog.show();
+                        }
+                    }, throwable -> {
+                        Log.e(TAG, "reviewRequest: " + throwable.getMessage());
+                    });
+        });
+        reviewView.findViewById(R.id.btn_return).setOnClickListener(v1 -> reviewDialog.dismiss());
+    }
 
     @SuppressLint("SetTextI18n")
     private void setDataToView(Request request) {
@@ -244,13 +291,13 @@ public class RequestDetailActivity extends BaseActivity {
                     .into(imgReqDetailShopAvatar);
         }
 
-        if(request.getCancelReason() != null){
-            if(request.getStatus().equals(MyInstances.STATUS_CANCELED) || request.getStatus().equals(MyInstances.STATUS_REJECTED))
-            txtReqDetailCancelReason.setText(" Lý do hủy: " + request.getCancelReason());
+        if (request.getCancelReason() != null) {
+            if (request.getStatus().equals(MyInstances.STATUS_CANCELED) || request.getStatus().equals(MyInstances.STATUS_REJECTED))
+                txtReqDetailCancelReason.setText(" Lý do hủy: " + request.getCancelReason());
             txtReqDetailCancelReason.setVisibility(View.VISIBLE);
         }
 
-        setCancelButtonClick(request.getId(),true);
+        setCancelButtonClick(request.getId(), true);
         btnReqDetailTracking.setOnClickListener(v -> {
 
             //mac dinh la thang biker vao activity nay
@@ -267,7 +314,7 @@ public class RequestDetailActivity extends BaseActivity {
         });
 
         btnReqDetailCallShop.setVisibility(View.VISIBLE);
-        btnReqDetailCallShop.setOnClickListener(v->{
+        btnReqDetailCallShop.setOnClickListener(v -> {
             Intent callIntent = new Intent(Intent.ACTION_DIAL);
             callIntent.setData(Uri.parse("tel:" + Uri.encode(request.getAcceptedUser().getPhoneNumber())));
             callIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -299,7 +346,7 @@ public class RequestDetailActivity extends BaseActivity {
                     .into(imgReqDetailShopAvatar);
         }
         btnComplain.setVisibility(View.GONE);
-        if(request.getCancelReason() != null && request.getStatus().equals(MyInstances.STATUS_CANCELED)){
+        if (request.getCancelReason() != null && request.getStatus().equals(MyInstances.STATUS_CANCELED)) {
             txtReqDetailCancelReason.setText(" Lý do hủy: " + request.getCancelReason());
             txtReqDetailCancelReason.setVisibility(View.VISIBLE);
         }
@@ -314,7 +361,7 @@ public class RequestDetailActivity extends BaseActivity {
     }
 
     @SuppressLint("SetTextI18n")
-    private void setCancelButtonClick(int reqId, boolean isSendToShop){
+    private void setCancelButtonClick(int reqId, boolean isSendToShop) {
         btnReqDetailCancel.setOnClickListener(v -> {
             LayoutInflater factory = LayoutInflater.from(this);
             final View editDialogView = factory.inflate(R.layout.activity_cancel_reason, null);
@@ -342,7 +389,7 @@ public class RequestDetailActivity extends BaseActivity {
 
 
             spinner.setOnItemSelectedListener((view, position, id, item) -> {
-                if(spinner.getText().toString().equals("Lý do khác")){
+                if (spinner.getText().toString().equals("Lý do khác")) {
                     txtReasonDetail.setVisibility(View.VISIBLE);
                 }
             });
@@ -350,7 +397,7 @@ public class RequestDetailActivity extends BaseActivity {
             editDialogView.findViewById(R.id.btn_confirm).setOnClickListener(confirmView -> {
                 editDialog.dismiss();
                 String reason = spinner.getText().toString();
-                if(reason.equals("Lý do khác")){
+                if (reason.equals("Lý do khác")) {
                     reason = txtReasonDetail.getText().toString();
                 }
 

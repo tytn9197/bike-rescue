@@ -44,4 +44,8 @@ public class RequestRepository {
     public Single<List<Request>> getRequestByBikerId(int bikerId) {
         return iRequestService.getRequestByBikerId(bikerId ,CurrentUser.getInstance().getAccessToken());
     }
+
+    public Single<ReviewRequestDTO> reviewRequest(int requestId, ReviewRequestDTO reviewRequestDTO){
+        return iRequestService.reviewRequest(requestId, reviewRequestDTO, CurrentUser.getInstance().getAccessToken());
+    }
 }

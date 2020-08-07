@@ -36,4 +36,9 @@ public class ShopUpdateViewModel extends ViewModel {
     public Single<List<StatusSuccessDTO>> getSuccessReq(int id){
         return userRepository.getSuccessReq(id);
     }
+
+    public Single<Double> getNumOfStarByShopOwnerId(int id){
+        return userRepository.getNumOfStarByShopOwnerId(id);
+    }
+
 }

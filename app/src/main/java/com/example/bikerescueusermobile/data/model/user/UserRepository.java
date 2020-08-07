@@ -45,4 +45,8 @@ public class UserRepository {
     public Single<List<StatusSuccessDTO>> getSuccessReq(int id){
         return userService.getSuccessReq(id, CurrentUser.getInstance().getAccessToken());
     }
+
+    public Single<Double> getNumOfStarByShopOwnerId(int id){
+        return userService.getNumOfStarByShopOwnerId(id, CurrentUser.getInstance().getAccessToken());
+    }
 }

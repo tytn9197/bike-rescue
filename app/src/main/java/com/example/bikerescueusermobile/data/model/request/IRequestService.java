@@ -7,6 +7,7 @@ import retrofit2.http.Body;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.POST;
+import retrofit2.http.PUT;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
 
@@ -36,5 +37,10 @@ public interface IRequestService {
     Single<Boolean> finishedRequest(@Query("id") int reqID, @Header("Authorization") String token);
 
     @GET("/biker/getRequestByBikerId/{bikerId}")
-    Single<List<Request>> getRequestByBikerId(@Path("bikerId") int bikerId,@Header("Authorization") String token );
+    Single<List<Request>> getRequestByBikerId(@Path("bikerId") int bikerId,@Header("Authorization") String token);
+
+    @PUT("/biker/reviewRequest")
+    Single<ReviewRequestDTO> reviewRequest(@Query("id") int requestId,
+                                           @Body ReviewRequestDTO reviewRequestDTO,
+                                           @Header("Authorization") String token);
 }

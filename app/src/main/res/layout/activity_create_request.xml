@@ -70,6 +70,23 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="298 Linh Trung, Phường Linh Trung, Thủ Đức, Hồ Chí Minh" />
+
+                <Button
+                    android:id="@+id/btnReqDetailCallShop"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginRight="20dp"
+                    android:layout_marginBottom="10dp"
+                    android:background="@drawable/border"
+                    android:gravity="center"
+                    android:padding="10dp"
+                    android:text="Gọi điện thoại cho shop"
+                    android:textAllCaps="false"
+                    android:textColor="@color/black"
+                    android:textSize="17dp"
+                    />
             </LinearLayout>
 
         </LinearLayout>
@@ -215,24 +232,6 @@
         android:textAllCaps="false"
         android:textColor="@color/black"
         android:visibility="gone"/>
-
-    <Button
-        android:id="@+id/btnReqDetailCallShop"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="20dp"
-        android:layout_marginTop="5dp"
-        android:layout_marginRight="20dp"
-        android:layout_marginBottom="10dp"
-        android:background="@drawable/border"
-        android:gravity="center"
-        android:padding="10dp"
-        android:text="Gọi điện thoại cho shop"
-        android:textAllCaps="false"
-        android:textColor="@color/black"
-        android:textSize="17dp"
-        android:visibility="gone"
-        />
 
     <Button
         android:id="@+id/btnReqDetailCancel"

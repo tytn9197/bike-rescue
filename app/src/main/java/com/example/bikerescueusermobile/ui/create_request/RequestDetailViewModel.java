@@ -6,6 +6,7 @@ import com.example.bikerescueusermobile.data.model.request.Request;
 import com.example.bikerescueusermobile.data.model.request.RequestDTO;
 import com.example.bikerescueusermobile.data.model.request.RequestRepository;
 import com.example.bikerescueusermobile.data.model.request.Response;
+import com.example.bikerescueusermobile.data.model.request.ReviewRequestDTO;
 
 import javax.inject.Inject;
 
@@ -33,5 +34,9 @@ public class RequestDetailViewModel extends ViewModel {
 
     public Single<Boolean> finishedRequest(int reqId){
         return requestRepository.finishedRequest(reqId);
+    }
+
+    public Single<ReviewRequestDTO> reviewRequest(int requestId, ReviewRequestDTO reviewRequestDTO){
+        return requestRepository.reviewRequest(requestId, reviewRequestDTO);
     }
 }
