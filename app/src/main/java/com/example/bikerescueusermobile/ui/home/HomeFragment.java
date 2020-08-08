@@ -1,6 +1,7 @@
 package com.example.bikerescueusermobile.ui.home;
 
 import android.Manifest;
+import android.app.Dialog;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
@@ -43,6 +44,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import cn.pedant.SweetAlert.SweetAlertDialog;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import retrofit2.Call;
@@ -105,7 +107,7 @@ public class HomeFragment extends BaseFragment
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(listShop -> {
-                            if (listShop != null) {
+                            if (listShop != null && listShop.size() > 0) {
                                 for (int i = 0; i < listShop.size(); i++) {
                                     googleMap.addMarker(new MarkerOptions()
                                             .position(new LatLng(Double.parseDouble(listShop.get(i).getLatitude()), Double.parseDouble(listShop.get(i).getLongtitude())))
@@ -148,8 +150,8 @@ public class HomeFragment extends BaseFragment
                                                         Log.e(TAG, "getDistance & Duration - response.body().routes().size() < 1: No routes found");
                                                         return;
                                                     }
-                                                    listShop.get(j).setDistanceFromUser(response.body().routes().get(0).distance()/1000);
-                                                    listShop.get(j).setDurationToBiker(response.body().routes().get(0).duration()/60);
+                                                    listShop.get(j).setDistanceFromUser(response.body().routes().get(0).distance() / 1000);
+                                                    listShop.get(j).setDurationToBiker(response.body().routes().get(0).duration() / 60);
                                                     shops.add(listShop.get(j));
                                                 }
 
@@ -161,6 +163,16 @@ public class HomeFragment extends BaseFragment
                                         }
                                     });
                                 }
+                            } else {
+                                SweetAlertDialog notiDialog = new SweetAlertDialog(getActivity(), SweetAlertDialog.ERROR_TYPE);
+                                notiDialog.setTitleText("Thông báo");
+                                notiDialog.setContentText("Các shop có dịch vụ này hiện đang bận");
+                                notiDialog.setConfirmText("OK");
+                                notiDialog.setConfirmClickListener(sweetAlertDialog -> {
+                                    sweetAlertDialog.dismiss();
+                                    getActivity().finish();
+                                });
+                                notiDialog.show();
                             }
                         }, throwable -> {
                             Log.e(TAG, "getShopByServiceName: " + throwable.getMessage());

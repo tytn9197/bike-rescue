@@ -16,6 +16,7 @@ import android.widget.Button;
 import androidx.annotation.LayoutRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
@@ -65,6 +66,8 @@ import com.mapbox.mapboxsdk.style.layers.PropertyFactory;
 import com.mapbox.mapboxsdk.style.layers.SymbolLayer;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
 import com.mapbox.mapboxsdk.style.sources.Source;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -184,86 +187,85 @@ public class TrackingMapActivity extends DaggerAppCompatActivity implements
         isBikerTracking = getIntent().getBooleanExtra("isBikerTracking", true);
         int reqId = getIntent().getIntExtra("reqId", -1);
         Log.e(TAG, "isBikerTracking: " + isBikerTracking + ".... req id" + reqId);
-
-        mDatabase = FirebaseDatabase.getInstance().getReference(MyInstances.APP);
-        mDatabase.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                userLatLongList.clear();
-                for (DataSnapshot listUserLatlng : dataSnapshot.getChildren()) {
-                    Log.e(TAG, "value is biker: " + listUserLatlng.getValue().toString() + "---- getChosenShopOwnerId id:" + CurrentUser.getInstance().getChosenShopOwnerId());
-                    userLatLongList.add(listUserLatlng.getValue(UserLatLong.class));
-                }
-                if (userLatLongList.size() > 0) {
-                    if (isBikerTracking) {
-                        Log.e(TAG, "list size: " + userLatLongList.size());
-                        int pos = -1;
-                        for (int i = 0; i < userLatLongList.size(); i++) {
-                            if (userLatLongList.get(i).getId() == CurrentUser.getInstance().getChosenShopOwnerId())
-                                pos = i;
-                        }
-                        if (pos > -1) {
-                            Log.e(TAG, "pos: " + pos);
-                            UserLatLong newUser = userLatLongList.get(pos);
-                            Log.e(TAG, "onChildChanged: " + newUser.toString());
-                            destination = new LatLng(Double.parseDouble(newUser.getLatitude()), Double.parseDouble(newUser.getLongtitude()));
-                            updateRoute();
-                        }
-                    } else {
-                        Log.e(TAG, "list size: " + userLatLongList.size());
-                        int pos = -1;
-                        for (int i = 0; i < userLatLongList.size(); i++) {
-                            if (userLatLongList.get(i).getId() == CurrentUser.getInstance().getCurrentBikerId())
-                                pos = i;
-                        }
-                        if (pos > -1) {
-                            Log.e(TAG, "pos: " + pos);
-                            UserLatLong newUser = userLatLongList.get(pos);
-                            Log.e(TAG, "onChildChanged: " + newUser.toString());
-                            destination = new LatLng(Double.parseDouble(newUser.getLatitude()), Double.parseDouble(newUser.getLongtitude()));
-                            updateRoute();
-                        }
-                    }
-
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError error) {
-                // Failed to read value
-                Log.e(TAG, "Failed to read value." + error.toException());
-            }
-        });
+        destination = new LatLng(Double.parseDouble(CurrentUser.getInstance().getLatitude()), Double.parseDouble(CurrentUser.getInstance().getLongtitude()));
 
         //set destination
         if (reqId == -1) {
             Log.e(TAG, "onCreate: cannot get reqId");
         } else {
-            Log.e(TAG, "else reqId == -1");
-            viewModel.getUserLatLongByReqId(reqId, isBikerTracking)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(uLatlng -> {
-                        Log.e(TAG, "getUserLatLongByReqId");
+//            viewModel.getUserLatLongByReqId(reqId, isBikerTracking)
+//                    .subscribeOn(Schedulers.io())
+//                    .observeOn(AndroidSchedulers.mainThread())
+//                    .subscribe(uLatlng -> {
+//
+//                    }, throwable -> {
+//                        Log.e(TAG, "getUserLatLong fail: " + throwable.getMessage());
+//                    });
+            Mapbox.getInstance(TrackingMapActivity.this, getString(R.string.mapbox_access_token));
+            setContentView(layoutRes());
+            ButterKnife.bind(TrackingMapActivity.this);
 
-                        destination = new LatLng(Double.parseDouble(uLatlng.getLatitude()), Double.parseDouble(uLatlng.getLongtitude()));
+            mapView = findViewById(R.id.trackingMap);
+            mapView.onCreate(savedInstanceState);
+            mapView.getMapAsync(TrackingMapActivity.this);
+            mFusedLocationClient = LocationServices.getFusedLocationProviderClient(TrackingMapActivity.this);
 
-                        Mapbox.getInstance(this, getString(R.string.mapbox_access_token));
-                        setContentView(layoutRes());
-                        ButterKnife.bind(this);
+            btnBack.setOnClickListener(v -> {
+                finish();
+            });
 
-                        mapView = findViewById(R.id.trackingMap);
-                        mapView.onCreate(savedInstanceState);
-                        mapView.getMapAsync(this);
-                        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+            mDatabase = FirebaseDatabase.getInstance().getReference(MyInstances.APP);
+            mDatabase.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NotNull DataSnapshot dataSnapshot) {
+                    if (getLifecycle().getCurrentState().isAtLeast(Lifecycle.State.STARTED)) {
+                        userLatLongList.clear();
+                        for (DataSnapshot listUserLatlng : dataSnapshot.getChildren()) {
+                            Log.e(TAG, "value is biker: " + listUserLatlng.getValue().toString() + "---- getChosenShopOwnerId id:" + CurrentUser.getInstance().getChosenShopOwnerId());
+                            userLatLongList.add(listUserLatlng.getValue(UserLatLong.class));
+                        }
+                        if (userLatLongList.size() > 0) {
+                            if (isBikerTracking) {
+                                Log.e(TAG, "list size: " + userLatLongList.size());
+                                int pos = -1;
+                                for (int i = 0; i < userLatLongList.size(); i++) {
+                                    if (userLatLongList.get(i).getId() == CurrentUser.getInstance().getChosenShopOwnerId())
+                                        pos = i;
+                                }
+                                if (pos > -1) {
+                                    Log.e(TAG, "pos: " + pos);
+                                    UserLatLong newUser = userLatLongList.get(pos);
+                                    Log.e(TAG, "onChildChanged: " + newUser.toString());
+                                    destination = new LatLng(Double.parseDouble(newUser.getLatitude()), Double.parseDouble(newUser.getLongtitude()));
+                                    updateRoute();
+                                }
+                            } else {
+                                Log.e(TAG, "list size: " + userLatLongList.size());
+                                int pos = -1;
+                                for (int i = 0; i < userLatLongList.size(); i++) {
+                                    if (userLatLongList.get(i).getId() == CurrentUser.getInstance().getCurrentBikerId())
+                                        pos = i;
+                                }
+                                if (pos > -1) {
+                                    Log.e(TAG, "pos: " + pos);
+                                    UserLatLong newUser = userLatLongList.get(pos);
+                                    Log.e(TAG, "onChildChanged: " + newUser.toString());
+                                    destination = new LatLng(Double.parseDouble(newUser.getLatitude()), Double.parseDouble(newUser.getLongtitude()));
+                                    updateRoute();
+                                }
+                            }
 
-                        btnBack.setOnClickListener(v -> {
-                            finish();
-                        });
-                    }, throwable -> {
-                        Log.e(TAG, "getUserLatLong fail: " + throwable.getMessage());
-                    });
-        }
+                        }
+                    }//end if (getLifecycle().getCurrentState().isAtLeast(Lifecycle.State.STARTED))
+                }//end data change
+
+                @Override
+                public void onCancelled(@NotNull DatabaseError error) {
+                    // Failed to read value
+                    Log.e(TAG, "Failed to read value." + error.toException());
+                }
+            });
+        }//end if (reqId == -1)
     }
 
     @Override

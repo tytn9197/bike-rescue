@@ -129,6 +129,10 @@ public class HistoryRecyclerViewAdapter extends RecyclerView.Adapter<HistoryRecy
                 txtFeedStatusParams.setMarginEnd(0);
             }
 
+            if (request.getStatus().equals(MyInstances.STATUS_ARRIVED)) {
+                txtFeedStatus.setText("Thợ đã đến");
+                txtFeedStatusParams.setMarginEnd(20);
+            }
             txtFeedStatus.setLayoutParams(txtFeedStatusParams);
             feedWrapper.setOnClickListener(v -> listener.onDetailSelected(request));
         }

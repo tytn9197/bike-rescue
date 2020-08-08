@@ -82,7 +82,7 @@
                     android:background="@drawable/border"
                     android:gravity="center"
                     android:padding="10dp"
-                    android:text="Gọi điện thoại cho shop"
+                    android:text="Gọi cho cửa hàng"
                     android:textAllCaps="false"
                     android:textColor="@color/black"
                     android:textSize="17dp"

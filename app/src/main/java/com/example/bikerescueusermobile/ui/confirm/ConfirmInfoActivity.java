@@ -2,6 +2,7 @@ package com.example.bikerescueusermobile.ui.confirm;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -361,14 +362,23 @@ public class ConfirmInfoActivity extends BaseActivity {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(response -> {
                     if (response != null) {
-                        Intent intentReqDetail = new Intent(getApplicationContext(), RequestDetailActivity.class);
-                        intentReqDetail.putExtra("reqId", response.getData().getId().intValue());
+                        if(response.isStatus()) {
+                            Intent intentReqDetail = new Intent(getApplicationContext(), RequestDetailActivity.class);
+                            intentReqDetail.putExtra("reqId", response.getData().getId().intValue());
 
-                        String sharedPreferenceStr = gson.toJson(response.getData());
-                        SharedPreferenceHelper.setSharedPreferenceString(getApplicationContext(), MyInstances.KEY_BIKER_REQUEST, sharedPreferenceStr);
+                            String sharedPreferenceStr = gson.toJson(response.getData());
+                            SharedPreferenceHelper.setSharedPreferenceString(getApplicationContext(), MyInstances.KEY_BIKER_REQUEST, sharedPreferenceStr);
 
-                        startActivity(intentReqDetail);
-                        finish();
+                            startActivity(intentReqDetail);
+                            finish();
+                        }else{
+                            SweetAlertDialog notiDialog = new SweetAlertDialog(this, SweetAlertDialog.ERROR_TYPE);
+                            notiDialog.setTitleText("Thông báo");
+                            notiDialog.setContentText("Shop này hiện đang bận");
+                            notiDialog.setConfirmText("OK");
+                            notiDialog.setConfirmClickListener(Dialog::dismiss);
+                            notiDialog.show();
+                        }
                     }
                 }, throwable -> {
                     Log.e(TAG, "createRequest: " + throwable.getMessage());

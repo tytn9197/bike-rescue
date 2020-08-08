@@ -26,6 +26,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
+import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
@@ -166,14 +167,13 @@ public class RequestDetailActivity extends BaseActivity {
                     }, throwable -> {
                         Log.e(TAG, "getRequestById: " + throwable.getMessage());
                     });
-//            setupReviewView(reqId);
         }
     }
 
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if (context != null) {
+            if (context != null && getLifecycle().getCurrentState().isAtLeast(Lifecycle.State.STARTED)) {
                 String message = intent.getStringExtra("message");
                 Gson gson = new Gson();
                 MessageRequestFB responeReq = gson.fromJson(message, MessageRequestFB.class);
@@ -226,6 +226,32 @@ public class RequestDetailActivity extends BaseActivity {
                     btnReqDetailCancel.setVisibility(View.VISIBLE);
                     btnReqDetailTracking.setVisibility(View.VISIBLE);
                 }
+
+//                if(responeReq.getMessage().equals(MyInstances.NOTI_ARRIVED) || responeReq.getMessage().equals(MyInstances.NOTI_ACCEPT)){
+//
+//                    viewModel.getRequestById(responeReq.getReqId())
+//                            .subscribeOn(Schedulers.io())
+//                            .observeOn(AndroidSchedulers.mainThread())
+//                            .subscribe(req -> {
+//                                if (req != null) {
+//                                    btnReqDetailTracking.setOnClickListener(v -> {
+//
+//                                        //mac dinh la thang biker vao activity nay
+//                                        Intent serviceIntent = new Intent(RequestDetailActivity.this, UpdateLocationService.class);
+//                                        CurrentUser.getInstance().setCurrentBikerId(CurrentUser.getInstance().getId());
+//                                        CurrentUser.getInstance().setChosenShopOwnerId(req.getAcceptedUser().getId());
+//                                        startService(serviceIntent);
+//
+//                                        Intent tracking = new Intent(RequestDetailActivity.this, TrackingMapActivity.class);
+//                                        tracking.putExtra("isBikerTracking", true);
+//                                        tracking.putExtra("reqId", req.getId());
+//                                        startActivity(tracking);
+//                                    });
+//                                }
+//                            }, throwable -> {
+//                                Log.e(TAG, "getRequestById: " + throwable.getMessage());
+//                            });
+//                }
             }
         }
     };
@@ -407,6 +433,7 @@ public class RequestDetailActivity extends BaseActivity {
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(isSuccess -> {
                             if (isSuccess) {
+                                btnReqDetailTracking.setVisibility(View.GONE);
                                 notiDialog.show();
                                 btnReqDetailCancel.setVisibility(View.GONE);
                                 txtReqDetailStatus.setText("Đã hủy");
@@ -456,6 +483,12 @@ public class RequestDetailActivity extends BaseActivity {
             txtReqDetailStatus.setText("Yêu cầu đã hoàn thành");
             btnReqDetailCancel.setVisibility(View.GONE);
             btnComplain.setVisibility(View.VISIBLE);
+        }
+
+        if (status.equals(MyInstances.STATUS_ARRIVED)) {
+            txtReqDetailStatus.setText("Đã đến");
+            btnReqDetailCancel.setVisibility(View.VISIBLE);
+            btnReqDetailTracking.setVisibility(View.VISIBLE);
         }
     }
 

@@ -2,14 +2,21 @@ package com.example.bikerescueusermobile.ui.main;
 
 import android.Manifest;
 import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.graphics.Color;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -18,14 +25,21 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.lifecycle.Lifecycle;
+import androidx.lifecycle.ViewModelProviders;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.example.bikerescueusermobile.R;
 import com.example.bikerescueusermobile.base.BaseActivity;
+import com.example.bikerescueusermobile.data.model.request.MessageRequestFB;
+import com.example.bikerescueusermobile.data.model.request.ReviewRequestDTO;
 import com.example.bikerescueusermobile.data.model.user.CurrentUser;
+import com.example.bikerescueusermobile.ui.create_request.RequestDetailViewModel;
 import com.example.bikerescueusermobile.ui.favorite.FavoriteShopFragment;
 import com.example.bikerescueusermobile.ui.history.HistoryFragment;
 import com.example.bikerescueusermobile.ui.home.HomeFragment;
@@ -35,9 +49,11 @@ import com.example.bikerescueusermobile.ui.seach_shop_service.SearchShopServiceF
 import com.example.bikerescueusermobile.util.MyInstances;
 import com.example.bikerescueusermobile.util.MyMethods;
 import com.example.bikerescueusermobile.util.SharedPreferenceHelper;
+import com.example.bikerescueusermobile.util.ViewModelFactory;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
+import com.google.gson.Gson;
 import com.karumi.dexter.Dexter;
 import com.karumi.dexter.MultiplePermissionsReport;
 import com.karumi.dexter.PermissionToken;
@@ -45,11 +61,17 @@ import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
 import com.squareup.picasso.Picasso;
 import com.victor.loading.rotate.RotateLoading;
+import com.willy.ratingbar.ScaleRatingBar;
 
 import java.util.List;
 
+import javax.inject.Inject;
+
 import butterknife.BindView;
+import cn.pedant.SweetAlert.SweetAlertDialog;
 import de.hdodenhof.circleimageview.CircleImageView;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 
 
 public class MainActivity extends BaseActivity {
@@ -82,12 +104,20 @@ public class MainActivity extends BaseActivity {
     private CircleImageView head_avatar;
     private TextView txtHeaderName;
     private FusedLocationProviderClient fusedLocationClient;
+    private AlertDialog reviewDialog;
+
+    @Inject
+    ViewModelFactory viewModelFactory;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         init();
         initGrantAppPermission();
+
+        LocalBroadcastManager.getInstance(this).registerReceiver(
+                mMessageReceiver, new IntentFilter("BikeRescueBiker"));
+
         searchShopServiceFragment = new SearchShopServiceFragment();
         // set header image & name
         View header =navigation.getHeaderView(0);
@@ -238,5 +268,90 @@ public class MainActivity extends BaseActivity {
     private void replaceFragment() {
         FragmentManager manager = getSupportFragmentManager();
         manager.beginTransaction().replace(R.id.frame_container, fragment).commit();
+    }
+
+    private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (context != null && getLifecycle().getCurrentState().isAtLeast(Lifecycle.State.STARTED)) {
+                String message = intent.getStringExtra("message");
+                Gson gson = new Gson();
+                MessageRequestFB responeReq = gson.fromJson(message, MessageRequestFB.class);
+
+                SweetAlertDialog notiDialog = new SweetAlertDialog(MainActivity.this, SweetAlertDialog.NORMAL_TYPE);
+                notiDialog.setTitleText("Thông báo");
+                notiDialog.setConfirmText("OK");
+                notiDialog.setConfirmClickListener(Dialog::dismiss);
+
+                if (responeReq.getMessage().equals(MyInstances.NOTI_ACCEPT)) {
+                    notiDialog.setContentText("Cửa hàng đã nhận yêu cầu của bạn");
+                    notiDialog.show();
+                }
+
+                if (responeReq.getMessage().equals(MyInstances.NOTI_REJECTED)) {
+                    notiDialog.setContentText("Cửa hàng đã từ chối yêu cầu của bạn");
+                    SharedPreferenceHelper.setSharedPreferenceString(getApplicationContext(), MyInstances.KEY_BIKER_REQUEST, "");
+                    notiDialog.show();
+                }
+
+                if (responeReq.getMessage().equals(MyInstances.NOTI_FINISH)) {
+                    SharedPreferenceHelper.setSharedPreferenceString(getApplicationContext(), MyInstances.KEY_BIKER_REQUEST, "");
+
+                    //review reruest
+                    setupReviewView(responeReq.getReqId());
+                    reviewDialog.show();
+                }
+
+                if (responeReq.getMessage().equals(MyInstances.NOTI_CANELED)) {
+                    notiDialog.setContentText("Cửa hàng đã hủy yêu cầu của bạn");
+                    SharedPreferenceHelper.setSharedPreferenceString(getApplicationContext(), MyInstances.KEY_BIKER_REQUEST, "");
+                    notiDialog.show();
+                }
+
+                if (responeReq.getMessage().equals(MyInstances.NOTI_ARRIVED)) {
+                    notiDialog.setContentText("Thợ sửa xe đã đến nơi");
+                    notiDialog.show();
+                }
+
+            }
+        }
+    };
+
+    private void setupReviewView(int reqId){
+        //set up review dialog
+        LayoutInflater factory = LayoutInflater.from(this);
+        final View reviewView = factory.inflate(R.layout.dialog_review_request, null);
+        reviewDialog = new AlertDialog.Builder(this).create();
+
+        ScaleRatingBar ratingBar = reviewView.findViewById(R.id.reviewRatingBar);
+        EditText edtComment = reviewView.findViewById(R.id.edtCommentDetail);
+
+        reviewDialog.setView(reviewView);
+        reviewView.findViewById(R.id.btn_confirm).setOnClickListener(confirmView -> {
+            reviewDialog.dismiss();
+
+            String comment = edtComment.getText().toString();
+            double star = ratingBar.getRating();
+
+            ReviewRequestDTO reviewDTO = new ReviewRequestDTO(comment, star);
+            Log.e(TAG, "review: " + reviewDTO.toString());
+
+            ViewModelProviders.of(this, viewModelFactory).get(RequestDetailViewModel.class).reviewRequest(reqId, reviewDTO)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(respone -> {
+                        if (respone != null) {
+                            SweetAlertDialog notiDialog = new SweetAlertDialog(this, SweetAlertDialog.SUCCESS_TYPE);
+                            notiDialog.setTitleText("Thông báo");
+                            notiDialog.setContentText("Đánh giá thành công");
+                            notiDialog.setConfirmText("OK");
+                            notiDialog.setConfirmClickListener(Dialog::dismiss);
+                            notiDialog.show();
+                        }
+                    }, throwable -> {
+                        Log.e(TAG, "reviewRequest: " + throwable.getMessage());
+                    });
+        });
+        reviewView.findViewById(R.id.btn_return).setOnClickListener(v1 -> reviewDialog.dismiss());
     }
 }

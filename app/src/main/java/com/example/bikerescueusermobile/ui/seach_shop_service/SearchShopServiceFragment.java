@@ -114,7 +114,7 @@ public class SearchShopServiceFragment extends BaseFragment implements TopShopSe
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(listShops -> {
                             viewModel.setLoading(false);
-                            if (listShops != null) {
+                            if (listShops != null && listShops.size() > 0) {
                                 shop = listShops.get(0);
                                 try {
                                     MyMethods.setDistance(listShops);

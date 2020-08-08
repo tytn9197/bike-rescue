@@ -578,6 +578,7 @@ public class ShopHomeFragment extends BaseFragment {
         btnArrived.setVisibility(View.GONE);
         btnTracking.setVisibility(View.GONE);
         txtReqCancelReason.setVisibility(View.GONE);
+        txtStatus.setVisibility(View.GONE);
     }
 
 }
