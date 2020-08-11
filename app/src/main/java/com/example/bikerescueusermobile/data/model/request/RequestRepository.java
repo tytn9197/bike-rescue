@@ -37,8 +37,8 @@ public class RequestRepository {
         return iRequestService.updateStatusRequest(reqId, status, CurrentUser.getInstance().getAccessToken());
     }
 
-    public Single<Boolean> finishedRequest(int reqID) {
-        return iRequestService.finishedRequest(reqID, CurrentUser.getInstance().getAccessToken());
+    public Single<Boolean> finishedRequest(int reqID, double price) {
+        return iRequestService.finishedRequest(reqID, price, CurrentUser.getInstance().getAccessToken());
     }
 
     public Single<List<Request>> getRequestByBikerId(int bikerId) {

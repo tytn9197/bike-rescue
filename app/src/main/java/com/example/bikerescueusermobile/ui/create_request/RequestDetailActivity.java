@@ -216,7 +216,7 @@ public class RequestDetailActivity extends BaseActivity {
                     SharedPreferenceHelper.setSharedPreferenceString(getApplicationContext(), MyInstances.KEY_BIKER_REQUEST, "");
 
                     //review reruest
-                    setupReviewView(responeReq.getReqId());
+                    setupReviewView(responeReq.getReqId(), responeReq.getReqCode(), responeReq.getReqPrice());
                     reviewDialog.show();
                 }
 
@@ -241,7 +241,8 @@ public class RequestDetailActivity extends BaseActivity {
         }
     };
 
-    private void setupReviewView(int reqId){
+    @SuppressLint("DefaultLocale")
+    private void setupReviewView(int reqId, String code, double price){
         //set up review dialog
         LayoutInflater factory = LayoutInflater.from(this);
         final View reviewView = factory.inflate(R.layout.dialog_review_request, null);
@@ -249,6 +250,11 @@ public class RequestDetailActivity extends BaseActivity {
 
         ScaleRatingBar ratingBar = reviewView.findViewById(R.id.reviewRatingBar);
         EditText edtComment = reviewView.findViewById(R.id.edtCommentDetail);
+        TextView txtReqCode = reviewView.findViewById(R.id.txtReviewReqCode);
+        TextView txtPrice = reviewView.findViewById(R.id.txtReviewPrice);
+
+        txtReqCode.setText(code);
+        txtPrice.setText(String.format("Giá: %1.0f k VND", price));
 
         reviewDialog.setView(reviewView);
         reviewView.findViewById(R.id.btn_confirm).setOnClickListener(confirmView -> {

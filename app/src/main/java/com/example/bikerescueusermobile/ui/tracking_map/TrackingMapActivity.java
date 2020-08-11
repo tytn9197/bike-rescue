@@ -206,53 +206,6 @@ public class TrackingMapActivity extends DaggerAppCompatActivity implements
                 finish();
             });
 
-//            //set up button arrive & finish
-//            if(!isBikerTracking){
-//                RequestDetailViewModel reqViewModel = ViewModelProviders.of(this, viewModelFactory).get(RequestDetailViewModel.class);
-//
-//                    if(CurrentRequest.getInstance().getStatus().equals(MyInstances.STATUS_ARRIVED)){
-//                    btnArrived.setVisibility(View.GONE);
-//                    btnFinish.setVisibility(View.VISIBLE);
-//                }
-//
-//                btnArrived.setOnClickListener(view -> {
-//                    reqViewModel.updateStatusRequest(reqId, MyInstances.STATUS_ARRIVED)
-//                            .subscribeOn(Schedulers.io())
-//                            .observeOn(AndroidSchedulers.mainThread())
-//                            .subscribe(responseDTO -> {
-//                                btnArrived.setVisibility(View.GONE);
-//                                btnFinish.setVisibility(View.VISIBLE);
-//                                CurrentRequest.getInstance().setStatus(MyInstances.STATUS_ARRIVED);
-//                            });
-//                });
-//
-//                btnFinish.setOnClickListener(v -> {
-//                    SweetAlertDialog sweetAlertDialog = new SweetAlertDialog(this, SweetAlertDialog.NORMAL_TYPE);
-//                    sweetAlertDialog.setTitleText("Thông báo");
-//                    sweetAlertDialog.setConfirmText("Xác nhận");
-//                    sweetAlertDialog.setCanceledOnTouchOutside(false);
-//                    sweetAlertDialog.setCancelable(false);
-//                    sweetAlertDialog.setContentText("Xác nhận hoàn thành yêu cầu?");
-//                    sweetAlertDialog.setCancelText("Hủy");
-//                    sweetAlertDialog.setCancelClickListener(Dialog::dismiss);
-//                    sweetAlertDialog.setConfirmClickListener(dialog -> {
-//                        dialog.dismiss();
-//
-//                        reqViewModel.finishedRequest(reqId)
-//                                .subscribeOn(Schedulers.io())
-//                                .observeOn(AndroidSchedulers.mainThread())
-//                                .subscribe(isSuccess -> {
-//                                    if (isSuccess) {
-//                                        SharedPreferenceHelper.setSharedPreferenceString(this, MyInstances.KEY_SHOP_REQUEST, "");
-//                                        setResult(Activity.RESULT_OK);
-//                                        finish();
-//                                    }
-//                                });
-//                    });
-//                    sweetAlertDialog.show();
-//                });
-//            }
-
             mDatabase = FirebaseDatabase.getInstance().getReference(MyInstances.APP);
             mDatabase.addValueEventListener(new ValueEventListener() {
                 @Override
