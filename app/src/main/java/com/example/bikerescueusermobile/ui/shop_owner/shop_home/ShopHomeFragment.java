@@ -226,7 +226,7 @@ public class ShopHomeFragment extends BaseFragment {
                                         });
 
                                         //run cown down timer
-                                        countDownTimer = new CountDownTimer(15000, 1000) {
+                                        countDownTimer = new CountDownTimer(60*1000, 1000) {
 
                                             @SuppressLint("DefaultLocale")
                                             @Override
@@ -306,7 +306,9 @@ public class ShopHomeFragment extends BaseFragment {
                             if (req.getAcceptedUser().getId() == CurrentUser.getInstance().getId()) {
                                 txtNoReq.setVisibility(View.GONE);
 
-                                if (req.getStatus().equals(MyInstances.STATUS_ACCEPT) || req.getStatus().equals(MyInstances.STATUS_CREATED)) {
+                                if (req.getStatus().equals(MyInstances.STATUS_ACCEPT)
+                                        || req.getStatus().equals(MyInstances.STATUS_CREATED)
+                                        || req.getStatus().equals(MyInstances.STATUS_ARRIVED)) {
                                     SweetAlertDialog sweetAlertDialog = new SweetAlertDialog(getBaseActivity(), SweetAlertDialog.NORMAL_TYPE);
                                     sweetAlertDialog.setTitleText("Thông báo");
                                     sweetAlertDialog.setConfirmText("Xem thông báo");
@@ -358,6 +360,7 @@ public class ShopHomeFragment extends BaseFragment {
                                                                 .commit();
                                                     });
                                             btnCancelReq.setVisibility(View.VISIBLE);
+                                            btnArrived.setVisibility(View.VISIBLE);
                                         });
                                         sweetAlertDialog.show();
                                     });
@@ -404,16 +407,15 @@ public class ShopHomeFragment extends BaseFragment {
         allButtonGone();
 
         btnTracking.setOnClickListener(v -> {
+            Intent serviceIntent = new Intent(getActivity(), UpdateLocationService.class);
+            CurrentUser.getInstance().setCurrentBikerId(request.getCreatedUser().getId());
+            CurrentUser.getInstance().setChosenShopOwnerId(CurrentUser.getInstance().getId());
+            getActivity().startService(serviceIntent);
+
             Intent intent = new Intent(getActivity(), TrackingMapActivity.class);
             intent.putExtra("isBikerTracking", false);
             intent.putExtra("reqId", request.getId());
             startActivity(intent);
-
-            Intent serviceIntent = new Intent(getActivity(), UpdateLocationService.class);
-            CurrentRequest.getInstance().setRequestCode(request.getRequestCode());
-            CurrentUser.getInstance().setCurrentBikerId(request.getCreatedUser().getId());
-            CurrentUser.getInstance().setChosenShopOwnerId(CurrentUser.getInstance().getId());
-            getActivity().startService(serviceIntent);
         });
 
         btnArrived.setOnClickListener(view -> {
@@ -580,5 +582,4 @@ public class ShopHomeFragment extends BaseFragment {
         txtReqCancelReason.setVisibility(View.GONE);
         txtStatus.setVisibility(View.GONE);
     }
-
 }

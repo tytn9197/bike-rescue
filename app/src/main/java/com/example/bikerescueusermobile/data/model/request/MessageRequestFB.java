@@ -14,4 +14,6 @@ public class MessageRequestFB implements Serializable {
     private String message;
     @SerializedName("reason")
     private String reason;
+    @SerializedName("acceptedId")
+    private int acceptedId;
 }

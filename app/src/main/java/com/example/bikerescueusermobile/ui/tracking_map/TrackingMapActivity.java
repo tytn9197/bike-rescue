@@ -186,21 +186,13 @@ public class TrackingMapActivity extends DaggerAppCompatActivity implements
 
         isBikerTracking = getIntent().getBooleanExtra("isBikerTracking", true);
         int reqId = getIntent().getIntExtra("reqId", -1);
-        Log.e(TAG, "isBikerTracking: " + isBikerTracking + ".... req id" + reqId);
+
         destination = new LatLng(Double.parseDouble(CurrentUser.getInstance().getLatitude()), Double.parseDouble(CurrentUser.getInstance().getLongtitude()));
 
         //set destination
         if (reqId == -1) {
             Log.e(TAG, "onCreate: cannot get reqId");
         } else {
-//            viewModel.getUserLatLongByReqId(reqId, isBikerTracking)
-//                    .subscribeOn(Schedulers.io())
-//                    .observeOn(AndroidSchedulers.mainThread())
-//                    .subscribe(uLatlng -> {
-//
-//                    }, throwable -> {
-//                        Log.e(TAG, "getUserLatLong fail: " + throwable.getMessage());
-//                    });
             Mapbox.getInstance(TrackingMapActivity.this, getString(R.string.mapbox_access_token));
             setContentView(layoutRes());
             ButterKnife.bind(TrackingMapActivity.this);
@@ -213,6 +205,53 @@ public class TrackingMapActivity extends DaggerAppCompatActivity implements
             btnBack.setOnClickListener(v -> {
                 finish();
             });
+
+//            //set up button arrive & finish
+//            if(!isBikerTracking){
+//                RequestDetailViewModel reqViewModel = ViewModelProviders.of(this, viewModelFactory).get(RequestDetailViewModel.class);
+//
+//                    if(CurrentRequest.getInstance().getStatus().equals(MyInstances.STATUS_ARRIVED)){
+//                    btnArrived.setVisibility(View.GONE);
+//                    btnFinish.setVisibility(View.VISIBLE);
+//                }
+//
+//                btnArrived.setOnClickListener(view -> {
+//                    reqViewModel.updateStatusRequest(reqId, MyInstances.STATUS_ARRIVED)
+//                            .subscribeOn(Schedulers.io())
+//                            .observeOn(AndroidSchedulers.mainThread())
+//                            .subscribe(responseDTO -> {
+//                                btnArrived.setVisibility(View.GONE);
+//                                btnFinish.setVisibility(View.VISIBLE);
+//                                CurrentRequest.getInstance().setStatus(MyInstances.STATUS_ARRIVED);
+//                            });
+//                });
+//
+//                btnFinish.setOnClickListener(v -> {
+//                    SweetAlertDialog sweetAlertDialog = new SweetAlertDialog(this, SweetAlertDialog.NORMAL_TYPE);
+//                    sweetAlertDialog.setTitleText("Thông báo");
+//                    sweetAlertDialog.setConfirmText("Xác nhận");
+//                    sweetAlertDialog.setCanceledOnTouchOutside(false);
+//                    sweetAlertDialog.setCancelable(false);
+//                    sweetAlertDialog.setContentText("Xác nhận hoàn thành yêu cầu?");
+//                    sweetAlertDialog.setCancelText("Hủy");
+//                    sweetAlertDialog.setCancelClickListener(Dialog::dismiss);
+//                    sweetAlertDialog.setConfirmClickListener(dialog -> {
+//                        dialog.dismiss();
+//
+//                        reqViewModel.finishedRequest(reqId)
+//                                .subscribeOn(Schedulers.io())
+//                                .observeOn(AndroidSchedulers.mainThread())
+//                                .subscribe(isSuccess -> {
+//                                    if (isSuccess) {
+//                                        SharedPreferenceHelper.setSharedPreferenceString(this, MyInstances.KEY_SHOP_REQUEST, "");
+//                                        setResult(Activity.RESULT_OK);
+//                                        finish();
+//                                    }
+//                                });
+//                    });
+//                    sweetAlertDialog.show();
+//                });
+//            }
 
             mDatabase = FirebaseDatabase.getInstance().getReference(MyInstances.APP);
             mDatabase.addValueEventListener(new ValueEventListener() {
@@ -387,13 +426,15 @@ public class TrackingMapActivity extends DaggerAppCompatActivity implements
      * Add the route and marker sources to the map
      */
     private void initSource(@NonNull Style loadedMapStyle, Point origin, Point destination) {
-        loadedMapStyle.addSource(new GeoJsonSource(ROUTE_SOURCE_ID,
-                FeatureCollection.fromFeatures(new Feature[]{})));
+        if(loadedMapStyle.isFullyLoaded()) {
+            loadedMapStyle.addSource(new GeoJsonSource(ROUTE_SOURCE_ID,
+                    FeatureCollection.fromFeatures(new Feature[]{})));
 
-        GeoJsonSource iconGeoJsonSource = new GeoJsonSource(ICON_SOURCE_ID, FeatureCollection.fromFeatures(new Feature[]{
-                Feature.fromGeometry(Point.fromLngLat(origin.longitude(), origin.latitude())),
-                Feature.fromGeometry(Point.fromLngLat(destination.longitude(), destination.latitude()))}));
-        loadedMapStyle.addSource(iconGeoJsonSource);
+            GeoJsonSource iconGeoJsonSource = new GeoJsonSource(ICON_SOURCE_ID, FeatureCollection.fromFeatures(new Feature[]{
+                    Feature.fromGeometry(Point.fromLngLat(origin.longitude(), origin.latitude())),
+                    Feature.fromGeometry(Point.fromLngLat(destination.longitude(), destination.latitude()))}));
+            loadedMapStyle.addSource(iconGeoJsonSource);
+        }
     }
 
     private void initLayers(@NonNull Style loadedMapStyle) {

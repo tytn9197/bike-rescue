@@ -185,6 +185,17 @@ public class RequestDetailActivity extends BaseActivity {
                     txtReqDetailStatus.setText("Cửa hàng đã nhận");
                     btnReqDetailCancel.setVisibility(View.VISIBLE);
                     btnReqDetailTracking.setVisibility(View.VISIBLE);
+
+                    //start service and go to tracking map
+                    Intent serviceIntent = new Intent(context, UpdateLocationService.class);
+                    CurrentUser.getInstance().setCurrentBikerId(CurrentUser.getInstance().getId());
+                    CurrentUser.getInstance().setChosenShopOwnerId(responeReq.getAcceptedId());
+                    startService(serviceIntent);
+
+                    Intent maptracking = new Intent(context, TrackingMapActivity.class);
+                    maptracking.putExtra("isBikerTracking", true);
+                    maptracking.putExtra("reqId", responeReq.getReqId());
+                    startActivity(maptracking);
                 }
 
                 if (responeReq.getMessage().equals(MyInstances.NOTI_REJECTED)) {
@@ -226,32 +237,6 @@ public class RequestDetailActivity extends BaseActivity {
                     btnReqDetailCancel.setVisibility(View.VISIBLE);
                     btnReqDetailTracking.setVisibility(View.VISIBLE);
                 }
-
-//                if(responeReq.getMessage().equals(MyInstances.NOTI_ARRIVED) || responeReq.getMessage().equals(MyInstances.NOTI_ACCEPT)){
-//
-//                    viewModel.getRequestById(responeReq.getReqId())
-//                            .subscribeOn(Schedulers.io())
-//                            .observeOn(AndroidSchedulers.mainThread())
-//                            .subscribe(req -> {
-//                                if (req != null) {
-//                                    btnReqDetailTracking.setOnClickListener(v -> {
-//
-//                                        //mac dinh la thang biker vao activity nay
-//                                        Intent serviceIntent = new Intent(RequestDetailActivity.this, UpdateLocationService.class);
-//                                        CurrentUser.getInstance().setCurrentBikerId(CurrentUser.getInstance().getId());
-//                                        CurrentUser.getInstance().setChosenShopOwnerId(req.getAcceptedUser().getId());
-//                                        startService(serviceIntent);
-//
-//                                        Intent tracking = new Intent(RequestDetailActivity.this, TrackingMapActivity.class);
-//                                        tracking.putExtra("isBikerTracking", true);
-//                                        tracking.putExtra("reqId", req.getId());
-//                                        startActivity(tracking);
-//                                    });
-//                                }
-//                            }, throwable -> {
-//                                Log.e(TAG, "getRequestById: " + throwable.getMessage());
-//                            });
-//                }
             }
         }
     };
@@ -328,7 +313,6 @@ public class RequestDetailActivity extends BaseActivity {
 
             //mac dinh la thang biker vao activity nay
             Intent serviceIntent = new Intent(this, UpdateLocationService.class);
-            CurrentRequest.getInstance().setRequestCode(request.getRequestCode());
             CurrentUser.getInstance().setCurrentBikerId(CurrentUser.getInstance().getId());
             CurrentUser.getInstance().setChosenShopOwnerId(request.getAcceptedUser().getId());
             startService(serviceIntent);
