@@ -125,6 +125,8 @@ public class LoginActivity extends BaseActivity {
                             CurrentUser.getInstance().setCreatedTime(user.getCreatedTime());
                             CurrentUser.getInstance().setStatus(user.getStatus());
                             CurrentUser.getInstance().setRoleId(user.getRoleId());
+                            CurrentUser.getInstance().setListVehicle(user.getListVehicle());
+                            CurrentUser.getInstance().setRejectTime(user.getRejectTime());
 
                             //login success -> set user latlong
                             final FusedLocationProviderClient mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);

@@ -63,8 +63,8 @@
                 android:layout_height="match_parent"
                 android:layout_marginLeft="5dp"
                 android:layout_marginTop="5dp"
-                android:hint=" Vị trí gọi yêu cầu"
                 android:drawableLeft="@drawable/ic_marker_24"
+                android:hint=" Vị trí gọi yêu cầu"
                 android:paddingBottom="15dp" />
 
             <FrameLayout
@@ -89,17 +89,39 @@
                     android:layout_width="20dp"
                     android:layout_height="20dp"
                     android:layout_gravity="right|end|top"
+                    android:layout_marginTop="3dp"
                     android:layout_marginEnd="5dp"
                     android:layout_marginRight="-5dp"
-                    android:layout_marginTop="3dp"
                     android:background="@drawable/badge_background"
                     android:gravity="center"
                     android:padding="3dp"
-                    android:textColor="@android:color/white"
                     android:text="!"
+                    android:textColor="@android:color/white"
                     android:textSize="13sp"
-                    android:visibility="gone"/>
+                    android:visibility="gone" />
             </FrameLayout>
+
+            <EditText
+                android:id="@+id/edtVanDeKhac"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="5dp"
+                android:layout_marginTop="5dp"
+                android:drawableLeft="@drawable/ic_baseline_help_24"
+                android:hint=" Chi tiết vấn đề"
+                android:paddingBottom="15dp"
+                android:visibility="gone" />
+
+            <EditText
+                android:id="@+id/edtDoXang"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="5dp"
+                android:layout_marginTop="5dp"
+                android:drawableLeft="@drawable/ic_baseline_help_24"
+                android:hint=" Giá tiền đổ xăng (Ví dụ: 20,...)"
+                android:paddingBottom="15dp"
+                android:visibility="gone" />
 
             <View
                 android:layout_width="match_parent"
@@ -207,24 +229,25 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_margin="5dp"
-                android:drawableLeft="@drawable/ic_shop_24"
-                android:hint=" Tên cửa hàng"
-                android:enabled="false"
-                android:focusable="false"
                 android:clickable="false"
                 android:cursorVisible="false"
+                android:drawableLeft="@drawable/ic_shop_24"
+                android:enabled="false"
+                android:focusable="false"
+                android:hint=" Tên cửa hàng"
                 android:paddingBottom="15dp" />
+
             <EditText
                 android:id="@+id/txtConfirmShopAddress"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_margin="5dp"
-                android:drawableLeft="@drawable/ic_shop_address_24"
-                android:hint=" Địa chỉ cửa hàng"
-                android:enabled="false"
-                android:focusable="false"
                 android:clickable="false"
                 android:cursorVisible="false"
+                android:drawableLeft="@drawable/ic_shop_address_24"
+                android:enabled="false"
+                android:focusable="false"
+                android:hint=" Địa chỉ cửa hàng"
                 android:paddingBottom="15dp" />
 
             <View
@@ -299,6 +322,17 @@
                     android:background="@color/white"
                     android:src="@drawable/ic_add" />
             </LinearLayout>
+
+            <TextView
+                android:id="@+id/txtConfirmInfoPrice"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"
+                android:gravity="center"
+                android:text="Gia: 80k vnd"
+                android:textSize="20sp"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/btnBookService"

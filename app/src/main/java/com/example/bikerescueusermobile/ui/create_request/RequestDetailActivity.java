@@ -1,6 +1,7 @@
 package com.example.bikerescueusermobile.ui.create_request;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.BroadcastReceiver;
@@ -195,7 +196,7 @@ public class RequestDetailActivity extends BaseActivity {
                     Intent maptracking = new Intent(context, TrackingMapActivity.class);
                     maptracking.putExtra("isBikerTracking", true);
                     maptracking.putExtra("reqId", responeReq.getReqId());
-                    startActivity(maptracking);
+                    startActivityForResult(maptracking, MyInstances.SHOP_RESULT_CODE);
                 }
 
                 if (responeReq.getMessage().equals(MyInstances.NOTI_REJECTED)) {
@@ -326,7 +327,7 @@ public class RequestDetailActivity extends BaseActivity {
             Intent intent = new Intent(this, TrackingMapActivity.class);
             intent.putExtra("isBikerTracking", true);
             intent.putExtra("reqId", request.getId());
-            startActivity(intent);
+            startActivityForResult(intent, MyInstances.SHOP_RESULT_CODE);
         });
 
         btnReqDetailCallShop.setVisibility(View.VISIBLE);
@@ -487,5 +488,16 @@ public class RequestDetailActivity extends BaseActivity {
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         finish();
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        Log.e(TAG, "onActivityResult: result code = " + resultCode);
+        if(resultCode == Activity.RESULT_OK) {
+            Intent intent = getIntent();
+            finish();
+            startActivity(intent);
+        }
     }
 }

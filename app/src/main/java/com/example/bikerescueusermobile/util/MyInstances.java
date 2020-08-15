@@ -38,6 +38,15 @@ public class MyInstances {
     public static final String NOTI_AUTO_REJECTED = "NOTI_AUTO_REJECTED";
     public static final String NOTI_ARRIVED = "NOTI_ARRIVED";
 
+    //for shop
+    public static final int SHOP_RESULT_CODE = 111;
+
+    // error code
+    public static final int ERROR_DOXANG_PRICE = 2;
+    public static final int ERROR_VANDEKHAC = 3;
+    public static final int ERROR_VEHICLE_TYPE = 1;
+
+
 //    //for biker's request detail
 //    public static final String SENT_FROM_HISTORY = "SENT_FROM_HISTORY";
 //    public static final String SENT_FROM_CONFIRM = "SENT_FROM_CONFIRM";

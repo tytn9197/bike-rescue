@@ -1,5 +1,6 @@
 package com.example.bikerescueusermobile.ui.tracking_map;
 
+import android.app.Activity;
 import android.app.Dialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -26,6 +27,7 @@ import com.example.bikerescueusermobile.data.model.request.CurrentRequest;
 import com.example.bikerescueusermobile.data.model.request.MessageRequestFB;
 import com.example.bikerescueusermobile.data.model.user.CurrentUser;
 import com.example.bikerescueusermobile.data.model.user.UserLatLong;
+import com.example.bikerescueusermobile.ui.create_request.RequestDetailViewModel;
 import com.example.bikerescueusermobile.ui.login.LoginModel;
 import com.example.bikerescueusermobile.ui.login.UpdateLocationService;
 import com.example.bikerescueusermobile.ui.shop_owner.shop_home.ShopHomeFragment;
@@ -123,69 +125,32 @@ public class TrackingMapActivity extends DaggerAppCompatActivity implements
     @Inject
     ViewModelFactory viewModelFactory;
 
+    @BindView(R.id.btnTrackingArrived)
+    Button btnArrived;
+
+    @BindView(R.id.btnTrackingFinish)
+    Button btnFinish;
+
+
     private LoginModel viewModel;
     private boolean isBikerTracking;
     private Style style;
     private DatabaseReference mDatabase;
     private List<UserLatLong> userLatLongList = new ArrayList<>();
-
-    @SuppressWarnings({"MissingPermission"})
-    private void updateRoute() {
-        if (mapboxMap != null) {
-            mapboxMap.setStyle(Style.LIGHT,
-                    style -> {
-                        this.style = style;
-                        initLayers(style);
-                        // Get an instance of the component
-                        LocationComponent locationComponent = mapboxMap.getLocationComponent();
-
-                        // Activate with options
-                        locationComponent.activateLocationComponent(
-                                LocationComponentActivationOptions.builder(this, style).build());
-
-                        // Enable to make component visible
-                        locationComponent.setLocationComponentEnabled(true);
-
-                        // Set the component's camera mode
-                        locationComponent.setCameraMode(CameraMode.TRACKING);
-
-                        // Set the component's render mode
-                        locationComponent.setRenderMode(RenderMode.COMPASS);
-
-                        if (style.isFullyLoaded())
-                            updateRoute(style);
-                        //Add marker
-                        if (isBikerTracking) {
-                            style.addImage("marker-icon-id",
-                                    BitmapFactory.decodeResource(
-                                            this.getResources(), R.drawable.ic_shop_location));
-                        } else {
-                            style.addImage("marker-icon-id",
-                                    BitmapFactory.decodeResource(
-                                            this.getResources(), R.drawable.mapbox_marker_icon_default));
-                        }
-                        if (destination != null) {
-                            GeoJsonSource geoJsonSource = new GeoJsonSource("source-id", Feature.fromGeometry(
-                                    Point.fromLngLat(destination.getLongitude(), destination.getLatitude())));
-                            style.addSource(geoJsonSource);
-                        }
-                        SymbolLayer symbolLayer = new SymbolLayer("layer-id", "source-id");
-                        symbolLayer.withProperties(
-                                PropertyFactory.iconImage("marker-icon-id")
-                        );
-                        style.addLayer(symbolLayer);
-                    });
-        }
-    }
+    private RequestDetailViewModel reqViewModel;
+    private double distance = -1;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.e(TAG, "onCreate");
         viewModel = ViewModelProviders.of(this, viewModelFactory).get(LoginModel.class);
+        reqViewModel = ViewModelProviders.of(this, viewModelFactory).get(RequestDetailViewModel.class);
 
         isBikerTracking = getIntent().getBooleanExtra("isBikerTracking", true);
         int reqId = getIntent().getIntExtra("reqId", -1);
+        String reqStatus = "";
+        reqStatus = getIntent().getStringExtra("reqStatus");
 
         destination = new LatLng(Double.parseDouble(CurrentUser.getInstance().getLatitude()), Double.parseDouble(CurrentUser.getInstance().getLongtitude()));
 
@@ -202,7 +167,18 @@ public class TrackingMapActivity extends DaggerAppCompatActivity implements
             mapView.getMapAsync(TrackingMapActivity.this);
             mFusedLocationClient = LocationServices.getFusedLocationProviderClient(TrackingMapActivity.this);
 
+            if (reqStatus != null)
+                if (reqStatus.equals(MyInstances.STATUS_ARRIVED)) {
+                    btnArrived.setVisibility(View.GONE);
+                }
+
+            if(isBikerTracking){
+                btnArrived.setVisibility(View.GONE);
+            }
+
             btnBack.setOnClickListener(v -> {
+                Intent i = new Intent();
+                setResult(Activity.RESULT_OK, i);
                 finish();
             });
 
@@ -231,7 +207,7 @@ public class TrackingMapActivity extends DaggerAppCompatActivity implements
                                     destination = new LatLng(Double.parseDouble(newUser.getLatitude()), Double.parseDouble(newUser.getLongtitude()));
                                     updateRoute();
                                 }
-                            } else {
+                            } else { // for shop owner
                                 Log.e(TAG, "list size: " + userLatLongList.size());
                                 int pos = -1;
                                 for (int i = 0; i < userLatLongList.size(); i++) {
@@ -244,6 +220,53 @@ public class TrackingMapActivity extends DaggerAppCompatActivity implements
                                     Log.e(TAG, "onChildChanged: " + newUser.toString());
                                     destination = new LatLng(Double.parseDouble(newUser.getLatitude()), Double.parseDouble(newUser.getLongtitude()));
                                     updateRoute();
+
+                                    //set up btn arrive
+                                    btnArrived.setOnClickListener(view -> {
+                                        Log.e(TAG, "distance: " + distance);
+                                        if (distance > 0 && distance < 0.5) {
+                                            reqViewModel.updateStatusRequest(reqId, MyInstances.STATUS_ARRIVED)
+                                                    .subscribeOn(Schedulers.io())
+                                                    .observeOn(AndroidSchedulers.mainThread())
+                                                    .subscribe(responseDTO -> {
+                                                        Intent i = new Intent();
+                                                        setResult(Activity.RESULT_OK, i);
+                                                        finish();
+                                                    });
+                                        } else {
+                                            SweetAlertDialog errorDialog = new SweetAlertDialog(TrackingMapActivity.this, SweetAlertDialog.ERROR_TYPE);
+                                            errorDialog.setTitleText("Thông báo");
+                                            errorDialog.setConfirmText("OK");
+                                            errorDialog.setContentText("Vị trí của bạn và khách quá xa nhau");
+                                            errorDialog.setConfirmClickListener(Dialog::dismiss);
+                                            errorDialog.show();
+                                        }
+                                    });
+
+//                                    //set up finish button
+//                                    btnFinish.setOnClickListener(v -> {
+//                                        SweetAlertDialog sweetAlertDialog = new SweetAlertDialog(TrackingMapActivity.this, SweetAlertDialog.NORMAL_TYPE);
+//                                        sweetAlertDialog.setTitleText("Thông báo");
+//                                        sweetAlertDialog.setConfirmText("Xác nhận");
+//                                        sweetAlertDialog.setCanceledOnTouchOutside(false);
+//                                        sweetAlertDialog.setCancelable(false);
+//                                        sweetAlertDialog.setContentText("Xác nhận hoàn thành yêu cầu?");
+//                                        sweetAlertDialog.setCancelText("Hủy");
+//                                        sweetAlertDialog.setCancelClickListener(Dialog::dismiss);
+//                                        sweetAlertDialog.setConfirmClickListener(dialog -> {
+//                                            dialog.dismiss();
+//
+//                                            reqViewModel.finishedRequest(reqId)
+//                                                    .subscribeOn(Schedulers.io())
+//                                                    .observeOn(AndroidSchedulers.mainThread())
+//                                                    .subscribe(isSuccess -> {
+//                                                        if (isSuccess) {
+//                                                            SharedPreferenceHelper.setSharedPreferenceString(TrackingMapActivity.this, MyInstances.KEY_SHOP_REQUEST, "");
+//                                                        }
+//                                                    });
+//                                        });
+//                                        sweetAlertDialog.show();
+//                                    });
                                 }
                             }
 
@@ -322,6 +345,55 @@ public class TrackingMapActivity extends DaggerAppCompatActivity implements
     }
 
     @SuppressWarnings({"MissingPermission"})
+    private void updateRoute() {
+        if (mapboxMap != null) {
+            mapboxMap.setStyle(Style.LIGHT,
+                    style -> {
+                        this.style = style;
+                        initLayers(style);
+                        // Get an instance of the component
+                        LocationComponent locationComponent = mapboxMap.getLocationComponent();
+
+                        // Activate with options
+                        locationComponent.activateLocationComponent(
+                                LocationComponentActivationOptions.builder(this, style).build());
+
+                        // Enable to make component visible
+                        locationComponent.setLocationComponentEnabled(true);
+
+                        // Set the component's camera mode
+                        locationComponent.setCameraMode(CameraMode.TRACKING);
+
+                        // Set the component's render mode
+                        locationComponent.setRenderMode(RenderMode.COMPASS);
+
+                        if (style.isFullyLoaded())
+                            updateRoute(style);
+                        //Add marker
+                        if (isBikerTracking) {
+                            style.addImage("marker-icon-id",
+                                    BitmapFactory.decodeResource(
+                                            this.getResources(), R.drawable.ic_shop_location));
+                        } else {
+                            style.addImage("marker-icon-id",
+                                    BitmapFactory.decodeResource(
+                                            this.getResources(), R.drawable.mapbox_marker_icon_default));
+                        }
+                        if (destination != null) {
+                            GeoJsonSource geoJsonSource = new GeoJsonSource("source-id", Feature.fromGeometry(
+                                    Point.fromLngLat(destination.getLongitude(), destination.getLatitude())));
+                            style.addSource(geoJsonSource);
+                        }
+                        SymbolLayer symbolLayer = new SymbolLayer("layer-id", "source-id");
+                        symbolLayer.withProperties(
+                                PropertyFactory.iconImage("marker-icon-id")
+                        );
+                        style.addLayer(symbolLayer);
+                    });
+        }
+    }
+
+    @SuppressWarnings({"MissingPermission"})
     private void updateRoute(@NonNull Style loadedMapStyle) {
         mFusedLocationClient.getLastLocation().addOnSuccessListener(this, location -> {
             if (location != null) {
@@ -357,6 +429,7 @@ public class TrackingMapActivity extends DaggerAppCompatActivity implements
                             // Retrieve and update the source designated for showing the directions route
                             source = loadedMapStyle.getSourceAs(ROUTE_SOURCE_ID);
 
+                            distance = response.body().routes().get(0).distance() / 1000;
                             // Create a LineString with the directions route's geometry and
                             // reset the GeoJSON source for the route LineLayer source
                             if (source != null) {
@@ -379,7 +452,7 @@ public class TrackingMapActivity extends DaggerAppCompatActivity implements
      * Add the route and marker sources to the map
      */
     private void initSource(@NonNull Style loadedMapStyle, Point origin, Point destination) {
-        if(loadedMapStyle.isFullyLoaded()) {
+        if (loadedMapStyle.isFullyLoaded()) {
             loadedMapStyle.addSource(new GeoJsonSource(ROUTE_SOURCE_ID,
                     FeatureCollection.fromFeatures(new Feature[]{})));
 

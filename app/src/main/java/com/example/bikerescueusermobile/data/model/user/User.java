@@ -1,9 +1,11 @@
 package com.example.bikerescueusermobile.data.model.user;
 
+import com.example.bikerescueusermobile.data.model.vehicle.VehicleDTO;
 import com.google.gson.annotations.SerializedName;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 import lombok.Data;
 
@@ -49,6 +51,12 @@ public class User implements Serializable {
 
     @SerializedName("roleId")
     private int roleId;
+
+    @SerializedName("listVehicle")
+    private List<VehicleDTO> listVehicle;
+
+    @SerializedName("rejectTime")
+    private int rejectTime;
 
     private int chosenShopOwnerId;
 

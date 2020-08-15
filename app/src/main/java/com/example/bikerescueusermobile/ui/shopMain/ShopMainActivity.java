@@ -1,5 +1,6 @@
 package com.example.bikerescueusermobile.ui.shopMain;
 
+import android.app.Activity;
 import android.app.Dialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -7,6 +8,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 
@@ -118,4 +120,13 @@ public class ShopMainActivity extends BaseActivity {
         }
     };
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(resultCode == Activity.RESULT_OK) {
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.frame_container, new ShopHomeFragment())
+                    .commit();
+        }
+    }
 }

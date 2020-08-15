@@ -15,6 +15,7 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
@@ -28,6 +29,7 @@ import com.example.bikerescueusermobile.data.model.shop_services.ShopServiceTabl
 import com.example.bikerescueusermobile.data.model.user.CurrentUser;
 import com.example.bikerescueusermobile.data.model.vehicle.Vehicle;
 import com.example.bikerescueusermobile.ui.create_request.RequestDetailActivity;
+import com.example.bikerescueusermobile.ui.profile.VehicleActivity;
 import com.example.bikerescueusermobile.ui.seach_shop_service.ShopServiceViewModel;
 import com.example.bikerescueusermobile.util.MyInstances;
 import com.example.bikerescueusermobile.util.SharedPreferenceHelper;
@@ -88,6 +90,15 @@ public class ConfirmInfoActivity extends BaseActivity {
     @BindView(R.id.txtConfirmProblemBadge)
     TextView txtConfirmProblemBadge;
 
+    @BindView(R.id.txtConfirmInfoPrice)
+    TextView txtConfirmInfoPrice;
+
+    @BindView(R.id.edtVanDeKhac)
+    EditText edtVanDeKhac;
+
+    @BindView(R.id.edtDoXang)
+    EditText edtDoXang;
+
     @Inject
     ViewModelFactory viewModelFactory;
 
@@ -123,7 +134,7 @@ public class ConfirmInfoActivity extends BaseActivity {
         //setup error dialog
         errorDialog = new SweetAlertDialog(this, SweetAlertDialog.ERROR_TYPE);
         errorDialog.setTitleText("Thông báo");
-        errorDialog.setConfirmText("Xác nhận");
+        errorDialog.setConfirmText("OK");
         errorDialog.setContentText("Vui lòng kiểm tra lại thông tin!!");
         errorDialog.setConfirmClickListener(sDialog2 -> {
             sDialog2.cancel();
@@ -162,6 +173,25 @@ public class ConfirmInfoActivity extends BaseActivity {
                                 dialog.dismiss();
                                 tvProblem.setText(problems.getItem(which));
                                 selectedService = which;
+                                if(listAllShopServices.get(which).getPrice().intValue() < 0){
+                                    txtConfirmInfoPrice.setText("Giá: liên hệ");
+                                }else{
+                                    txtConfirmInfoPrice.setText("Giá: " + listAllShopServices.get(which).getPrice().intValue() + "k vnd");
+                                }
+
+                                if(problems.getItem(which).contains("Đổ xăng".toLowerCase())){
+                                    edtDoXang.setVisibility(View.VISIBLE);
+                                    txtConfirmInfoPrice.setVisibility(View.GONE);
+                                }else{
+                                    edtDoXang.setVisibility(View.GONE);
+                                    txtConfirmInfoPrice.setVisibility(View.VISIBLE);
+                                }
+
+                                if(problems.getItem(which).contains("Vấn đề khác".toLowerCase())){
+                                    edtVanDeKhac.setVisibility(View.VISIBLE);
+                                }else{
+                                    edtVanDeKhac.setVisibility(View.GONE);
+                                }
                             });
 
                             AlertDialog alertDialog = builder.create();
@@ -205,34 +235,44 @@ public class ConfirmInfoActivity extends BaseActivity {
                                 sweetAlertDialog.setConfirmClickListener(sDialog -> {
                                     sDialog.dismiss();
                                     if (shopServiceId != -1) {
-                                        boolean isSucces = sendReqAndSaveRequestToSharePref();
-                                        if (!isSucces) {
-                                            SweetAlertDialog errorDialog = new SweetAlertDialog(this, SweetAlertDialog.ERROR_TYPE);
-                                            errorDialog.setTitleText("Thông báo");
-                                            errorDialog.setConfirmText("Xác nhận");
-                                            errorDialog.setContentText("Xe bạn chọn và dịch vụ bạn chọn không tương đồng!");
-                                            errorDialog.setConfirmClickListener(sDialog2 -> {
-                                                sDialog2.cancel();
-                                                errorDialog.dismiss();
-                                            });
-                                            errorDialog.show();
+                                        int returnCode = sendReqAndSaveRequestToSharePref();
+
+                                        SweetAlertDialog returnDialog = new SweetAlertDialog(this, SweetAlertDialog.ERROR_TYPE);
+                                        returnDialog.setTitleText("Thông báo");
+                                        returnDialog.setConfirmText("OK");
+                                        returnDialog.setConfirmClickListener(Dialog::dismiss);
+
+                                        if (returnCode == MyInstances.ERROR_VEHICLE_TYPE) {
+                                            returnDialog.setContentText("Xe bạn chọn và dịch vụ bạn chọn không tương đồng!");
+                                            returnDialog.show();
                                             Log.e(TAG, "!isSucces: check vehicle va service name khong khop");
+                                        }
+
+                                        if(returnCode == MyInstances.ERROR_VANDEKHAC){
+                                            returnDialog.setContentText("Vui lòng nhập chi tiết vấn đề!");
+                                            edtVanDeKhac.requestFocus();
+                                            returnDialog.show();
+                                        }
+
+                                        if(returnCode == MyInstances.ERROR_DOXANG_PRICE){
+                                            returnDialog.setContentText("Vui lòng nhập giá tiền đổ xăng!");
+                                            edtDoXang.requestFocus();
+                                            returnDialog.show();
                                         }
                                     } else {
                                         errorDialog.show();
                                         Log.e(TAG, "shopServiceId != -1");
                                     }
                                 });
-                                sweetAlertDialog.setCancelButton("Quay lại", sDialog -> {
-                                    sDialog.dismissWithAnimation();
-                                });
+                                sweetAlertDialog.setCancelButton("Quay lại", SweetAlertDialog::dismissWithAnimation);
                                 sweetAlertDialog.show();
-                            } else {
+
+                            } else { // else khi chua chon service name
                                 errorDialog.show();
                                 txtConfirmProblemBadge.setVisibility(View.VISIBLE);
                                 Log.e(TAG, "selectedService == -1: chua chon dich vu");
                             }
-                        });
+                        }); //end btn confirm request
                     }
                 }, throwable -> {
                     Log.e(TAG, "getShopServiceByShopId: " + throwable.getMessage());
@@ -269,6 +309,16 @@ public class ConfirmInfoActivity extends BaseActivity {
                             alertDialog.show();
                         });
                     } else {
+                        SweetAlertDialog errorDialog = new SweetAlertDialog(this, SweetAlertDialog.ERROR_TYPE);
+                        errorDialog.setTitleText("Thông báo");
+                        errorDialog.setConfirmText("OK");
+                        errorDialog.setContentText("Vui lòng cập nhập thông tin xe của bạn!");
+                        errorDialog.setConfirmClickListener(sweetAlertDialog -> {
+                            sweetAlertDialog.dismiss();
+                            Intent intent = new Intent(this, VehicleActivity.class);
+                            startActivity(intent);
+                            finish();
+                        });
                         errorDialog.show();
                         Log.e(TAG, "listVehicles != null && listVehicles.size() > 0  -> false");
                     }
@@ -320,7 +370,7 @@ public class ConfirmInfoActivity extends BaseActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private boolean sendReqAndSaveRequestToSharePref() {
+    private int sendReqAndSaveRequestToSharePref() {
         //create code from current time -> seconds
         long secs = (new Date().getTime()) / 1000;
         String code = "" + String.format(Locale.getDefault(), "%013d", Integer.parseInt("" + secs));
@@ -331,6 +381,31 @@ public class ConfirmInfoActivity extends BaseActivity {
 
         String userLat = CurrentUser.getInstance().getLatitude();
         String userLong = CurrentUser.getInstance().getLongtitude();
+        String doXangPrice = edtDoXang.getText().toString();
+        int doXangPriceInt = -1;
+
+        if (serviceName.equals("Đổ xăng")){
+            if(doXangPrice.equals("")){
+                return MyInstances.ERROR_DOXANG_PRICE;
+            }else{
+                try{
+                    doXangPriceInt = Integer.parseInt(doXangPrice);
+                    description = String.format(Locale.getDefault(), "Tôi cần đổ %d k vnd tiền xăng.\n " + description, doXangPriceInt);
+                }catch (Exception e){
+                    Log.e(TAG, "Khong the parse gia tien do xang thanh int: " + e.getMessage());
+                    return MyInstances.ERROR_DOXANG_PRICE;
+                }
+            }
+        }
+
+        String problemDetail = edtVanDeKhac.getText().toString();
+        if (serviceName.equals("Vấn đề khác")){
+            if(problemDetail.equals("")) {
+                return MyInstances.ERROR_VANDEKHAC;
+            }else{
+                description = "Chi tiết vấn đề: " + problemDetail + "\n " + description;
+            }
+        }
 
         int vehicleId = listUserVehicle.get(0).getId();
         if (selectedVehicle != 0) {
@@ -339,10 +414,8 @@ public class ConfirmInfoActivity extends BaseActivity {
 
         if (!serviceName.contains(listUserVehicle.get(selectedVehicle).getType().toLowerCase().trim()))
             if (!serviceName.equals("Đổ xăng"))
-                if (!serviceName.equals("Thay bugi"))
                     if (!serviceName.equals("Vấn đề khác"))
-                        if (!serviceName.equals("Xạc bình xe"))
-                            return false;
+                            return MyInstances.ERROR_VEHICLE_TYPE;
 
         RequestDTO request = new RequestDTO();
         request.setCode(code);
@@ -362,7 +435,7 @@ public class ConfirmInfoActivity extends BaseActivity {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(response -> {
                     if (response != null) {
-                        if(response.isStatus()) {
+                        if (response.isStatus()) {
                             Intent intentReqDetail = new Intent(getApplicationContext(), RequestDetailActivity.class);
                             intentReqDetail.putExtra("reqId", response.getData().getId().intValue());
 
@@ -371,7 +444,7 @@ public class ConfirmInfoActivity extends BaseActivity {
 
                             startActivity(intentReqDetail);
                             finish();
-                        }else{
+                        } else {
                             SweetAlertDialog notiDialog = new SweetAlertDialog(this, SweetAlertDialog.ERROR_TYPE);
                             notiDialog.setTitleText("Thông báo");
                             notiDialog.setContentText("Shop này hiện đang bận");
@@ -384,7 +457,7 @@ public class ConfirmInfoActivity extends BaseActivity {
                     Log.e(TAG, "createRequest: " + throwable.getMessage());
                 });
 
-        return true;
+        return 0;
     }
 
 }

@@ -305,7 +305,7 @@ public class MapActivity extends DaggerAppCompatActivity implements
         if (!request.trim().equals("")) {
             SweetAlertDialog errorDialog = new SweetAlertDialog(this, SweetAlertDialog.ERROR_TYPE);
             errorDialog.setTitleText("Thông báo");
-            errorDialog.setConfirmText("Xác nhận");
+            errorDialog.setConfirmText("OK");
             errorDialog.setContentText("Yêu cầu của bạn đang được xử lí, xin vui lòng chờ bên phía cửa hàng xác nhận!");
             errorDialog.setConfirmClickListener(sDialog2 -> {
                 sDialog2.cancel();

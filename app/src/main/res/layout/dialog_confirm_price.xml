@@ -21,8 +21,19 @@
 
         <View
             android:layout_width="match_parent"
-            android:layout_height="0.1dp"
+            android:layout_height="1dp"
             android:background="@color/grey" />
+
+        <TextView
+            android:id="@+id/txtConfirmSerName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="5dp"
+            android:layout_marginStart="15dp"
+            android:text="Tên dịch vụ: abc"
+            android:textSize="17sp"
+            android:textColor="@color/black"/>
 
         <EditText
             android:id="@+id/txtConfirmPrice"

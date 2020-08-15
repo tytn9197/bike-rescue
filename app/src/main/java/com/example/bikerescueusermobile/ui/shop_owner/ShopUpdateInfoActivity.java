@@ -81,7 +81,7 @@ public class ShopUpdateInfoActivity extends BaseActivity {
 
     private ShopUpdateViewModel viewModel;
 
-    String TAG = "abc";
+    String TAG = "ShopUpdate";
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -99,11 +99,11 @@ public class ShopUpdateInfoActivity extends BaseActivity {
         email.setText(CurrentUser.getInstance().getEmail());
 
         String address = CurrentUser.getInstance().getAddress();
-        String[] words = address.split(",",4);
-        street.setText(words[0]);
-        ward.setText(words[1]);
-        district.setText(words[2]);
-        city.setText(words[3]);
+//        String[] words = address.split(",",4);
+//        street.setText(words[0]);
+//        ward.setText(words[1]);
+//        district.setText(words[2]);
+//        city.setText(words[3]);
 
 
         //setup viewmodel
@@ -125,7 +125,8 @@ public class ShopUpdateInfoActivity extends BaseActivity {
             userInfo.setPhoneNumber(phoneNumber.getText().toString());
             userInfo.setFullName(fullName.getText().toString());
             userInfo.setEmail(email.getText().toString());
-            userInfo.setAddress(street.getText().toString() + "," + ward.getText().toString() + "," + district.getText().toString() + "," + city.getText().toString());
+//            userInfo.setAddress(street.getText().toString() + "," + ward.getText().toString() + "," + district.getText().toString() + "," + city.getText().toString());
+            userInfo.setAddress(address);
             //update Shop Owner Information
             Log.e(TAG, "ID: " + CurrentUser.getInstance().getId());
             Log.e(TAG, "Address: " + userInfo.getAddress());
