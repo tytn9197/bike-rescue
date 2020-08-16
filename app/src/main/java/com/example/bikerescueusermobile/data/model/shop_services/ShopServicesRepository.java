@@ -1,5 +1,6 @@
 package com.example.bikerescueusermobile.data.model.shop_services;
 
+import com.example.bikerescueusermobile.data.model.request.ReviewRequestDTO;
 import com.example.bikerescueusermobile.data.model.user.CurrentUser;
 
 import java.util.List;
@@ -38,5 +39,9 @@ public class ShopServicesRepository {
 
     public Single<ShopServiceTable> getByServiceNameAndShopsId(String serviceName, int shopId){
         return shopServices.getByServiceNameAndShopsId(serviceName, shopId, CurrentUser.getInstance().getAccessToken());
+    }
+
+    public Single<List<ReviewRequestDTO>> getReviewCommentByShopId(int shopId){
+        return shopServices.getReviewCommentByShopId(shopId, CurrentUser.getInstance().getAccessToken());
     }
 }

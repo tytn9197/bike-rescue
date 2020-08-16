@@ -1,5 +1,6 @@
 package com.example.bikerescueusermobile.data.model.shop_services;
 
+import com.example.bikerescueusermobile.data.model.request.ReviewRequestDTO;
 import com.example.bikerescueusermobile.data.model.shop_services.ShopService;
 
 import java.util.List;
@@ -28,4 +29,7 @@ public interface IShopServicesService {
 
     @GET("/shop/getByServiceNameAndShopsId")
     Single<ShopServiceTable> getByServiceNameAndShopsId(@Query("serviceName") String serviceName, @Query("shopsId")int shopId, @Header("Authorization")String token);
+
+    @GET("/shop/reviewComment/{shopId}")
+    Single<List<ReviewRequestDTO>> getReviewCommentByShopId(@Path("shopId") int shopId, @Header("Authorization")String token);
 }

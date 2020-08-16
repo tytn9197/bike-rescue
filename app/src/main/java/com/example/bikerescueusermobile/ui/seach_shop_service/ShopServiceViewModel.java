@@ -3,6 +3,7 @@ package com.example.bikerescueusermobile.ui.seach_shop_service;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import com.example.bikerescueusermobile.data.model.request.ReviewRequestDTO;
 import com.example.bikerescueusermobile.data.model.shop.Shop;
 import com.example.bikerescueusermobile.data.model.shop_services.ShopService;
 import com.example.bikerescueusermobile.data.model.shop_services.ShopServiceTable;
@@ -70,5 +71,9 @@ public class ShopServiceViewModel extends ViewModel {
     public Single<ShopServiceTable> getByServiceNameAndShopsId(String serviceName, int shopId){
         loading.setValue(true);
         return shopServicesRepository.getByServiceNameAndShopsId(serviceName, shopId);
+    }
+
+    public Single<List<ReviewRequestDTO>> getReviewCommentByShopId(int shopId){
+        return shopServicesRepository.getReviewCommentByShopId(shopId);
     }
 }

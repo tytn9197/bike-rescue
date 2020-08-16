@@ -31,7 +31,7 @@
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
                 android:layout_margin="10dp"
-                android:layout_toRightOf="@+id/profile_img"
+                android:layout_toEndOf="@+id/profile_img"
                 android:includeFontPadding="false"
                 android:text="Phan Gia Cường"
                 android:textColor="@color/white"
@@ -44,7 +44,7 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/full_name"
                 android:layout_margin="10dp"
-                android:layout_toRightOf="@+id/profile_img"
+                android:layout_toEndOf="@+id/profile_img"
                 android:includeFontPadding="false"
                 android:text="0907698838"
                 android:textColor="@color/white"
@@ -112,29 +112,36 @@
             android:orientation="vertical"
             android:padding="20dp">
 
-            <LinearLayout
+            <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center"
-                android:orientation="horizontal">
+                android:layout_margin="10dp"
+                android:text="Số sao của cửa hàng: "
+                android:textColor="@color/black"
+                android:textSize="20sp"/>
 
-                <com.willy.ratingbar.ScaleRatingBar
-                    android:id="@+id/shopProfileRating"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@id/imgFavorite"
-                    android:layout_alignParentStart="true"
-                    app:srb_clickable="false"
-                    app:srb_drawableEmpty="@drawable/ic_star_empty"
-                    app:srb_drawableFilled="@drawable/ic_star_filled"
-                    app:srb_isIndicator="true"
-                    app:srb_numStars="5"
-                    app:srb_starHeight="40dp"
-                    app:srb_starWidth="40dp"
-                    app:srb_stepSize="0.5" />
+            <com.willy.ratingbar.ScaleRatingBar
+                android:id="@+id/shopProfileRating"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:srb_clickable="false"
+                app:srb_drawableEmpty="@drawable/ic_star_empty"
+                app:srb_drawableFilled="@drawable/ic_star_filled"
+                app:srb_isIndicator="true"
+                app:srb_numStars="5"
+                app:srb_starHeight="40dp"
+                app:srb_starWidth="40dp"
+                app:srb_stepSize="0.5" />
 
-            </LinearLayout>
-
+            <Switch
+                android:id="@+id/shopOwnerStatus"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:checked="true"
+                android:text="Trạng thái hoạt động: "
+                android:textColor="@color/black"
+                android:textSize="20sp" />
 
             <LinearLayout
                 android:layout_width="match_parent"

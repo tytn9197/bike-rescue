@@ -28,15 +28,7 @@ public class FavoriteRecyclerViewAdapter  extends RecyclerView.Adapter<FavoriteR
     private FavoriteSelectedListener listener;
 
     public FavoriteRecyclerViewAdapter(List<Shop> viewModel,
-                                      LifecycleOwner lifecycleOwner, FavoriteSelectedListener selectedListener) {
-//        viewModel.getFeedLivedata().observe(lifecycleOwner, cases -> {
-//            data.clear();
-//            if (cases != null) {
-//                data.addAll(cases);
-//                notifyDataSetChanged();
-//            }
-//        });
-//        setHasStableIds(true);
+                                      FavoriteSelectedListener selectedListener) {
         data = viewModel;
         this.listener = selectedListener;
 

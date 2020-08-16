@@ -168,7 +168,7 @@ public class TrackingMapActivity extends DaggerAppCompatActivity implements
             mFusedLocationClient = LocationServices.getFusedLocationProviderClient(TrackingMapActivity.this);
 
             if (reqStatus != null)
-                if (reqStatus.equals(MyInstances.STATUS_ARRIVED)) {
+                if (reqStatus.equals(MyInstances.STATUS_ARRIVED) || reqStatus.equals(MyInstances.STATUS_CREATED)) {
                     btnArrived.setVisibility(View.GONE);
                 }
 

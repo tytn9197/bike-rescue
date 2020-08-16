@@ -8,6 +8,7 @@ public class MyInstances {
     public static final int USER_STATUS_DEACTIVE = 0;
     public static final int USER_STATUS_FREE = 1;
     public static final int USER_STATUS_BUSY = 2;
+    public static final int USER_STATUS_OFFLINE = 3;
 
     //request status
     public static final String STATUS_CANCELED="CANCELED";
