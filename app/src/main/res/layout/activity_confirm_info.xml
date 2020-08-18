@@ -294,34 +294,28 @@
                     android:id="@+id/btnImg"
                     android:layout_width="70dp"
                     android:layout_height="70dp"
-                    android:layout_margin="5dp"
-                    android:background="@drawable/custom_border_text"
-                    android:src="@drawable/ic_camera_alt_24" />
-
-                <ImageButton
-                    android:id="@+id/btnImg2"
-                    android:layout_width="70dp"
-                    android:layout_height="70dp"
-                    android:layout_margin="5dp"
-                    android:background="@drawable/custom_border_text"
-                    android:src="@drawable/ic_camera_alt_24" />
-
-                <ImageButton
-                    android:id="@+id/btnImg3"
-                    android:layout_width="70dp"
-                    android:layout_height="70dp"
-                    android:layout_margin="5dp"
-                    android:background="@drawable/custom_border_text"
-                    android:src="@drawable/ic_camera_alt_24" />
-
-                <ImageButton
-                    android:id="@+id/btnImg4"
-                    android:layout_width="70dp"
-                    android:layout_height="70dp"
-                    android:layout_margin="5dp"
+                    android:layout_margin="10dp"
                     android:background="@color/white"
-                    android:src="@drawable/ic_add" />
+                    android:src="@drawable/ic_add_photo_70" />
+
+                <HorizontalScrollView
+                    android:id="@+id/image_scroll"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="5dp"
+                    android:visibility="gone">
+                    <LinearLayout
+                        android:id="@+id/imageLayout"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="5dp"
+                        android:orientation="horizontal"
+                        android:padding="5dp">
+                    </LinearLayout>
+                </HorizontalScrollView>
+
             </LinearLayout>
+
 
             <TextView
                 android:id="@+id/txtConfirmInfoPrice"
@@ -332,7 +326,8 @@
                 android:gravity="center"
                 android:text="Gia: 80k vnd"
                 android:textSize="20sp"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                android:visibility="gone"/>
 
             <TextView
                 android:id="@+id/btnBookService"

@@ -8,6 +8,7 @@ public class MyInstances {
     public static final int USER_STATUS_DEACTIVE = 0;
     public static final int USER_STATUS_FREE = 1;
     public static final int USER_STATUS_BUSY = 2;
+    public static final int USER_STATUS_OFFLINE = 3;
 
     //request status
     public static final String STATUS_CANCELED="CANCELED";
@@ -45,6 +46,11 @@ public class MyInstances {
     public static final int ERROR_DOXANG_PRICE = 2;
     public static final int ERROR_VANDEKHAC = 3;
     public static final int ERROR_VEHICLE_TYPE = 1;
+
+    // algorithm
+    public static final double DISTANCE_WEIGHT = 0.5;
+    public static final double PRICE_WEIGHT = 0.3;
+    public static final double RATING_WEIGHT = 0.2;
 
 
 //    //for biker's request detail

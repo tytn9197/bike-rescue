@@ -2,6 +2,7 @@ package com.example.bikerescueusermobile.data.model.user;
 
 import com.example.bikerescueusermobile.data.model.login.LoginData;
 import com.example.bikerescueusermobile.data.model.login.UpdateDevice;
+import com.example.bikerescueusermobile.data.model.request.Response;
 import com.example.bikerescueusermobile.data.model.shop.StatusSuccessDTO;
 
 import java.util.List;
@@ -46,4 +47,7 @@ public interface IUserService {
 
     @GET("/shop/getNumOfStarByShopOwnerId/{id}")
     Single<Double> getNumOfStarByShopOwnerId(@Path("id") int id, @Header("Authorization") String token);
+
+    @PUT("/api/updateStatusById")
+    Single<Boolean> updateUserStatus(@Body UserStatusDTO userStatusDTO, @Header("Authorization") String token);
 }

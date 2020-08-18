@@ -7,6 +7,7 @@ import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -44,6 +45,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import butterknife.BindView;
 import cn.pedant.SweetAlert.SweetAlertDialog;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
@@ -67,6 +69,9 @@ public class HomeFragment extends BaseFragment
     private ShopServiceViewModel viewModel;
 
     private final List<Shop> shops = new ArrayList<>();
+
+    @BindView(R.id.btnShowShopList)
+    Button btnShowShopList;
 
     @Inject
     ViewModelFactory viewModelFactory;
@@ -153,6 +158,7 @@ public class HomeFragment extends BaseFragment
                                                     listShop.get(j).setDistanceFromUser(response.body().routes().get(0).distance() / 1000);
                                                     listShop.get(j).setDurationToBiker(response.body().routes().get(0).duration() / 60);
                                                     shops.add(listShop.get(j));
+                                                    Log.e(TAG, "listshop sau khi them distance: " + listShop.get(j).toString());
                                                 }
 
                                                 @Override
@@ -162,7 +168,14 @@ public class HomeFragment extends BaseFragment
                                             });
                                         }
                                     });
-                                }
+                                }//end for
+
+                                btnShowShopList.setOnClickListener(v -> {
+                                    if (getActivity() != null) {
+                                        ((MapActivity) getActivity()).showSuggestShops(shops);
+                                    }
+                                });
+
                             } else {
                                 SweetAlertDialog notiDialog = new SweetAlertDialog(getActivity(), SweetAlertDialog.ERROR_TYPE);
                                 notiDialog.setTitleText("Thông báo");
@@ -234,9 +247,10 @@ public class HomeFragment extends BaseFragment
                 break;
             }
         }
-        if (position != -1)
+        if (position != -1 && getActivity() != null) {
             ((MapActivity) getActivity()).setShopDetailToMapbox(shops.get(position), shops.get(position).getUserNameOnly().getId());
-        else
+            Log.e(TAG, "shop pos: " + position + " --- shop:" + shops.get(position).toString());
+        } else
             Log.e(TAG, "position == -1");
         return false;
     }

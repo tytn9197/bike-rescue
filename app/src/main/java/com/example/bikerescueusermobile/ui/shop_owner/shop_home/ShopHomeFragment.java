@@ -21,6 +21,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -29,6 +30,10 @@ import androidx.core.content.ContextCompat;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.example.bikerescueusermobile.R;
 import com.example.bikerescueusermobile.base.BaseFragment;
@@ -42,6 +47,7 @@ import com.example.bikerescueusermobile.ui.confirm.ConfirmViewModel;
 import com.example.bikerescueusermobile.ui.create_request.RequestDetailViewModel;
 import com.example.bikerescueusermobile.ui.login.UpdateLocationService;
 import com.example.bikerescueusermobile.ui.tracking_map.TrackingMapActivity;
+import com.example.bikerescueusermobile.ui.tracking_map.ViewReviewRvAdapter;
 import com.example.bikerescueusermobile.util.MyInstances;
 import com.example.bikerescueusermobile.util.SharedPreferenceHelper;
 import com.example.bikerescueusermobile.util.ViewModelFactory;
@@ -60,6 +66,8 @@ import com.mapbox.api.directions.v5.MapboxDirections;
 import com.mapbox.api.directions.v5.models.DirectionsResponse;
 import com.mapbox.geojson.Point;
 import com.mapbox.mapboxsdk.geometry.LatLng;
+import com.mingle.sweetpick.CustomDelegate;
+import com.mingle.sweetpick.SweetSheet;
 import com.squareup.picasso.Picasso;
 import com.willy.ratingbar.ScaleRatingBar;
 
@@ -163,12 +171,16 @@ public class ShopHomeFragment extends BaseFragment {
     @BindView(R.id.btnShopHomeArrived)
     Button btnArrived;
 
+    @BindView(R.id.shopHomeRelativeLayout)
+    RelativeLayout shopHomeRelativeLayout;
+
     @Inject
     ViewModelFactory viewModelFactory;
 
     private RequestDetailViewModel viewModel;
     private CountDownTimer countDownTimer;
     private double distance = -1;
+    private SweetSheet mSweetSheet;
 
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
         @Override
@@ -258,7 +270,7 @@ public class ShopHomeFragment extends BaseFragment {
                                                         Intent tracking = new Intent(getActivity(), TrackingMapActivity.class);
                                                         tracking.putExtra("isBikerTracking", false);
                                                         tracking.putExtra("reqId", req.getId());
-                                                        tracking.putExtra("reqStatus", req.getStatus());
+                                                        tracking.putExtra("reqStatus", MyInstances.STATUS_ACCEPT);
                                                         startActivityForResult(tracking, MyInstances.SHOP_RESULT_CODE);
                                                     });
                                             btnCancelReq.setVisibility(View.VISIBLE);
@@ -406,7 +418,7 @@ public class ShopHomeFragment extends BaseFragment {
                                                         Intent tracking = new Intent(getActivity(), TrackingMapActivity.class);
                                                         tracking.putExtra("isBikerTracking", false);
                                                         tracking.putExtra("reqId", req.getId());
-                                                        tracking.putExtra("reqStatus", req.getStatus());
+                                                        tracking.putExtra("reqStatus", MyInstances.STATUS_ACCEPT);
                                                         startActivityForResult(tracking, MyInstances.SHOP_RESULT_CODE);
                                                     });
                                             btnCancelReq.setVisibility(View.VISIBLE);
@@ -423,15 +435,44 @@ public class ShopHomeFragment extends BaseFragment {
                         }// req ->
                     });
         }//end of else
-
-        btnReqImg.setOnClickListener(v -> {
-            SharedPreferenceHelper.setSharedPreferenceString(getActivity(), MyInstances.KEY_SHOP_REQUEST, "");
-        });
     }
 
     @SuppressLint("SetTextI18n")
     private void setDataToView(Request request) {
         allButtonGone();
+
+        btnReqImg.setOnClickListener(v -> {
+            mSweetSheet = new SweetSheet(shopHomeRelativeLayout);
+            CustomDelegate customDelegate = new CustomDelegate(true,
+                    CustomDelegate.AnimationType.DuangLayoutAnimation);
+            View mView = LayoutInflater.from(getActivity()).inflate(R.layout.fragment_show_image, null, false);
+            customDelegate.setCustomView(mView);
+            mSweetSheet.setDelegate(customDelegate);
+            viewModel.getReqImgByReqId(request.getId())
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(listImgs -> {
+                        if (listImgs != null) {
+                            LinearLayout imageLayout = mView.findViewById(R.id.imageLayout);
+
+                            for (int i = 0; i < listImgs.size(); i++) {
+                                ImageView image = new ImageView(getActivity());
+                                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(200, 200);
+                                int marginValue = 10;
+                                params.setMargins(marginValue, marginValue, marginValue, marginValue);
+                                Picasso.with(getActivity())
+                                        .load(listImgs.get(0).getImage()).placeholder(R.drawable.ic_load)
+                                        .into(image);
+                                image.setLayoutParams(params);
+                                imageLayout.addView(image);
+                            }
+
+                            mSweetSheet.show();
+                        }
+                    }, throwable -> {
+                        Log.e(TAG, "getReqImgByReqId: " + throwable.getMessage());
+                    });
+        });
 
         btnFinish.setOnClickListener(v -> {
 
@@ -628,7 +669,7 @@ public class ShopHomeFragment extends BaseFragment {
 
     private void allButtonGone() {
         btnCancelReq.setVisibility(View.GONE);
-        btnReqImg.setVisibility(View.GONE);
+//        btnReqImg.setVisibility(View.GONE);
         statusCreated.setVisibility(View.GONE);
         btnFinish.setVisibility(View.GONE);
         btnArrived.setVisibility(View.GONE);

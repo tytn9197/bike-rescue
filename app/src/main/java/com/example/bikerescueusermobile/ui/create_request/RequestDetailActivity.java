@@ -330,13 +330,17 @@ public class RequestDetailActivity extends BaseActivity {
             startActivityForResult(intent, MyInstances.SHOP_RESULT_CODE);
         });
 
-        btnReqDetailCallShop.setVisibility(View.VISIBLE);
-        btnReqDetailCallShop.setOnClickListener(v -> {
-            Intent callIntent = new Intent(Intent.ACTION_DIAL);
-            callIntent.setData(Uri.parse("tel:" + Uri.encode(request.getAcceptedUser().getPhoneNumber())));
-            callIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            startActivity(callIntent);
-        });
+        if(!request.getStatus().equals(MyInstances.STATUS_REJECTED) &&
+                !request.getStatus().equals(MyInstances.STATUS_FINISHED) &&
+                !request.getStatus().equals(MyInstances.STATUS_CANCELED)) {
+            btnReqDetailCallShop.setVisibility(View.VISIBLE);
+            btnReqDetailCallShop.setOnClickListener(v -> {
+                Intent callIntent = new Intent(Intent.ACTION_DIAL);
+                callIntent.setData(Uri.parse("tel:" + Uri.encode(request.getAcceptedUser().getPhoneNumber())));
+                callIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(callIntent);
+            });
+        }
     }
 
     @SuppressLint("SetTextI18n")
@@ -375,6 +379,7 @@ public class RequestDetailActivity extends BaseActivity {
             txtReqDetailCancelReason.setVisibility(View.VISIBLE);
             txtReqDetailCancelReason.setText(" Lý do hủy: " + request.getCancelReason());
         }
+        btnReqDetailCallShop.setVisibility(View.GONE);
     }
 
     @SuppressLint("SetTextI18n")

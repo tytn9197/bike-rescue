@@ -62,7 +62,7 @@ public class FavoriteShopFragment extends BaseFragment implements FavoriteSelect
 
 
 //        mRecyclerView.addItemDecoration(new DividerItemDecoration((getActivity()), DividerItemDecoration.VERTICAL));
-        mRecyclerView.setAdapter(new FavoriteRecyclerViewAdapter(list, this, this));
+        mRecyclerView.setAdapter(new FavoriteRecyclerViewAdapter(list, this));
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         pullToRefreshFavorite.setOnRefreshListener(() -> pullToRefreshFavorite.setRefreshing(false));
     }

@@ -20,6 +20,7 @@ import java.util.List;
 import javax.inject.Inject;
 
 import io.reactivex.Single;
+import okhttp3.MultipartBody;
 
 public class ConfirmViewModel extends ViewModel {
     private final ConfigurationRepository configurationRepository;
@@ -55,9 +56,9 @@ public class ConfirmViewModel extends ViewModel {
         return vehicleRepository.getAllVehicles(CurrentUser.getInstance().getAccessToken());
     }
 
-    public Single<Response<RequestDTO>> createRequest(RequestDTO request){
+    public Single<Response<RequestDTO>> createRequest(RequestDTO request, List<MultipartBody.Part> listImg){
         loading.setValue(true);
-        return requestRepository.createRequest(request);
+        return requestRepository.createRequest(request, listImg);
     }
 
     public Single<List<Vehicle>> getVehicleByUserId(int id){

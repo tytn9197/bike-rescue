@@ -10,6 +10,7 @@ import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -21,19 +22,29 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProviders;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.example.bikerescueusermobile.R;
+import com.example.bikerescueusermobile.data.model.request.ReviewRequestDTO;
 import com.example.bikerescueusermobile.data.model.shop.Shop;
 import com.example.bikerescueusermobile.data.model.shop_services.ShopService;
 import com.example.bikerescueusermobile.data.model.shop_services.ShopServiceTable;
 import com.example.bikerescueusermobile.data.model.user.CurrentUser;
 import com.example.bikerescueusermobile.ui.confirm.ConfirmInfoActivity;
+import com.example.bikerescueusermobile.ui.favorite.FavoriteRecyclerViewAdapter;
 import com.example.bikerescueusermobile.ui.home.HomeFragment;
 import com.example.bikerescueusermobile.ui.seach_shop_service.ShopServiceViewModel;
+import com.example.bikerescueusermobile.ui.seach_shop_service.TopShopRecyclerViewAdapter;
+import com.example.bikerescueusermobile.ui.seach_shop_service.TopShopSelectedListener;
+import com.example.bikerescueusermobile.ui.tracking_map.ViewReviewRvAdapter;
 import com.example.bikerescueusermobile.util.MyInstances;
 import com.example.bikerescueusermobile.util.MyMethods;
 import com.example.bikerescueusermobile.util.SharedPreferenceHelper;
@@ -73,10 +84,17 @@ import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.mapbox.mapboxsdk.location.LocationComponent;
+import com.mingle.entity.MenuEntity;
+import com.mingle.sweetpick.BlurEffect;
+import com.mingle.sweetpick.CustomDelegate;
+import com.mingle.sweetpick.NoneEffect;
+import com.mingle.sweetpick.RecyclerViewDelegate;
+import com.mingle.sweetpick.SweetSheet;
 
 import javax.inject.Inject;
 
@@ -99,7 +117,7 @@ import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.lineWidth;
 
 
 public class MapActivity extends DaggerAppCompatActivity implements
-        OnMapReadyCallback, MapboxMap.OnMapClickListener, PermissionsListener {
+        OnMapReadyCallback, MapboxMap.OnMapClickListener, PermissionsListener, TopShopSelectedListener {
 
     private static final String TAG = "MapActivity";
     private static final String ROUTE_LAYER_ID = "route-layer-id";
@@ -131,11 +149,15 @@ public class MapActivity extends DaggerAppCompatActivity implements
     Button btnGoogleMapBack;
     ImageView imgDistance;
     TextView txtMapOpenTime;
+    Button btnReadReview;
+    RelativeLayout mapRelativeLayout;
 
     private double distance = -1;
     private String serviceName = "";
     private String mPlaceName = "";
     private ArrayList<ShopServiceTable> listAllShopServices;
+    private SweetSheet mSweetSheet;
+    private SweetSheet mSweetSheetShop;
 
     @Inject
     ViewModelFactory viewModelFactory;
@@ -184,6 +206,122 @@ public class MapActivity extends DaggerAppCompatActivity implements
         initShopDetail(s, id, true);
     }
 
+    public void showSuggestShops(List<Shop> shops) {
+        //set sweet sheet on cluster map
+        mSweetSheetShop = new SweetSheet(mapRelativeLayout);
+        CustomDelegate customDelegate = new CustomDelegate(true,
+                CustomDelegate.AnimationType.DuangLayoutAnimation);
+        View view = LayoutInflater.from(this).inflate(R.layout.fragment_algo_shop, null, false);
+        customDelegate.setCustomView(view);
+        mSweetSheetShop.setDelegate(customDelegate);
+
+        double totalPrice = 0;
+        double totalDistance = 0;
+        for (int i = 0; i < shops.size(); i++) {
+            totalDistance += shops.get(i).getDistanceFromUser();
+            double price = Double.parseDouble(shops.get(i).getDescription());
+            if (price > 0) {
+                totalPrice += price;
+            }
+        }
+
+        Log.e(TAG, "total price: " + totalPrice + "  --- total dis:" + totalDistance);
+
+        List<Shop> sortedList = new ArrayList<>();
+        if(totalPrice == 0){
+            // neu khong co gia thi se sort theo khoang cach
+            Log.e(TAG, "price = 0");
+            sortedList.addAll(shops);
+            int size = sortedList.size();
+            for (int i = 0; i < size - 1; i++)
+                for (int j = 0; j < size - i - 1; j++)
+                    if (sortedList.get(j).getDistanceFromUser() > sortedList.get(j + 1).getDistanceFromUser()) {
+                        // swap arr[j+1] and arr[j]
+                        Shop temp = sortedList.get(j);
+                        sortedList.set(j, sortedList.get(j + 1));
+                        sortedList.set(j + 1, temp);
+                    }
+        }else{
+            // neu co gia ro rang => tinh weigh roi moi sort theo trong so
+            Log.e(TAG, "price != 0");
+            for (int i = 0; i < shops.size(); i++) {
+                double score = 0;
+                double ratingScore = getRatingScore(Double.parseDouble(shops.get(i).getShopRatingStar())) * MyInstances.RATING_WEIGHT;
+                double distanceScore = getScoreInverse(shops.get(i).getDistanceFromUser(), totalDistance) * MyInstances.DISTANCE_WEIGHT;
+                double priceScore = getScoreInverse(Double.parseDouble(shops.get(i).getDescription()), totalPrice) * MyInstances.PRICE_WEIGHT;
+
+                score = ratingScore + distanceScore + priceScore;
+                shops.get(i).setScore(score);
+                Log.e(TAG, "score shop " + i + " ---- score = " + score);
+            }
+
+            //bubble sort
+            sortedList.addAll(shops);
+            int size = sortedList.size();
+            for (int i = 0; i < size - 1; i++)
+                for (int j = 0; j < size - i - 1; j++)
+                    if (sortedList.get(j).getScore() < sortedList.get(j + 1).getScore()) {
+                        // swap arr[j+1] and arr[j]
+                        Shop temp = sortedList.get(j);
+                        sortedList.set(j, sortedList.get(j + 1));
+                        sortedList.set(j + 1, temp);
+                    }
+        }
+
+
+
+        RecyclerView mRecyclerView = view.findViewById(R.id.rvTopShop);
+
+        mRecyclerView.setAdapter(new TopShopRecyclerViewAdapter(sortedList, this));
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+        SwipeRefreshLayout refresh = view.findViewById(R.id.pullToRefreshReview);
+        refresh.setOnRefreshListener(() -> refresh.setRefreshing(false));
+
+        mSweetSheetShop.show();
+    }
+
+    private void setViewReviewButton(int shopOwnerId) {
+        btnReadReview.setOnClickListener(v -> {
+            mSweetSheet = new SweetSheet(mapRelativeLayout);
+            CustomDelegate customDelegate = new CustomDelegate(true,
+                    CustomDelegate.AnimationType.DuangLayoutAnimation);
+            View view = LayoutInflater.from(this).inflate(R.layout.fragment_view_review, null, false);
+            customDelegate.setCustomView(view);
+            mSweetSheet.setDelegate(customDelegate);
+
+            RecyclerView mRecyclerView = view.findViewById(R.id.rvReview);
+
+            viewModel.getReviewCommentByShopId(shopOwnerId)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(listReviews -> {
+                        if (listReviews != null && listReviews.size() > 0) {
+                            List<ReviewRequestDTO> list = new ArrayList<>();
+
+                            for (int i = 0; i < listReviews.size(); i++) {
+                                if (listReviews.get(i).getReviewRating() > 0) {
+                                    list.add(listReviews.get(i));
+                                }
+                            }
+
+                            mRecyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
+                            mRecyclerView.setAdapter(new ViewReviewRvAdapter(list));
+                            mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+                            SwipeRefreshLayout refresh = view.findViewById(R.id.pullToRefreshReview);
+                            refresh.setOnRefreshListener(() -> refresh.setRefreshing(false));
+                            mSweetSheet.show();
+                        } else{
+                            Log.e(TAG, "listReviews != null && listReviews.size() > 0");
+                        }
+                    }, throwable -> {
+                        Log.e(TAG, "getReviewCommentByShopId: " + throwable.getMessage());
+                    });
+
+        });
+    }
+
     @SuppressLint({"DefaultLocale", "SetTextI18n"})
     private void initShopDetail(Shop shop, int ownerId, boolean hasServiceName) {
         shopLocation = new LatLng(Double.parseDouble(shop.getLatitude()), Double.parseDouble(shop.getLongtitude()));
@@ -192,6 +330,13 @@ public class MapActivity extends DaggerAppCompatActivity implements
         String start = shop.getShopRatingStar() + "/5";
         txtMapShopRatingStarNum.setText(start);
         txtShopAndCurrentLocationDistance.setText(String.format("Cách đây %.1f km", shop.getDistanceFromUser()));
+        Log.e(TAG, "shop: " + shop.toString());
+
+        if (shop.getUser() != null) {
+            setViewReviewButton(shop.getUser().getId());
+        } else {
+            setViewReviewButton(shop.getUserNameOnly().getId());
+        }
 
         if (!hasServiceName) {
             viewModel.getShopServiceByShopId(shop.getId())
@@ -275,6 +420,8 @@ public class MapActivity extends DaggerAppCompatActivity implements
         imgDistance = findViewById(R.id.imgDistance);
         txtMapOpenTime = findViewById(R.id.txtMapOpenTime);
 //        imgShopLogo = findViewById(R.id.imgShopLogo);
+        btnReadReview = findViewById(R.id.btnReadReview);
+        mapRelativeLayout = findViewById(R.id.mapRelativeLayout);
     }
 
     private void showClusterMap() {
@@ -285,7 +432,6 @@ public class MapActivity extends DaggerAppCompatActivity implements
     private void hideClusterMap() {
         mapClusterShop.setVisibility(View.GONE);
         btnGoogleMapBack.setVisibility(View.GONE);
-
     }
 
     private View.OnClickListener btnMapBackOnClickListener = v -> {
@@ -300,7 +446,7 @@ public class MapActivity extends DaggerAppCompatActivity implements
         }
     };
 
-    private void sendReqClick(Shop shop){
+    private void sendReqClick(Shop shop) {
         String request = SharedPreferenceHelper.getSharedPreferenceString(getApplicationContext(), MyInstances.KEY_BIKER_REQUEST, "");
         if (!request.trim().equals("")) {
             SweetAlertDialog errorDialog = new SweetAlertDialog(this, SweetAlertDialog.ERROR_TYPE);
@@ -550,4 +696,24 @@ public class MapActivity extends DaggerAppCompatActivity implements
         mapView.onLowMemory();
     }
 
+    @Override
+    public void onBackPressed() {
+        finish();
+    }
+
+    private double getRatingScore(double shopRating) {
+        return (shopRating * 100) / 5;
+    }
+
+    private double getScoreInverse(double element, double sumElement) {
+        return (1 - element / sumElement) * 100;
+    }
+
+    @Override
+    public void onDetailSelected(Shop shop) {
+        setShopDetailToMapbox(shop, shop.getUserNameOnly().getId());
+        if (mSweetSheetShop.isShow()) {
+            mSweetSheetShop.dismiss();
+        }
+    }
 }

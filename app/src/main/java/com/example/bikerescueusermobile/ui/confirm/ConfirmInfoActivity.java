@@ -11,9 +11,13 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.HorizontalScrollView;
 import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -49,6 +53,9 @@ import butterknife.BindView;
 import cn.pedant.SweetAlert.SweetAlertDialog;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
 
 public class ConfirmInfoActivity extends BaseActivity {
 
@@ -99,6 +106,12 @@ public class ConfirmInfoActivity extends BaseActivity {
     @BindView(R.id.edtDoXang)
     EditText edtDoXang;
 
+    @BindView(R.id.imageLayout)
+    LinearLayout imageLayout;
+
+    @BindView(R.id.image_scroll)
+    HorizontalScrollView imgScroll;
+
     @Inject
     ViewModelFactory viewModelFactory;
 
@@ -112,6 +125,7 @@ public class ConfirmInfoActivity extends BaseActivity {
     private SweetAlertDialog loadingDialog;
     private int selectedService = -1;
     private String serviceName = "";
+    private List<MultipartBody.Part> images = null;
 
     @Override
     protected int layoutRes() {
@@ -173,23 +187,25 @@ public class ConfirmInfoActivity extends BaseActivity {
                                 dialog.dismiss();
                                 tvProblem.setText(problems.getItem(which));
                                 selectedService = which;
-                                if(listAllShopServices.get(which).getPrice().intValue() < 0){
+                                txtConfirmInfoPrice.setVisibility(View.VISIBLE);
+
+                                if (listAllShopServices.get(which).getPrice().intValue() < 0) {
                                     txtConfirmInfoPrice.setText("Giá: liên hệ");
-                                }else{
+                                } else {
                                     txtConfirmInfoPrice.setText("Giá: " + listAllShopServices.get(which).getPrice().intValue() + "k vnd");
                                 }
 
-                                if(problems.getItem(which).contains("Đổ xăng".toLowerCase())){
+                                if (problems.getItem(which).contains("Đổ xăng".toLowerCase())) {
                                     edtDoXang.setVisibility(View.VISIBLE);
                                     txtConfirmInfoPrice.setVisibility(View.GONE);
-                                }else{
+                                } else {
                                     edtDoXang.setVisibility(View.GONE);
                                     txtConfirmInfoPrice.setVisibility(View.VISIBLE);
                                 }
 
-                                if(problems.getItem(which).contains("Vấn đề khác".toLowerCase())){
+                                if (problems.getItem(which).contains("Vấn đề khác".toLowerCase())) {
                                     edtVanDeKhac.setVisibility(View.VISIBLE);
-                                }else{
+                                } else {
                                     edtVanDeKhac.setVisibility(View.GONE);
                                 }
                             });
@@ -248,13 +264,13 @@ public class ConfirmInfoActivity extends BaseActivity {
                                             Log.e(TAG, "!isSucces: check vehicle va service name khong khop");
                                         }
 
-                                        if(returnCode == MyInstances.ERROR_VANDEKHAC){
+                                        if (returnCode == MyInstances.ERROR_VANDEKHAC) {
                                             returnDialog.setContentText("Vui lòng nhập chi tiết vấn đề!");
                                             edtVanDeKhac.requestFocus();
                                             returnDialog.show();
                                         }
 
-                                        if(returnCode == MyInstances.ERROR_DOXANG_PRICE){
+                                        if (returnCode == MyInstances.ERROR_DOXANG_PRICE) {
                                             returnDialog.setContentText("Vui lòng nhập giá tiền đổ xăng!");
                                             edtDoXang.requestFocus();
                                             returnDialog.show();
@@ -264,7 +280,7 @@ public class ConfirmInfoActivity extends BaseActivity {
                                         Log.e(TAG, "shopServiceId != -1");
                                     }
                                 });
-                                sweetAlertDialog.setCancelButton("Quay lại", SweetAlertDialog::dismissWithAnimation);
+                                sweetAlertDialog.setCancelButton("Hủy", SweetAlertDialog::dismissWithAnimation);
                                 sweetAlertDialog.show();
 
                             } else { // else khi chua chon service name
@@ -335,8 +351,8 @@ public class ConfirmInfoActivity extends BaseActivity {
         btnImg.setOnClickListener(v -> {
             ImagePicker.Companion.with(this)
                     .crop()                    //Crop image(Optional), Check Customization for more option
-                    .compress(1024)            //Final image size will be less than 1 MB(Optional)
-                    .maxResultSize(100, 100)    //Final image resolution will be less than 1080 x 1080(Optional)
+                    .compress(1024*2)            //Final image size will be less than 1 MB(Optional)
+                    .maxResultSize(200, 200)    //Final image resolution will be less than 1080 x 1080(Optional)
                     .start();
         });
 
@@ -348,12 +364,33 @@ public class ConfirmInfoActivity extends BaseActivity {
         if (resultCode == Activity.RESULT_OK) {
             //get File object from ImagePicker
             File file = ImagePicker.Companion.getFile(data);
+//            for (int i = 0; i < 10; i++) {
+//                ImageView image = new ImageView(this);
+//                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(btnImg.getWidth(), btnImg.getHeight());
+//                int marginValue = 10;
+//                params.setMargins(marginValue, marginValue, marginValue, marginValue);
+//                image.setImageResource(R.drawable.ic_add_photo_70);
+//                image.setLayoutParams(params);
+//                image.setAdjustViewBounds(true);
+//
+//                imageLayout.addView(image);
+                imgScroll.setVisibility(View.VISIBLE);
+//            }
+            if (file != null) {
+                // set path toi' hin`h do' thanh` bitmap
+                Bitmap myBitmap = BitmapFactory.decodeFile(file.getAbsolutePath());
 
-            // set path toi' hin`h do' thanh` bitmap
-            Bitmap myBitmap = BitmapFactory.decodeFile(file.getAbsolutePath());
+                if (images == null) {
+                    Log.e(TAG, "image == null");
+                    images = new ArrayList<>();
+                    RequestBody requestBody = RequestBody.create(MediaType.parse("multipart/form-data"), file);
+                    MultipartBody.Part formData = MultipartBody.Part.createFormData("listImg", file.getName(), requestBody);
+                    images.add(formData);
+                }
 
-            //set image to image view
-            btnImg.setImageBitmap(myBitmap);
+                //set image to image view
+                btnImg.setImageBitmap(myBitmap);
+            }
         } else if (resultCode == ImagePicker.RESULT_ERROR) {
             Log.e(TAG, "ImagePicker - Get image fail: " + ImagePicker.Companion.getError(data));
         } else {
@@ -384,14 +421,14 @@ public class ConfirmInfoActivity extends BaseActivity {
         String doXangPrice = edtDoXang.getText().toString();
         int doXangPriceInt = -1;
 
-        if (serviceName.equals("Đổ xăng")){
-            if(doXangPrice.equals("")){
+        if (serviceName.equals("Đổ xăng")) {
+            if (doXangPrice.equals("")) {
                 return MyInstances.ERROR_DOXANG_PRICE;
-            }else{
-                try{
+            } else {
+                try {
                     doXangPriceInt = Integer.parseInt(doXangPrice);
                     description = String.format(Locale.getDefault(), "Tôi cần đổ %d k vnd tiền xăng.\n " + description, doXangPriceInt);
-                }catch (Exception e){
+                } catch (Exception e) {
                     Log.e(TAG, "Khong the parse gia tien do xang thanh int: " + e.getMessage());
                     return MyInstances.ERROR_DOXANG_PRICE;
                 }
@@ -399,10 +436,10 @@ public class ConfirmInfoActivity extends BaseActivity {
         }
 
         String problemDetail = edtVanDeKhac.getText().toString();
-        if (serviceName.equals("Vấn đề khác")){
-            if(problemDetail.equals("")) {
+        if (serviceName.equals("Vấn đề khác")) {
+            if (problemDetail.equals("")) {
                 return MyInstances.ERROR_VANDEKHAC;
-            }else{
+            } else {
                 description = "Chi tiết vấn đề: " + problemDetail + "\n " + description;
             }
         }
@@ -414,8 +451,8 @@ public class ConfirmInfoActivity extends BaseActivity {
 
         if (!serviceName.contains(listUserVehicle.get(selectedVehicle).getType().toLowerCase().trim()))
             if (!serviceName.equals("Đổ xăng"))
-                    if (!serviceName.equals("Vấn đề khác"))
-                            return MyInstances.ERROR_VEHICLE_TYPE;
+                if (!serviceName.equals("Vấn đề khác"))
+                    return MyInstances.ERROR_VEHICLE_TYPE;
 
         RequestDTO request = new RequestDTO();
         request.setCode(code);
@@ -430,7 +467,7 @@ public class ConfirmInfoActivity extends BaseActivity {
 
         Gson gson = new Gson();
 
-        viewModel.createRequest(request)
+        viewModel.createRequest(request, images)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(response -> {

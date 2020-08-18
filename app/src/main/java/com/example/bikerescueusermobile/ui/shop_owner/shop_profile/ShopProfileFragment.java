@@ -1,11 +1,14 @@
 package com.example.bikerescueusermobile.ui.shop_owner.shop_profile;
 
+import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.RatingBar;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -15,6 +18,7 @@ import androidx.lifecycle.ViewModelProviders;
 import com.example.bikerescueusermobile.R;
 import com.example.bikerescueusermobile.base.BaseFragment;
 import com.example.bikerescueusermobile.data.model.user.CurrentUser;
+import com.example.bikerescueusermobile.data.model.user.UserStatusDTO;
 import com.example.bikerescueusermobile.ui.login.LoginActivity;
 import com.example.bikerescueusermobile.ui.main.MainActivity;
 import com.example.bikerescueusermobile.ui.shop_owner.ShopUpdateInfoActivity;
@@ -67,6 +71,9 @@ public class ShopProfileFragment extends BaseFragment {
 
     @BindView(R.id.phone_number)
     TextView txtPhoneNumber;
+
+    @BindView(R.id.shopOwnerStatus)
+    Switch shopOwnerStatus;
 
     @Inject
     ViewModelFactory viewModelFactory;
@@ -131,6 +138,29 @@ public class ShopProfileFragment extends BaseFragment {
                     shopProfileRating.setStepSize((float) 0.5);
                     shopProfileRating.setRating(numOfStar.floatValue());
                 });
+
+        shopOwnerStatus.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            shopOwnerStatus.setEnabled(false);
+
+            int status = MyInstances.USER_STATUS_FREE;
+            if(!isChecked){
+                status = MyInstances.USER_STATUS_OFFLINE;
+            }
+
+            UserStatusDTO userStatusDTO = new UserStatusDTO();
+            userStatusDTO.setId(CurrentUser.getInstance().getId());
+            userStatusDTO.setStatus(status);
+
+            viewModel.updateUserStatus(userStatusDTO)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(isSuccess -> {
+                        if(isSuccess){
+                            Log.e("updateUserStatus", "OK");
+                            shopOwnerStatus.setEnabled(true);
+                        }
+                    });
+        });
     }
 
 }

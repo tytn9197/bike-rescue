@@ -4,6 +4,7 @@ package com.example.bikerescueusermobile.data.model.user;
 
 import com.example.bikerescueusermobile.data.model.login.LoginData;
 import com.example.bikerescueusermobile.data.model.login.UpdateDevice;
+import com.example.bikerescueusermobile.data.model.request.Response;
 import com.example.bikerescueusermobile.data.model.shop.StatusSuccessDTO;
 
 import java.util.List;
@@ -48,5 +49,9 @@ public class UserRepository {
 
     public Single<Double> getNumOfStarByShopOwnerId(int id){
         return userService.getNumOfStarByShopOwnerId(id, CurrentUser.getInstance().getAccessToken());
+    }
+
+    public Single<Boolean> updateUserStatus(UserStatusDTO userStatusDTO){
+        return userService.updateUserStatus(userStatusDTO, CurrentUser.getInstance().getAccessToken());
     }
 }
