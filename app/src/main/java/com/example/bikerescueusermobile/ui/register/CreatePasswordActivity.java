@@ -40,6 +40,15 @@ public class CreatePasswordActivity extends BaseActivity {
     @BindView(R.id.confirmPassword)
     EditText confirmPassword;
 
+    @BindView(R.id.address)
+    EditText edtAddress;
+
+    @BindView(R.id.newEmail)
+    EditText edtEmail;
+
+    @BindView(R.id.fullName)
+    EditText edtFullName;
+
     @BindView(R.id.clearNewPw)
     ImageView clearNewPw;
 
@@ -101,8 +110,13 @@ public class CreatePasswordActivity extends BaseActivity {
 
             //LoginData user = new LoginData(phoneNumber.getText().toString(), newPassword.getText().toString());
             User user = new User();
-            user.setPassword("123");
-            user.setPhoneNumber("0909123456");
+            user.setPhoneNumber(sdt);
+            user.setPassword(newPassword.getText().toString());
+            user.setAddress(edtAddress.getText().toString());
+            user.setEmail(edtEmail.getText().toString());
+            user.setFullName(edtFullName.getText().toString());
+            user.setAvatarUrl("");
+            user.setStatus("1");
             viewModel.register(user, ROLE_NAME)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())

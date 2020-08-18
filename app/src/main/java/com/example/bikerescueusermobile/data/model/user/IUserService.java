@@ -24,10 +24,11 @@ public interface IUserService {
     @POST("/api/login")
     Single<User> login(@Body LoginData loginData);
 
-    @POST("/biker/register?roleName=ROLE_BIKER")
-    Single<User> register(@Body LoginData user);
+//    @POST("/biker/register?roleName=ROLE_BIKER")
+//    Single<User> register(@Body LoginData user);
 
-    Single<User> register(User user, String roleName);
+    @POST("biker/register")
+    Single<User> register(@Body User user, @Query("roleName") String roleName);
 
     @POST("/biker/update/{id}")
     Single<User> updateInfo(@Header("Authorization") String token, @Path("id") int userId, @Body User user);
