@@ -20,11 +20,11 @@
         android:id="@+id/btnShowShopList"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="10dp"
-        android:background="@drawable/border"
+        android:layout_margin="20dp"
+        android:background="@drawable/border_login"
         android:text="Danh sách cửa hàng"
         android:textAllCaps="false"
-        android:textColor="@color/black"
+        android:textColor="@color/white"
         app:layout_anchor="@+id/mapHome"
         app:layout_anchorGravity="center|top" />
 

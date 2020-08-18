@@ -311,8 +311,9 @@ public class MapActivity extends DaggerAppCompatActivity implements
 
                             SwipeRefreshLayout refresh = view.findViewById(R.id.pullToRefreshReview);
                             refresh.setOnRefreshListener(() -> refresh.setRefreshing(false));
-
                             mSweetSheet.show();
+                        } else{
+                            Log.e(TAG, "listReviews != null && listReviews.size() > 0");
                         }
                     }, throwable -> {
                         Log.e(TAG, "getReviewCommentByShopId: " + throwable.getMessage());
@@ -697,18 +698,7 @@ public class MapActivity extends DaggerAppCompatActivity implements
 
     @Override
     public void onBackPressed() {
-
-        if (mSweetSheet.isShow()) {
-            mSweetSheet.dismiss();
-        } else {
-            super.onBackPressed();
-        }
-
-        if (mSweetSheetShop.isShow()) {
-            mSweetSheetShop.dismiss();
-        } else {
-            super.onBackPressed();
-        }
+        finish();
     }
 
     private double getRatingScore(double shopRating) {
