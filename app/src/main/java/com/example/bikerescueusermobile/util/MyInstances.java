@@ -47,6 +47,11 @@ public class MyInstances {
     public static final int ERROR_VANDEKHAC = 3;
     public static final int ERROR_VEHICLE_TYPE = 1;
 
+    // algorithm
+    public static final double DISTANCE_WEIGHT = 0.5;
+    public static final double PRICE_WEIGHT = 0.3;
+    public static final double RATING_WEIGHT = 0.2;
+
 
 //    //for biker's request detail
 //    public static final String SENT_FROM_HISTORY = "SENT_FROM_HISTORY";

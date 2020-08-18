@@ -7,6 +7,7 @@ import java.util.List;
 import javax.inject.Inject;
 
 import io.reactivex.Single;
+import okhttp3.MultipartBody;
 
 public class RequestRepository {
     private final IRequestService iRequestService;
@@ -21,8 +22,8 @@ public class RequestRepository {
         return iRequestService.getRequestByShopId(token, shopId);
     }
 
-    public Single<Response<RequestDTO>> createRequest(RequestDTO request) {
-        return iRequestService.createRequest(CurrentUser.getInstance().getAccessToken(), request);
+    public Single<Response<RequestDTO>> createRequest(RequestDTO request, List<MultipartBody.Part> listImg) {
+        return iRequestService.createRequest(CurrentUser.getInstance().getAccessToken(), request,  listImg);
     }
 
     public Single<Request> getRequestById(int reqId) {
@@ -47,5 +48,9 @@ public class RequestRepository {
 
     public Single<ReviewRequestDTO> reviewRequest(int requestId, ReviewRequestDTO reviewRequestDTO){
         return iRequestService.reviewRequest(requestId, reviewRequestDTO, CurrentUser.getInstance().getAccessToken());
+    }
+
+    public Single<List<RequestImg>> getReqImgByReqId(int reqId){
+        return iRequestService.getReqImgByReqId(reqId, CurrentUser.getInstance().getAccessToken());
     }
 }

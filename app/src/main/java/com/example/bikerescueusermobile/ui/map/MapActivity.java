@@ -42,6 +42,8 @@ import com.example.bikerescueusermobile.ui.confirm.ConfirmInfoActivity;
 import com.example.bikerescueusermobile.ui.favorite.FavoriteRecyclerViewAdapter;
 import com.example.bikerescueusermobile.ui.home.HomeFragment;
 import com.example.bikerescueusermobile.ui.seach_shop_service.ShopServiceViewModel;
+import com.example.bikerescueusermobile.ui.seach_shop_service.TopShopRecyclerViewAdapter;
+import com.example.bikerescueusermobile.ui.seach_shop_service.TopShopSelectedListener;
 import com.example.bikerescueusermobile.ui.tracking_map.ViewReviewRvAdapter;
 import com.example.bikerescueusermobile.util.MyInstances;
 import com.example.bikerescueusermobile.util.MyMethods;
@@ -82,6 +84,7 @@ import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -114,7 +117,7 @@ import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.lineWidth;
 
 
 public class MapActivity extends DaggerAppCompatActivity implements
-        OnMapReadyCallback, MapboxMap.OnMapClickListener, PermissionsListener {
+        OnMapReadyCallback, MapboxMap.OnMapClickListener, PermissionsListener, TopShopSelectedListener {
 
     private static final String TAG = "MapActivity";
     private static final String ROUTE_LAYER_ID = "route-layer-id";
@@ -154,6 +157,7 @@ public class MapActivity extends DaggerAppCompatActivity implements
     private String mPlaceName = "";
     private ArrayList<ShopServiceTable> listAllShopServices;
     private SweetSheet mSweetSheet;
+    private SweetSheet mSweetSheetShop;
 
     @Inject
     ViewModelFactory viewModelFactory;
@@ -202,7 +206,82 @@ public class MapActivity extends DaggerAppCompatActivity implements
         initShopDetail(s, id, true);
     }
 
-    private void setViewReviewButton(int shopOwnerId){
+    public void showSuggestShops(List<Shop> shops) {
+        //set sweet sheet on cluster map
+        mSweetSheetShop = new SweetSheet(mapRelativeLayout);
+        CustomDelegate customDelegate = new CustomDelegate(true,
+                CustomDelegate.AnimationType.DuangLayoutAnimation);
+        View view = LayoutInflater.from(this).inflate(R.layout.fragment_algo_shop, null, false);
+        customDelegate.setCustomView(view);
+        mSweetSheetShop.setDelegate(customDelegate);
+
+        double totalPrice = 0;
+        double totalDistance = 0;
+        for (int i = 0; i < shops.size(); i++) {
+            totalDistance += shops.get(i).getDistanceFromUser();
+            double price = Double.parseDouble(shops.get(i).getDescription());
+            if (price > 0) {
+                totalPrice += price;
+            }
+        }
+
+        Log.e(TAG, "total price: " + totalPrice + "  --- total dis:" + totalDistance);
+
+        List<Shop> sortedList = new ArrayList<>();
+        if(totalPrice == 0){
+            // neu khong co gia thi se sort theo khoang cach
+            Log.e(TAG, "price = 0");
+            sortedList.addAll(shops);
+            int size = sortedList.size();
+            for (int i = 0; i < size - 1; i++)
+                for (int j = 0; j < size - i - 1; j++)
+                    if (sortedList.get(j).getDistanceFromUser() > sortedList.get(j + 1).getDistanceFromUser()) {
+                        // swap arr[j+1] and arr[j]
+                        Shop temp = sortedList.get(j);
+                        sortedList.set(j, sortedList.get(j + 1));
+                        sortedList.set(j + 1, temp);
+                    }
+        }else{
+            // neu co gia ro rang => tinh weigh roi moi sort theo trong so
+            Log.e(TAG, "price != 0");
+            for (int i = 0; i < shops.size(); i++) {
+                double score = 0;
+                double ratingScore = getRatingScore(Double.parseDouble(shops.get(i).getShopRatingStar())) * MyInstances.RATING_WEIGHT;
+                double distanceScore = getScoreInverse(shops.get(i).getDistanceFromUser(), totalDistance) * MyInstances.DISTANCE_WEIGHT;
+                double priceScore = getScoreInverse(Double.parseDouble(shops.get(i).getDescription()), totalPrice) * MyInstances.PRICE_WEIGHT;
+
+                score = ratingScore + distanceScore + priceScore;
+                shops.get(i).setScore(score);
+                Log.e(TAG, "score shop " + i + " ---- score = " + score);
+            }
+
+            //bubble sort
+            sortedList.addAll(shops);
+            int size = sortedList.size();
+            for (int i = 0; i < size - 1; i++)
+                for (int j = 0; j < size - i - 1; j++)
+                    if (sortedList.get(j).getScore() < sortedList.get(j + 1).getScore()) {
+                        // swap arr[j+1] and arr[j]
+                        Shop temp = sortedList.get(j);
+                        sortedList.set(j, sortedList.get(j + 1));
+                        sortedList.set(j + 1, temp);
+                    }
+        }
+
+
+
+        RecyclerView mRecyclerView = view.findViewById(R.id.rvTopShop);
+
+        mRecyclerView.setAdapter(new TopShopRecyclerViewAdapter(sortedList, this));
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+        SwipeRefreshLayout refresh = view.findViewById(R.id.pullToRefreshReview);
+        refresh.setOnRefreshListener(() -> refresh.setRefreshing(false));
+
+        mSweetSheetShop.show();
+    }
+
+    private void setViewReviewButton(int shopOwnerId) {
         btnReadReview.setOnClickListener(v -> {
             mSweetSheet = new SweetSheet(mapRelativeLayout);
             CustomDelegate customDelegate = new CustomDelegate(true,
@@ -220,8 +299,8 @@ public class MapActivity extends DaggerAppCompatActivity implements
                         if (listReviews != null && listReviews.size() > 0) {
                             List<ReviewRequestDTO> list = new ArrayList<>();
 
-                            for(int i = 0; i < listReviews.size(); i++){
-                                if(listReviews.get(i).getReviewRating() > 0){
+                            for (int i = 0; i < listReviews.size(); i++) {
+                                if (listReviews.get(i).getReviewRating() > 0) {
                                     list.add(listReviews.get(i));
                                 }
                             }
@@ -250,8 +329,13 @@ public class MapActivity extends DaggerAppCompatActivity implements
         String start = shop.getShopRatingStar() + "/5";
         txtMapShopRatingStarNum.setText(start);
         txtShopAndCurrentLocationDistance.setText(String.format("Cách đây %.1f km", shop.getDistanceFromUser()));
+        Log.e(TAG, "shop: " + shop.toString());
 
-        setViewReviewButton(shop.getUser().getId());
+        if (shop.getUser() != null) {
+            setViewReviewButton(shop.getUser().getId());
+        } else {
+            setViewReviewButton(shop.getUserNameOnly().getId());
+        }
 
         if (!hasServiceName) {
             viewModel.getShopServiceByShopId(shop.getId())
@@ -347,7 +431,6 @@ public class MapActivity extends DaggerAppCompatActivity implements
     private void hideClusterMap() {
         mapClusterShop.setVisibility(View.GONE);
         btnGoogleMapBack.setVisibility(View.GONE);
-
     }
 
     private View.OnClickListener btnMapBackOnClickListener = v -> {
@@ -619,6 +702,28 @@ public class MapActivity extends DaggerAppCompatActivity implements
             mSweetSheet.dismiss();
         } else {
             super.onBackPressed();
+        }
+
+        if (mSweetSheetShop.isShow()) {
+            mSweetSheetShop.dismiss();
+        } else {
+            super.onBackPressed();
+        }
+    }
+
+    private double getRatingScore(double shopRating) {
+        return (shopRating * 100) / 5;
+    }
+
+    private double getScoreInverse(double element, double sumElement) {
+        return (1 - element / sumElement) * 100;
+    }
+
+    @Override
+    public void onDetailSelected(Shop shop) {
+        setShopDetailToMapbox(shop, shop.getUserNameOnly().getId());
+        if (mSweetSheetShop.isShow()) {
+            mSweetSheetShop.dismiss();
         }
     }
 }

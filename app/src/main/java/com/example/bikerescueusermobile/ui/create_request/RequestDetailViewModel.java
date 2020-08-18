@@ -4,9 +4,12 @@ import androidx.lifecycle.ViewModel;
 
 import com.example.bikerescueusermobile.data.model.request.Request;
 import com.example.bikerescueusermobile.data.model.request.RequestDTO;
+import com.example.bikerescueusermobile.data.model.request.RequestImg;
 import com.example.bikerescueusermobile.data.model.request.RequestRepository;
 import com.example.bikerescueusermobile.data.model.request.Response;
 import com.example.bikerescueusermobile.data.model.request.ReviewRequestDTO;
+
+import java.util.List;
 
 import javax.inject.Inject;
 
@@ -38,5 +41,9 @@ public class RequestDetailViewModel extends ViewModel {
 
     public Single<ReviewRequestDTO> reviewRequest(int requestId, ReviewRequestDTO reviewRequestDTO){
         return requestRepository.reviewRequest(requestId, reviewRequestDTO);
+    }
+
+    public Single<List<RequestImg>> getReqImgByReqId(int reqId){
+        return requestRepository.getReqImgByReqId(reqId);
     }
 }
