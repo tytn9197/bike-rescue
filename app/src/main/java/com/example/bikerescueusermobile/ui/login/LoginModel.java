@@ -45,6 +45,10 @@ public class LoginModel extends ViewModel {
         return userRepository.login(loginData);
     }
 
+    public Single<User> loginWithoutLoad(LoginData loginData) {
+        return userRepository.login(loginData);
+    }
+
     public Single<UserLatLong> setUserLatLong(UserLatLong input, String token){
         return userRepository.setUserLatLong(input, token);
     }

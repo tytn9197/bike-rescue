@@ -52,4 +52,7 @@ public interface IRequestService {
 
     @GET("/shop/getReqImgByReqId/{reqId}")
     Single<List<RequestImg>> getReqImgByReqId(@Path("reqId") int reqId, @Header("Authorization") String token);
+
+    @GET("/shop/rejectRequest/{reqId}")
+    Single<Boolean> rejectRequest(@Path("reqId") int reqId, @Query("reason") String reason, @Header("Authorization") String token);
 }

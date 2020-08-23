@@ -1,5 +1,6 @@
 package com.example.bikerescueusermobile.data.model.user;
 
+import com.example.bikerescueusermobile.data.model.shop.Shop;
 import com.example.bikerescueusermobile.data.model.vehicle.VehicleDTO;
 import com.google.gson.annotations.SerializedName;
 
@@ -63,6 +64,11 @@ public class User implements Serializable {
     private int currentBikerId;
 
     private int sentReqId;
+
+    private String passwordLogin;
+
+    @SerializedName("shop")
+    private Shop shop;
 
     public User(){
 

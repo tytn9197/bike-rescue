@@ -75,6 +75,9 @@ public class ShopProfileFragment extends BaseFragment {
     @BindView(R.id.shopOwnerStatus)
     Switch shopOwnerStatus;
 
+    @BindView(R.id.shopProfileName)
+    TextView shopProfileName;
+
     @Inject
     ViewModelFactory viewModelFactory;
 
@@ -91,6 +94,17 @@ public class ShopProfileFragment extends BaseFragment {
             Picasso.with(getActivity())
                     .load(CurrentUser.getInstance().getAvatarUrl()).placeholder(R.drawable.ic_load)
                     .into(imgAvatar);
+        }
+
+        shopProfileName.setText(CurrentUser.getInstance().getShop().getShopName());
+
+        shopProfileRating.setStepSize((float) 0.5);
+        float numOfStar = Float.parseFloat(CurrentUser.getInstance().getShop().getShopRatingStar());
+        if(numOfStar < 0){
+            shopProfileRating.setVisibility(View.GONE);
+        }else{
+            shopProfileRating.setVisibility(View.VISIBLE);
+            shopProfileRating.setRating(numOfStar);
         }
 
         manageProfile.setOnClickListener(v -> {
@@ -128,15 +142,6 @@ public class ShopProfileFragment extends BaseFragment {
                     }else{
                         booking.setText("0");
                     }
-                });
-
-        viewModel.getNumOfStarByShopOwnerId(CurrentUser.getInstance().getId())
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(numOfStar -> {
-                    //init rating
-                    shopProfileRating.setStepSize((float) 0.5);
-                    shopProfileRating.setRating(numOfStar.floatValue());
                 });
 
         shopOwnerStatus.setOnCheckedChangeListener((buttonView, isChecked) -> {

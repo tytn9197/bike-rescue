@@ -1,6 +1,8 @@
 package com.example.bikerescueusermobile.ui.tracking_map;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -11,12 +13,16 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
 
 import androidx.annotation.LayoutRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
@@ -25,6 +31,7 @@ import com.example.bikerescueusermobile.R;
 import com.example.bikerescueusermobile.base.BaseActivity;
 import com.example.bikerescueusermobile.data.model.request.CurrentRequest;
 import com.example.bikerescueusermobile.data.model.request.MessageRequestFB;
+import com.example.bikerescueusermobile.data.model.request.ReviewRequestDTO;
 import com.example.bikerescueusermobile.data.model.user.CurrentUser;
 import com.example.bikerescueusermobile.data.model.user.UserLatLong;
 import com.example.bikerescueusermobile.ui.create_request.RequestDetailViewModel;
@@ -68,6 +75,7 @@ import com.mapbox.mapboxsdk.style.layers.PropertyFactory;
 import com.mapbox.mapboxsdk.style.layers.SymbolLayer;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
 import com.mapbox.mapboxsdk.style.sources.Source;
+import com.willy.ratingbar.ScaleRatingBar;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -134,11 +142,11 @@ public class TrackingMapActivity extends DaggerAppCompatActivity implements
 
     private LoginModel viewModel;
     private boolean isBikerTracking;
-    private Style style;
     private DatabaseReference mDatabase;
     private List<UserLatLong> userLatLongList = new ArrayList<>();
     private RequestDetailViewModel reqViewModel;
     private double distance = -1;
+    private AlertDialog reviewDialog;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -148,6 +156,12 @@ public class TrackingMapActivity extends DaggerAppCompatActivity implements
         reqViewModel = ViewModelProviders.of(this, viewModelFactory).get(RequestDetailViewModel.class);
 
         isBikerTracking = getIntent().getBooleanExtra("isBikerTracking", true);
+
+        if (isBikerTracking) {
+            LocalBroadcastManager.getInstance(this).registerReceiver(
+                    mMessageReceiver, new IntentFilter("BikeRescueBiker"));
+        }
+
         int reqId = getIntent().getIntExtra("reqId", -1);
         String reqStatus = "";
         reqStatus = getIntent().getStringExtra("reqStatus");
@@ -172,7 +186,7 @@ public class TrackingMapActivity extends DaggerAppCompatActivity implements
                     btnArrived.setVisibility(View.GONE);
                 }
 
-            if(isBikerTracking){
+            if (isBikerTracking) {
                 btnArrived.setVisibility(View.GONE);
             }
 
@@ -221,6 +235,17 @@ public class TrackingMapActivity extends DaggerAppCompatActivity implements
                                     destination = new LatLng(Double.parseDouble(newUser.getLatitude()), Double.parseDouble(newUser.getLongtitude()));
                                     updateRoute();
 
+                                    if (distance > 0 && distance < 0.5) {
+                                        reqViewModel.updateStatusRequest(reqId, MyInstances.STATUS_ARRIVED)
+                                                .subscribeOn(Schedulers.io())
+                                                .observeOn(AndroidSchedulers.mainThread())
+                                                .subscribe(responseDTO -> {
+                                                    Intent i = new Intent();
+                                                    setResult(Activity.RESULT_OK, i);
+                                                    finish();
+                                                });
+                                    }
+
                                     //set up btn arrive
                                     btnArrived.setOnClickListener(view -> {
                                         Log.e(TAG, "distance: " + distance);
@@ -242,31 +267,6 @@ public class TrackingMapActivity extends DaggerAppCompatActivity implements
                                             errorDialog.show();
                                         }
                                     });
-
-//                                    //set up finish button
-//                                    btnFinish.setOnClickListener(v -> {
-//                                        SweetAlertDialog sweetAlertDialog = new SweetAlertDialog(TrackingMapActivity.this, SweetAlertDialog.NORMAL_TYPE);
-//                                        sweetAlertDialog.setTitleText("Thông báo");
-//                                        sweetAlertDialog.setConfirmText("Xác nhận");
-//                                        sweetAlertDialog.setCanceledOnTouchOutside(false);
-//                                        sweetAlertDialog.setCancelable(false);
-//                                        sweetAlertDialog.setContentText("Xác nhận hoàn thành yêu cầu?");
-//                                        sweetAlertDialog.setCancelText("Hủy");
-//                                        sweetAlertDialog.setCancelClickListener(Dialog::dismiss);
-//                                        sweetAlertDialog.setConfirmClickListener(dialog -> {
-//                                            dialog.dismiss();
-//
-//                                            reqViewModel.finishedRequest(reqId)
-//                                                    .subscribeOn(Schedulers.io())
-//                                                    .observeOn(AndroidSchedulers.mainThread())
-//                                                    .subscribe(isSuccess -> {
-//                                                        if (isSuccess) {
-//                                                            SharedPreferenceHelper.setSharedPreferenceString(TrackingMapActivity.this, MyInstances.KEY_SHOP_REQUEST, "");
-//                                                        }
-//                                                    });
-//                                        });
-//                                        sweetAlertDialog.show();
-//                                    });
                                 }
                             }
 
@@ -283,6 +283,40 @@ public class TrackingMapActivity extends DaggerAppCompatActivity implements
         }//end if (reqId == -1)
     }
 
+    private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (context != null && getLifecycle().getCurrentState().isAtLeast(Lifecycle.State.STARTED)) {
+                String message = intent.getStringExtra("message");
+                Gson gson = new Gson();
+                MessageRequestFB responeReq = gson.fromJson(message, MessageRequestFB.class);
+
+
+                if (responeReq.getMessage().equals(MyInstances.NOTI_FINISH)) {
+                    SharedPreferenceHelper.setSharedPreferenceString(getApplicationContext(), MyInstances.KEY_BIKER_REQUEST, "");
+
+                    //review reruest
+                    setupReviewView(responeReq.getReqId(), responeReq.getReqCode(), responeReq.getReqPrice());
+                    reviewDialog.show();
+                }
+
+                if (responeReq.getMessage().equals(MyInstances.NOTI_REJECTED) || responeReq.getMessage().equals(MyInstances.NOTI_CANELED)) {
+                    SharedPreferenceHelper.setSharedPreferenceString(getApplicationContext(), MyInstances.KEY_BIKER_REQUEST, "");
+                    Intent i = new Intent();
+                    TrackingMapActivity.this.setResult(Activity.RESULT_OK, i);
+                    finish();
+                }
+
+                if (responeReq.getMessage().equals(MyInstances.NOTI_ARRIVED)) {
+                    Intent i = new Intent();
+                    TrackingMapActivity.this.setResult(Activity.RESULT_OK, i);
+                    finish();
+                }
+
+            }
+        }
+    };
+
     @Override
     public void setContentView(@LayoutRes int layoutResID) {
         getDelegate().setContentView(layoutResID);
@@ -293,7 +327,6 @@ public class TrackingMapActivity extends DaggerAppCompatActivity implements
         this.mapboxMap = mapboxMap;
         mapboxMap.setStyle(Style.LIGHT,
                 style -> {
-                    this.style = style;
                     initLayers(style);
                     enableLocationComponent(style);
                     //Add marker
@@ -349,7 +382,6 @@ public class TrackingMapActivity extends DaggerAppCompatActivity implements
         if (mapboxMap != null) {
             mapboxMap.setStyle(Style.LIGHT,
                     style -> {
-                        this.style = style;
                         initLayers(style);
                         // Get an instance of the component
                         LocationComponent locationComponent = mapboxMap.getLocationComponent();
@@ -482,6 +514,55 @@ public class TrackingMapActivity extends DaggerAppCompatActivity implements
                 iconIgnorePlacement(true),
                 iconIgnorePlacement(true),
                 iconOffset(new Float[]{0f, -4f})));
+    }
+
+    @SuppressLint("DefaultLocale")
+    private void setupReviewView(int reqId, String code, double price) {
+        //set up review dialog
+        LayoutInflater factory = LayoutInflater.from(this);
+        final View reviewView = factory.inflate(R.layout.dialog_review_request, null);
+        reviewDialog = new AlertDialog.Builder(this).create();
+
+        ScaleRatingBar ratingBar = reviewView.findViewById(R.id.reviewRatingBar);
+        EditText edtComment = reviewView.findViewById(R.id.edtCommentDetail);
+        TextView txtReqCode = reviewView.findViewById(R.id.txtReviewReqCode);
+        TextView txtPrice = reviewView.findViewById(R.id.txtReviewPrice);
+
+        txtReqCode.setText(code);
+        txtPrice.setText(String.format("Giá: %1.0f k VND", price));
+
+        reviewDialog.setView(reviewView);
+        reviewView.findViewById(R.id.btn_confirm).setOnClickListener(confirmView -> {
+            reviewDialog.dismiss();
+
+            String comment = edtComment.getText().toString();
+            double star = ratingBar.getRating();
+
+            ReviewRequestDTO reviewDTO = new ReviewRequestDTO(comment, star);
+            Log.e(TAG, "review: " + reviewDTO.toString());
+
+            ViewModelProviders.of(this, viewModelFactory).get(RequestDetailViewModel.class).reviewRequest(reqId, reviewDTO)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(respone -> {
+                        if (respone != null) {
+                            SweetAlertDialog notiDialog = new SweetAlertDialog(this, SweetAlertDialog.SUCCESS_TYPE);
+                            notiDialog.setTitleText("Thông báo");
+                            notiDialog.setContentText("Đánh giá thành công");
+                            notiDialog.setConfirmText("OK");
+                            notiDialog.setConfirmClickListener(sweetAlertDialog -> {
+                                sweetAlertDialog.dismiss();
+                                Intent i = new Intent();
+                                TrackingMapActivity.this.setResult(Activity.RESULT_OK, i);
+                                finish();
+                            });
+                            notiDialog.show();
+                        }
+                    }, throwable -> {
+                        Log.e(TAG, "reviewRequest: " + throwable.getMessage());
+                    });
+        });
+        reviewView.findViewById(R.id.btn_return).setOnClickListener(v1 -> reviewDialog.dismiss());
     }
 
     @Override

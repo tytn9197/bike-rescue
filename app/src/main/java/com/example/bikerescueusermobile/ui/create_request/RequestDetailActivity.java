@@ -205,7 +205,7 @@ public class RequestDetailActivity extends BaseActivity {
                     btnReqDetailCancel.setVisibility(View.GONE);
                     txtReqDetailCancelReason.setVisibility(View.VISIBLE);
                     if (responeReq.getReason() != null && !responeReq.getReason().equals("")) {
-                        txtReqDetailCancelReason.setText(" Lý do hủy: " + responeReq.getReason());
+                        txtReqDetailCancelReason.setText(" Lý do từ chối: " + responeReq.getReason());
                     }
                     SharedPreferenceHelper.setSharedPreferenceString(getApplicationContext(), MyInstances.KEY_BIKER_REQUEST, "");
                 }
@@ -310,8 +310,12 @@ public class RequestDetailActivity extends BaseActivity {
         }
 
         if (request.getCancelReason() != null) {
-            if (request.getStatus().equals(MyInstances.STATUS_CANCELED) || request.getStatus().equals(MyInstances.STATUS_REJECTED))
+            if (request.getStatus().equals(MyInstances.STATUS_CANCELED))
                 txtReqDetailCancelReason.setText(" Lý do hủy: " + request.getCancelReason());
+
+            if (request.getStatus().equals(MyInstances.STATUS_REJECTED))
+                txtReqDetailCancelReason.setText(" Lý do từ chối: " + request.getCancelReason());
+
             txtReqDetailCancelReason.setVisibility(View.VISIBLE);
         }
 
@@ -375,10 +379,16 @@ public class RequestDetailActivity extends BaseActivity {
         setCancelButtonClick(request.getId(), false);
 
         txtReqDetailCancelReason.setVisibility(View.GONE);
-        if (request.getStatus().equals(MyInstances.STATUS_CANCELED) || request.getStatus().equals(MyInstances.STATUS_REJECTED)) {
+        if (request.getStatus().equals(MyInstances.STATUS_CANCELED)) {
             txtReqDetailCancelReason.setVisibility(View.VISIBLE);
             txtReqDetailCancelReason.setText(" Lý do hủy: " + request.getCancelReason());
         }
+
+        if (request.getStatus().equals(MyInstances.STATUS_REJECTED)) {
+            txtReqDetailCancelReason.setVisibility(View.VISIBLE);
+            txtReqDetailCancelReason.setText(" Lý do từ chối: " + request.getCancelReason());
+        }
+
         btnReqDetailCallShop.setVisibility(View.GONE);
     }
 
@@ -400,8 +410,10 @@ public class RequestDetailActivity extends BaseActivity {
                         if (listConfig != null) {
                             ArrayAdapter listAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item);
                             for (int i = 0; i < listConfig.size(); i++) {
-                                if (listConfig.get(i).getName().equals("biker cancel reason"))
+                                if (listConfig.get(i).getName().equals("biker cancel reason")) {
                                     listAdapter.add(listConfig.get(i).getValue());
+                                    Log.e(TAG, listConfig.get(i).getValue());
+                                }
                             }
                             spinner.setAdapter(listAdapter);
                         }
@@ -413,6 +425,8 @@ public class RequestDetailActivity extends BaseActivity {
             spinner.setOnItemSelectedListener((view, position, id, item) -> {
                 if (spinner.getText().toString().equals("Lý do khác")) {
                     txtReasonDetail.setVisibility(View.VISIBLE);
+                }else{
+                    txtReasonDetail.setVisibility(View.GONE);
                 }
             });
 
@@ -461,12 +475,14 @@ public class RequestDetailActivity extends BaseActivity {
             txtReqDetailStatus.setText("Đã hủy");
             txtReqDetailStatus.setTextColor(Color.RED);
             btnReqDetailCancel.setVisibility(View.GONE);
+            SharedPreferenceHelper.setSharedPreferenceString(getApplicationContext(), MyInstances.KEY_BIKER_REQUEST, "");
         }
 
         if (status.equals(MyInstances.STATUS_REJECTED)) {
             txtReqDetailStatus.setText("Cửa hàng đã từ chối");
             txtReqDetailStatus.setTextColor(Color.RED);
             btnReqDetailCancel.setVisibility(View.GONE);
+            SharedPreferenceHelper.setSharedPreferenceString(getApplicationContext(), MyInstances.KEY_BIKER_REQUEST, "");
         }
 
         if (status.equals(MyInstances.STATUS_ACCEPT)) {

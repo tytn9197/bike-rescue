@@ -225,6 +225,14 @@ public class ConfirmInfoActivity extends BaseActivity {
                                 }
                             }
                             tvProblem.setText(s);
+
+                            if (serviceName.equals("Đổ xăng")) {
+                                edtDoXang.setVisibility(View.VISIBLE);
+                            }
+
+                            if(serviceName.equals("Vấn đề khác")){
+                                edtVanDeKhac.setVisibility(View.VISIBLE);
+                            }
                         }
 
                         tvBookService.setOnClickListener(v -> {

@@ -53,4 +53,8 @@ public class RequestRepository {
     public Single<List<RequestImg>> getReqImgByReqId(int reqId){
         return iRequestService.getReqImgByReqId(reqId, CurrentUser.getInstance().getAccessToken());
     }
+
+    public Single<Boolean> rejectRequest(int reqId, String reason){
+        return iRequestService.rejectRequest(reqId, reason, CurrentUser.getInstance().getAccessToken());
+    }
 }

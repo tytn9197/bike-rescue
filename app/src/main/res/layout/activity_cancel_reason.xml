@@ -36,9 +36,7 @@
             android:padding="18dp"
             android:textSize="18dp"
             app:ms_dropdown_max_height="140dp"
-            app:ms_hint_color="#BEBBBB">
-
-        </com.jaredrummler.materialspinner.MaterialSpinner>
+            app:ms_hint_color="#BEBBBB"/>
 
         <EditText
             android:id="@+id/txtReasonDetail"

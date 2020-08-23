@@ -113,6 +113,16 @@
             android:padding="20dp">
 
             <TextView
+                android:id="@+id/shopProfileName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:text="Cua hang Duc Phat"
+                android:textColor="@color/black"
+                android:textSize="24sp"
+                android:textStyle="bold"/>
+
+            <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="10dp"

@@ -2,6 +2,7 @@ package com.example.bikerescueusermobile.ui.map;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.Dialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.BitmapFactory;
@@ -158,6 +159,7 @@ public class MapActivity extends DaggerAppCompatActivity implements
     private ArrayList<ShopServiceTable> listAllShopServices;
     private SweetSheet mSweetSheet;
     private SweetSheet mSweetSheetShop;
+    private double distanceToShop = -1;
 
     @Inject
     ViewModelFactory viewModelFactory;
@@ -188,7 +190,11 @@ public class MapActivity extends DaggerAppCompatActivity implements
         Shop shop = (Shop) getIntent().getSerializableExtra("shop");
         this.distance = getIntent().getDoubleExtra("dis", -1);
         serviceName = getIntent().getStringExtra("serviceName");
-        initShopDetail(shop, shop.getUser().getId(), false);
+        if (shop.getUser() != null)
+            initShopDetail(shop, shop.getUser().getId(), false);
+
+        if(shop.getUserNameOnly() != null)
+            initShopDetail(shop, shop.getUserNameOnly().getId(), false);
 
         //set-up cluster google map
         FragmentManager manager = getSupportFragmentManager();
@@ -228,7 +234,9 @@ public class MapActivity extends DaggerAppCompatActivity implements
         Log.e(TAG, "total price: " + totalPrice + "  --- total dis:" + totalDistance);
 
         List<Shop> sortedList = new ArrayList<>();
-        if(totalPrice == 0){
+        if (sortedList.size() == 1) {
+
+        } else if (totalPrice == 0) {
             // neu khong co gia thi se sort theo khoang cach
             Log.e(TAG, "price = 0");
             sortedList.addAll(shops);
@@ -241,7 +249,7 @@ public class MapActivity extends DaggerAppCompatActivity implements
                         sortedList.set(j, sortedList.get(j + 1));
                         sortedList.set(j + 1, temp);
                     }
-        }else{
+        } else {
             // neu co gia ro rang => tinh weigh roi moi sort theo trong so
             Log.e(TAG, "price != 0");
             for (int i = 0; i < shops.size(); i++) {
@@ -267,7 +275,6 @@ public class MapActivity extends DaggerAppCompatActivity implements
                         sortedList.set(j + 1, temp);
                     }
         }
-
 
 
         RecyclerView mRecyclerView = view.findViewById(R.id.rvTopShop);
@@ -312,7 +319,7 @@ public class MapActivity extends DaggerAppCompatActivity implements
                             SwipeRefreshLayout refresh = view.findViewById(R.id.pullToRefreshReview);
                             refresh.setOnRefreshListener(() -> refresh.setRefreshing(false));
                             mSweetSheet.show();
-                        } else{
+                        } else {
                             Log.e(TAG, "listReviews != null && listReviews.size() > 0");
                         }
                     }, throwable -> {
@@ -400,7 +407,16 @@ public class MapActivity extends DaggerAppCompatActivity implements
         CurrentUser.getInstance().setChosenShopOwnerId(ownerId);
 
         btnSendRequest.setOnClickListener(v -> {
-            sendReqClick(shop);
+            if (distanceToShop > 0 && distanceToShop < 0.02) {
+                SweetAlertDialog errorDialog = new SweetAlertDialog(this, SweetAlertDialog.ERROR_TYPE);
+                errorDialog.setTitleText("Thông báo");
+                errorDialog.setConfirmText("OK");
+                errorDialog.setContentText("Cửa hàng đang rất gần bạn, xin vui lòng kiểm tra lại!");
+                errorDialog.setConfirmClickListener(Dialog::dismiss);
+                errorDialog.show();
+            } else {
+                sendReqClick(shop);
+            }
         });
     }
 
@@ -602,6 +618,7 @@ public class MapActivity extends DaggerAppCompatActivity implements
 
                             // Retrieve the directions route from the API response
                             currentRoute = response.body().routes().get(0);
+                            distanceToShop = response.body().routes().get(0).distance() / 1000;
                             if (loadedMapStyle.isFullyLoaded()) {
                                 // Retrieve and update the source designated for showing the directions route
                                 GeoJsonSource source = loadedMapStyle.getSourceAs(ROUTE_SOURCE_ID);

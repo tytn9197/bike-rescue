@@ -24,7 +24,7 @@ import java.util.Locale;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class TopShopRecyclerViewAdapter  extends RecyclerView.Adapter<TopShopRecyclerViewAdapter.ViewHolder>{
+public class TopShopRecyclerViewAdapter extends RecyclerView.Adapter<TopShopRecyclerViewAdapter.ViewHolder> {
     private List<Shop> data;
     private TopShopSelectedListener listener;
 
@@ -90,14 +90,22 @@ public class TopShopRecyclerViewAdapter  extends RecyclerView.Adapter<TopShopRec
             txtTopShopNumberOfStar.setText(txtNumOfStar);
 
             topShopRatingBar.setRating(Float.parseFloat(shop.getShopRatingStar()));
-            txtDistance.setText(String.format(Locale.getDefault(),"Cách đây %.1f km", shop.getDistanceFromUser()));
+            txtDistance.setText(String.format(Locale.getDefault(), "Cách đây %.1f km", shop.getDistanceFromUser()));
 
             wrapper.setOnClickListener(v -> listener.onDetailSelected(shop));
 
             if (shop.getAvtUrl() != null) {
-                Picasso.with(context)
-                        .load(shop.getAvtUrl()).placeholder(R.drawable.ic_load)
-                        .into(imgTopShop);
+                if (shop.getAvtUrl().contains("imgur"))
+                    Picasso.with(context)
+                            .load(shop.getAvtUrl()).placeholder(R.drawable.ic_load)
+                            .into(imgTopShop);
+            }
+
+            if (shop.getAvatarUrl() != null) {
+                if (shop.getAvatarUrl().contains("imgur"))
+                    Picasso.with(context)
+                            .load(shop.getAvatarUrl()).placeholder(R.drawable.ic_load)
+                            .into(imgTopShop);
             }
         }
 

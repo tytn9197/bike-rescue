@@ -46,4 +46,8 @@ public class RequestDetailViewModel extends ViewModel {
     public Single<List<RequestImg>> getReqImgByReqId(int reqId){
         return requestRepository.getReqImgByReqId(reqId);
     }
+
+    public Single<Boolean> rejectRequest(int reqId, String reason){
+        return requestRepository.rejectRequest(reqId, reason);
+    }
 }

@@ -234,20 +234,7 @@ public class ShopHomeFragment extends BaseFragment {
                                     });
 
                                     btnDecline.setOnClickListener(v -> {
-                                        sweetAlertDialog.setContentText("Từ chối yêu cầu này?");
-                                        sweetAlertDialog.setConfirmClickListener(d -> {
-                                            d.dismiss();
-                                            viewModel.updateStatusRequest(req.getId(), MyInstances.STATUS_REJECTED)
-                                                    .subscribeOn(Schedulers.io())
-                                                    .observeOn(AndroidSchedulers.mainThread())
-                                                    .subscribe(responseDTO -> {
-                                                        SharedPreferenceHelper.setSharedPreferenceString(getActivity(), MyInstances.KEY_SHOP_REQUEST, "");
-                                                        getActivity().getSupportFragmentManager().beginTransaction()
-                                                                .replace(R.id.frame_container, new ShopHomeFragment())
-                                                                .commit();
-                                                    });
-                                        });
-                                        sweetAlertDialog.show();
+                                        rejectReq(req.getId());
                                     });
 
                                     btnAccept.setOnClickListener(v -> {
@@ -383,20 +370,7 @@ public class ShopHomeFragment extends BaseFragment {
                                     });
 
                                     btnDecline.setOnClickListener(v -> {
-                                        sweetAlertDialog.setContentText("Từ chối yêu cầu này?");
-                                        sweetAlertDialog.setConfirmClickListener(d -> {
-                                            d.dismiss();
-                                            viewModel.updateStatusRequest(req.getId(), MyInstances.STATUS_REJECTED)
-                                                    .subscribeOn(Schedulers.io())
-                                                    .observeOn(AndroidSchedulers.mainThread())
-                                                    .subscribe(responseDTO -> {
-                                                        SharedPreferenceHelper.setSharedPreferenceString(getActivity(), MyInstances.KEY_SHOP_REQUEST, "");
-                                                        getActivity().getSupportFragmentManager().beginTransaction()
-                                                                .replace(R.id.frame_container, new ShopHomeFragment())
-                                                                .commit();
-                                                    });
-                                        });
-                                        sweetAlertDialog.show();
+                                        rejectReq(req.getId());
                                     });
 
                                     btnAccept.setOnClickListener(v -> {
@@ -550,6 +524,8 @@ public class ShopHomeFragment extends BaseFragment {
             spinner.setOnItemSelectedListener((view, position, id, item) -> {
                 if (spinner.getText().toString().equals("Lý do khác")) {
                     txtReasonDetail.setVisibility(View.VISIBLE);
+                }else{
+                    txtReasonDetail.setVisibility(View.GONE);
                 }
             });
 
@@ -678,88 +654,64 @@ public class ShopHomeFragment extends BaseFragment {
         txtStatus.setVisibility(View.GONE);
     }
 
-//    @SuppressWarnings({"MissingPermission"})
-//    private void setBtnArrived(int reqId){
-//        DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference(MyInstances.APP);
-//        mDatabase.addValueEventListener(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(@NotNull DataSnapshot dataSnapshot) {
-//                List<UserLatLong> list = new ArrayList<>();
-//                for (DataSnapshot listUserLatlng : dataSnapshot.getChildren()) {
-//                    list.add(listUserLatlng.getValue(UserLatLong.class));
-//                }
-//                if (list.size() > 0) {
-//                    int pos = -1;
-//                    for (int i = 0; i < list.size(); i++) {
-//                        if (list.get(i).getId() == CurrentUser.getInstance().getCurrentBikerId())
-//                            pos = i;
-//                    }
-//                    if (pos > -1) {
-//                        UserLatLong newUser = list.get(pos);
-//                        final FusedLocationProviderClient mFusedLocationClient = LocationServices.getFusedLocationProviderClient(getActivity());
-//
-//                        mFusedLocationClient.getLastLocation().addOnSuccessListener(getActivity(), location -> {
-//                            if (location != null) {
-//                                Point origin = Point.fromLngLat(location.getLongitude(), location.getLatitude());
-//
-//                                MapboxDirections client = MapboxDirections.builder()
-//                                        .origin(origin)
-//                                        .destination(Point.fromLngLat(Double.parseDouble(newUser.getLongtitude()), Double.parseDouble(newUser.getLatitude())))
-//                                        .overview(DirectionsCriteria.OVERVIEW_FULL)
-//                                        .profile(DirectionsCriteria.PROFILE_DRIVING)
-//                                        .accessToken(getString(R.string.mapbox_access_token))
-//                                        .build();
-//
-//                                client.enqueueCall(new Callback<DirectionsResponse>() {
-//                                    @Override
-//                                    public void onResponse(Call<DirectionsResponse> call, Response<DirectionsResponse> response) {
-//                                        if (response.body() == null) {
-//                                            Log.e(TAG, "getDistance & Duration - response.body() == null: No routes found, make sure you set the right user and access token.");
-//                                            return;
-//                                        } else if (response.body().routes().size() < 1) {
-//                                            Log.e(TAG, "getDistance & Duration - response.body().routes().size() < 1: No routes found");
-//                                            return;
-//                                        }
-//
-//                                        double distance = response.body().routes().get(0).distance() / 1000;
-//                                        Log.e(TAG, "distance 11: " + distance);
-//                                        btnArrived.setOnClickListener(view -> {
-//                                            if (distance < 0.2 && distance > 0) { // 0.5 km
-//                                                viewModel.updateStatusRequest(reqId, MyInstances.STATUS_ARRIVED)
-//                                                        .subscribeOn(Schedulers.io())
-//                                                        .observeOn(AndroidSchedulers.mainThread())
-//                                                        .subscribe(responseDTO -> {
-//                                                            btnArrived.setVisibility(View.GONE);
-//                                                            btnFinish.setVisibility(View.VISIBLE);
-//                                                            txtStatus.setText("Đã đến nơi ");
-//                                                        });
-//                                            } else {
-//                                                SweetAlertDialog errorDialog = new SweetAlertDialog(getActivity(), SweetAlertDialog.ERROR_TYPE);
-//                                                errorDialog.setTitleText("Thông báo");
-//                                                errorDialog.setConfirmText("OK");
-//                                                errorDialog.setContentText("Vị trí của bạn và khách quá xa nhau");
-//                                                errorDialog.setConfirmClickListener(Dialog::dismiss);
-//                                                errorDialog.show();
-//                                            }
-//                                        });
-//                                    }
-//
-//                                    @Override
-//                                    public void onFailure(Call<DirectionsResponse> call, Throwable throwable) {
-//                                        Log.e(TAG, "getDistance & Duration - enableLocationComponent - onFailure: " + throwable.getMessage());
-//                                    }
-//                                });
-//                            }
-//                        });
-//                    }
-//                }
-//            }//end data change
-//
-//            @Override
-//            public void onCancelled(@NotNull DatabaseError error) {
-//                // Failed to read value
-//                Log.e(TAG, "Failed to read value." + error.toException());
-//            }
-//        });
-//    }
+    private void rejectReq(int reqId){
+        LayoutInflater factory = LayoutInflater.from(getActivity());
+        final View editDialogView = factory.inflate(R.layout.activity_cancel_reason, null);
+        final AlertDialog editDialog = new AlertDialog.Builder(getActivity()).create();
+        editDialog.setView(editDialogView);
+
+        MaterialSpinner spinner = editDialogView.findViewById(R.id.confirm_spinner);
+        EditText txtReasonDetail = editDialogView.findViewById(R.id.txtReasonDetail);
+        TextView tittle = editDialogView.findViewById(R.id.select_content);
+        tittle.setText("Chọn lý do từ chối yêu cầu:");
+
+        ConfirmViewModel confirmViewModel = ViewModelProviders.of(getActivity(), viewModelFactory).get(ConfirmViewModel.class);
+        confirmViewModel.getAllConfig()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(listConfig -> {
+                    if (listConfig != null) {
+                        ArrayAdapter listAdapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_dropdown_item);
+                        for (int i = 0; i < listConfig.size(); i++) {
+                            if (listConfig.get(i).getName().equals("shop cancel reason"))
+                                listAdapter.add(listConfig.get(i).getValue());
+                        }
+                        spinner.setAdapter(listAdapter);
+                    }
+                }, throwable -> {
+                    Log.e(TAG, "getAllConfig: " + throwable.getMessage());
+                });
+
+        spinner.setOnItemSelectedListener((view, position, id, item) -> {
+            if (spinner.getText().toString().equals("Lý do khác")) {
+                txtReasonDetail.setVisibility(View.VISIBLE);
+            }else{
+                txtReasonDetail.setVisibility(View.GONE);
+            }
+        });
+
+        editDialogView.findViewById(R.id.btn_confirm).setOnClickListener(confirmView -> {
+            editDialog.dismiss();
+            String reason = spinner.getText().toString();
+            if (reason.equals("Lý do khác")) {
+                reason = txtReasonDetail.getText().toString();
+            }
+            viewModel.rejectRequest(reqId, reason)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(isSuccess -> {
+                        if (isSuccess) {
+                            SharedPreferenceHelper.setSharedPreferenceString(getActivity(), MyInstances.KEY_BIKER_REQUEST, "");
+                            getActivity().getSupportFragmentManager().beginTransaction()
+                                    .replace(R.id.frame_container, new ShopHomeFragment())
+                                    .commit();
+                        }
+                    }, throwable -> {
+                        Log.e(TAG, "rejectRequest: " + throwable.getMessage());
+                    });
+        });
+        editDialogView.findViewById(R.id.btn_return).setOnClickListener(v1 -> editDialog.dismiss());
+        editDialog.show();
+    }
+
 }

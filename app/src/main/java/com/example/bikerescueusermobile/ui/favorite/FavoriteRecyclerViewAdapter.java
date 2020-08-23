@@ -1,5 +1,6 @@
 package com.example.bikerescueusermobile.ui.favorite;
 
+import android.content.Context;
 import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,6 +16,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.bikerescueusermobile.R;
 import com.example.bikerescueusermobile.data.model.shop.Shop;
+import com.example.bikerescueusermobile.data.model.user.CurrentUser;
+import com.squareup.picasso.Picasso;
 import com.willy.ratingbar.ScaleRatingBar;
 
 import java.util.ArrayList;
@@ -73,9 +76,12 @@ public class FavoriteRecyclerViewAdapter  extends RecyclerView.Adapter<FavoriteR
         @BindView(R.id.favoriteRatingBar)
         ScaleRatingBar favoriteRatingBar;
 
+        private Context context;
+
         public ViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
+            context = itemView.getContext();
         }
 
         void bind(Shop shop) {
@@ -87,6 +93,12 @@ public class FavoriteRecyclerViewAdapter  extends RecyclerView.Adapter<FavoriteR
 
             String txtNumOfStar = shop.getShopRatingStar() + "/" + favoriteRatingBar.getNumStars();
             txtFavoriteNumberOfStar.setText(txtNumOfStar);
+
+            if(shop.getAvatarUrl().contains("imgur")){
+                Picasso.with(context)
+                        .load(shop.getAvatarUrl()).placeholder(R.drawable.ic_load)
+                        .into(imgFavorite);
+            }
 
             favoriteRatingBar.setRating(Float.parseFloat(shop.getShopRatingStar()));
 

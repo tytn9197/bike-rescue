@@ -9,6 +9,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -30,6 +31,7 @@ import com.example.bikerescueusermobile.ui.shop_owner.shop_profile.ShopProfileFr
 import com.example.bikerescueusermobile.ui.update_info.UpdateViewModel;
 import com.example.bikerescueusermobile.util.ViewModelFactory;
 import com.github.dhaval2404.imagepicker.ImagePicker;
+import com.squareup.picasso.Picasso;
 
 import javax.inject.Inject;
 
@@ -75,6 +77,9 @@ public class ShopUpdateInfoActivity extends BaseActivity {
     @BindView(R.id.street)
     EditText street;
 
+    @BindView(R.id.updateProfileAva)
+    ImageView updateProfileAva;
+
 
     @Inject
     ViewModelFactory viewModelFactory;
@@ -97,6 +102,12 @@ public class ShopUpdateInfoActivity extends BaseActivity {
         phoneNumber.setText(CurrentUser.getInstance().getPhoneNumber());
         disableEditText(phoneNumber);
         email.setText(CurrentUser.getInstance().getEmail());
+
+        if(CurrentUser.getInstance().getAvatarUrl().contains("imgur")){
+            Picasso.with(this)
+                    .load(CurrentUser.getInstance().getAvatarUrl()).placeholder(R.drawable.ic_load)
+                    .into(updateProfileAva);
+        }
 
         String address = CurrentUser.getInstance().getAddress();
 //        String[] words = address.split(",",4);

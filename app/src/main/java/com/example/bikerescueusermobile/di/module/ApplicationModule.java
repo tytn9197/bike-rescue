@@ -2,6 +2,7 @@ package com.example.bikerescueusermobile.di.module;
 
 import com.example.bikerescueusermobile.data.dont_use_it.RepoService;
 import com.example.bikerescueusermobile.data.model.configuration.IConfigurationService;
+import com.example.bikerescueusermobile.data.model.favorite.FavoriteService;
 import com.example.bikerescueusermobile.data.model.request.IRequestService;
 import com.example.bikerescueusermobile.data.model.shop.IShopService;
 import com.example.bikerescueusermobile.data.model.user.IUserService;
@@ -16,7 +17,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 @Module(includes = ViewModelModule.class)
 public class ApplicationModule {
-    private static final String BASE_URL = "http://192.168.1.67:8080/";
+    private static final String BASE_URL = "http://192.168.0.3:8080/"; //172.20.10.4 ----------- http://192.168.0.3:8080/
 
     @Singleton
     @Provides
@@ -67,5 +68,11 @@ public class ApplicationModule {
     @Provides
     static IVehicleService provideIVehicleService(Retrofit retrofit){
         return retrofit.create(IVehicleService.class);
+    }
+
+    @Singleton
+    @Provides
+    static FavoriteService provideFavoriteService(Retrofit retrofit){
+        return retrofit.create(FavoriteService.class);
     }
 }

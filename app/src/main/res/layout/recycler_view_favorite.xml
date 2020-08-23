@@ -39,7 +39,7 @@
             android:layout_margin="2dp"
             android:padding="3dp"
             android:contentDescription="@string/app_name"
-            android:src="@drawable/ic_wrench" />
+            android:src="@drawable/ic_shop_100" />
 
         <TextView
             android:id="@+id/txtFavoriteShopAddress"
@@ -97,6 +97,7 @@
             app:srb_isIndicator="false"
             app:srb_drawableEmpty="@drawable/ic_love_empty"
             app:srb_drawableFilled="@drawable/ic_love_filled"
+            android:visibility="gone"
             />
 
     </RelativeLayout>
