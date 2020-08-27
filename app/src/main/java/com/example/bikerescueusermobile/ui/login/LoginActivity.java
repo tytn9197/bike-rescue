@@ -37,6 +37,10 @@ import com.google.firebase.iid.InstanceIdResult;
 import com.google.gson.Gson;
 import com.victor.loading.rotate.RotateLoading;
 
+import java.time.LocalDate;
+import java.util.Calendar;
+import java.util.Date;
+
 import javax.inject.Inject;
 
 import butterknife.BindView;
@@ -106,20 +110,7 @@ public class LoginActivity extends BaseActivity {
                             user.setPasswordLogin(edtPass.getText().toString());
                             String sharedPreferenceStr = gson.toJson(user);
                             SharedPreferenceHelper.setSharedPreferenceString(LoginActivity.this, MyInstances.KEY_LOGGED_IN, sharedPreferenceStr);
-                            CurrentUser.getInstance().setFullName(user.getFullName());
-                            CurrentUser.getInstance().setDeviceToken(this.deviceToken);
-                            CurrentUser.getInstance().setAccessToken("Bearer " + user.getAccessToken());
-                            CurrentUser.getInstance().setAvatarUrl(user.getAvatarUrl());
-                            CurrentUser.getInstance().setId(user.getId());
-                            CurrentUser.getInstance().setDeviceToken(user.getDeviceToken());
-                            CurrentUser.getInstance().setAddress(user.getAddress());
-                            CurrentUser.getInstance().setEmail(user.getEmail());
-                            CurrentUser.getInstance().setPhoneNumber(user.getPhoneNumber());
-                            CurrentUser.getInstance().setCreatedTime(user.getCreatedTime());
-                            CurrentUser.getInstance().setStatus(user.getStatus());
-                            CurrentUser.getInstance().setRoleId(user.getRoleId());
-                            CurrentUser.getInstance().setListVehicle(user.getListVehicle());
-                            CurrentUser.getInstance().setRejectTime(user.getRejectTime());
+                            setDataToCurrentUser(user, edtPass.getText().toString());
 
                             //login success -> set user latlong
                             final FusedLocationProviderClient mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
@@ -211,20 +202,7 @@ public class LoginActivity extends BaseActivity {
                     .subscribe(user -> {
                         viewModel.setLoading(false);
                         if (user != null) {
-                            CurrentUser.getInstance().setFullName(user.getFullName());
-                            CurrentUser.getInstance().setDeviceToken(this.deviceToken);
-                            CurrentUser.getInstance().setAccessToken("Bearer " + user.getAccessToken());
-                            CurrentUser.getInstance().setAvatarUrl(user.getAvatarUrl());
-                            CurrentUser.getInstance().setId(user.getId());
-                            CurrentUser.getInstance().setDeviceToken(user.getDeviceToken());
-                            CurrentUser.getInstance().setAddress(user.getAddress());
-                            CurrentUser.getInstance().setEmail(user.getEmail());
-                            CurrentUser.getInstance().setPhoneNumber(user.getPhoneNumber());
-                            CurrentUser.getInstance().setCreatedTime(user.getCreatedTime());
-                            CurrentUser.getInstance().setStatus(user.getStatus());
-                            CurrentUser.getInstance().setRoleId(user.getRoleId());
-                            CurrentUser.getInstance().setListVehicle(user.getListVehicle());
-                            CurrentUser.getInstance().setRejectTime(user.getRejectTime());
+                            setDataToCurrentUser(user, loginUser.getPasswordLogin());
 
                             //login success -> set user latlong
                             final FusedLocationProviderClient mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
@@ -299,6 +277,53 @@ public class LoginActivity extends BaseActivity {
         }
     }
 
+    private void setDataToCurrentUser(User user, String pass) {
+        CurrentUser.getInstance().setFullName(user.getFullName());
+        CurrentUser.getInstance().setDeviceToken(this.deviceToken);
+        CurrentUser.getInstance().setAccessToken("Bearer " + user.getAccessToken());
+        CurrentUser.getInstance().setAvatarUrl(user.getAvatarUrl());
+        CurrentUser.getInstance().setId(user.getId());
+        CurrentUser.getInstance().setDeviceToken(user.getDeviceToken());
+        CurrentUser.getInstance().setAddress(user.getAddress());
+        CurrentUser.getInstance().setEmail(user.getEmail());
+        CurrentUser.getInstance().setPhoneNumber(user.getPhoneNumber());
+        CurrentUser.getInstance().setCreatedTime(user.getCreatedTime());
+        CurrentUser.getInstance().setStatus(user.getStatus());
+        CurrentUser.getInstance().setRoleId(user.getRoleId());
+        CurrentUser.getInstance().setListVehicle(user.getListVehicle());
+        CurrentUser.getInstance().setRejectTime(user.getRejectTime());
+        CurrentUser.getInstance().setArriveDistance(user.getArriveDistance());
+        CurrentUser.getInstance().setMinimumDistance(user.getMinimumDistance());
+        CurrentUser.getInstance().setPasswordLogin(pass);
+
+        long currentTimeMillis = System.currentTimeMillis();
+
+        String shareUser = SharedPreferenceHelper.getSharedPreferenceString(this, MyInstances.KEY_COUNT_CANCELATION, "");
+        Log.e(TAG, "last login mili sec before: " + CurrentUser.getInstance().getLastLogin());
+
+        if (shareUser.equals("")) {
+            CurrentUser.getInstance().setLastLogin(currentTimeMillis);
+            CurrentUser.getInstance().setNumOfCancel(0);
+        } else {
+            User userLastLogin = gson.fromJson(shareUser, User.class);
+            CurrentUser.getInstance().setLastLogin(userLastLogin.getLastLogin());
+            CurrentUser.getInstance().setNumOfCancel(userLastLogin.getNumOfCancel());
+
+            if (CurrentUser.getInstance().getLastLogin() == 0) {
+                CurrentUser.getInstance().setLastLogin(currentTimeMillis);
+            } else {
+                if ((currentTimeMillis - CurrentUser.getInstance().getLastLogin()) > MyInstances.ONE_DAY_MILLISECONDS) {
+                    CurrentUser.getInstance().setNumOfCancel(0);
+                    Log.e(TAG, "set num of cancel = 0");
+                }
+            }
+        }
+        Log.e(TAG, "last login mili sec after: " + CurrentUser.getInstance().getLastLogin());
+
+        String sharedPreferenceStr = gson.toJson(CurrentUser.getInstance());
+        SharedPreferenceHelper.setSharedPreferenceString(LoginActivity.this, MyInstances.KEY_COUNT_CANCELATION, sharedPreferenceStr);
+
+    }
 
     private void hideErrorText() {
         errorTextView.setText("");

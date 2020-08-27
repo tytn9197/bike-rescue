@@ -38,8 +38,10 @@ import com.example.bikerescueusermobile.data.model.request.MessageRequestFB;
 import com.example.bikerescueusermobile.data.model.request.Request;
 import com.example.bikerescueusermobile.data.model.request.ReviewRequestDTO;
 import com.example.bikerescueusermobile.data.model.user.CurrentUser;
+import com.example.bikerescueusermobile.ui.complain.ComplainActivity;
 import com.example.bikerescueusermobile.ui.confirm.ConfirmInfoActivity;
 import com.example.bikerescueusermobile.ui.confirm.ConfirmViewModel;
+import com.example.bikerescueusermobile.ui.login.LoginActivity;
 import com.example.bikerescueusermobile.ui.login.UpdateLocationService;
 import com.example.bikerescueusermobile.ui.shop_owner.shop_home.ShopHomeFragment;
 import com.example.bikerescueusermobile.ui.tracking_map.TrackingMapActivity;
@@ -345,6 +347,13 @@ public class RequestDetailActivity extends BaseActivity {
                 startActivity(callIntent);
             });
         }
+
+        if(request.getStatus().equals(MyInstances.STATUS_FINISHED)){
+            btnComplain.setOnClickListener(v -> {
+                Intent i = new Intent(this, ComplainActivity.class);
+                startActivity(i);
+            });
+        }
     }
 
     @SuppressLint("SetTextI18n")
@@ -451,6 +460,9 @@ public class RequestDetailActivity extends BaseActivity {
                                 txtReqDetailCancelReason.setVisibility(View.VISIBLE);
                                 txtReqDetailCancelReason.setText(" Lý do hủy: " + finalReason);
                                 SharedPreferenceHelper.setSharedPreferenceString(getApplicationContext(), MyInstances.KEY_BIKER_REQUEST, "");
+                                CurrentUser.getInstance().setNumOfCancel(CurrentUser.getInstance().getNumOfCancel() + 1);
+                                String sharedPreferenceStr = (new Gson()).toJson(CurrentUser.getInstance());
+                                SharedPreferenceHelper.setSharedPreferenceString(this, MyInstances.KEY_COUNT_CANCELATION, sharedPreferenceStr);
                             }
                         }, throwable -> {
                             Log.e(TAG, "cancleRequest: " + throwable.getMessage());

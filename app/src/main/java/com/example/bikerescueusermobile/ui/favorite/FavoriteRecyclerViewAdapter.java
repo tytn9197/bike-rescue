@@ -76,6 +76,9 @@ public class FavoriteRecyclerViewAdapter  extends RecyclerView.Adapter<FavoriteR
         @BindView(R.id.favoriteRatingBar)
         ScaleRatingBar favoriteRatingBar;
 
+        @BindView(R.id.savedShopRatingBar)
+        ScaleRatingBar savedShopRatingBar;
+
         private Context context;
 
         public ViewHolder(View itemView) {
@@ -103,6 +106,8 @@ public class FavoriteRecyclerViewAdapter  extends RecyclerView.Adapter<FavoriteR
             favoriteRatingBar.setRating(Float.parseFloat(shop.getShopRatingStar()));
 
             favoriteWrapper.setOnClickListener((View.OnClickListener) v -> listener.onDetailSelected(shop));
+
+            savedShopRatingBar.setRating(1);
         }
 
     }

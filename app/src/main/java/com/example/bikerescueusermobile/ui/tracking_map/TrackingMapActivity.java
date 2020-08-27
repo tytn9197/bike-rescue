@@ -235,21 +235,21 @@ public class TrackingMapActivity extends DaggerAppCompatActivity implements
                                     destination = new LatLng(Double.parseDouble(newUser.getLatitude()), Double.parseDouble(newUser.getLongtitude()));
                                     updateRoute();
 
-                                    if (distance > 0 && distance < 0.5) {
-                                        reqViewModel.updateStatusRequest(reqId, MyInstances.STATUS_ARRIVED)
-                                                .subscribeOn(Schedulers.io())
-                                                .observeOn(AndroidSchedulers.mainThread())
-                                                .subscribe(responseDTO -> {
-                                                    Intent i = new Intent();
-                                                    setResult(Activity.RESULT_OK, i);
-                                                    finish();
-                                                });
-                                    }
+//                                    if (distance > 0 && distance < 0.5) {
+//                                        reqViewModel.updateStatusRequest(reqId, MyInstances.STATUS_ARRIVED)
+//                                                .subscribeOn(Schedulers.io())
+//                                                .observeOn(AndroidSchedulers.mainThread())
+//                                                .subscribe(responseDTO -> {
+//                                                    Intent i = new Intent();
+//                                                    setResult(Activity.RESULT_OK, i);
+//                                                    finish();
+//                                                });
+//                                    }
 
                                     //set up btn arrive
                                     btnArrived.setOnClickListener(view -> {
-                                        Log.e(TAG, "distance: " + distance);
-                                        if (distance > 0 && distance < 0.5) {
+                                        Log.e(TAG, "distance: " + distance + " ---- current: " + CurrentUser.getInstance().getArriveDistance());
+                                        if (distance > 0 && distance < CurrentUser.getInstance().getArriveDistance()) {
                                             reqViewModel.updateStatusRequest(reqId, MyInstances.STATUS_ARRIVED)
                                                     .subscribeOn(Schedulers.io())
                                                     .observeOn(AndroidSchedulers.mainThread())

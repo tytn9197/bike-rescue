@@ -35,6 +35,7 @@ import com.example.bikerescueusermobile.data.model.vehicle.Vehicle;
 import com.example.bikerescueusermobile.ui.create_request.RequestDetailActivity;
 import com.example.bikerescueusermobile.ui.profile.VehicleActivity;
 import com.example.bikerescueusermobile.ui.seach_shop_service.ShopServiceViewModel;
+import com.example.bikerescueusermobile.ui.shopMain.ShopMainActivity;
 import com.example.bikerescueusermobile.util.MyInstances;
 import com.example.bikerescueusermobile.util.SharedPreferenceHelper;
 import com.example.bikerescueusermobile.util.ViewModelFactory;
@@ -230,71 +231,83 @@ public class ConfirmInfoActivity extends BaseActivity {
                                 edtDoXang.setVisibility(View.VISIBLE);
                             }
 
-                            if(serviceName.equals("Vấn đề khác")){
+                            if (serviceName.equals("Vấn đề khác")) {
                                 edtVanDeKhac.setVisibility(View.VISIBLE);
                             }
                         }
 
                         tvBookService.setOnClickListener(v -> {
-                            txtConfirmProblemBadge.setVisibility(View.GONE);
-                            int serviceId = -1;
-                            if (selectedService != -1) {
-                                serviceId = listAllShopServices.get(selectedService).getServices().getId();
-                                viewModel.getShopServiceId(selectedShop.getId(), serviceId)
-                                        .subscribeOn(Schedulers.io())
-                                        .observeOn(AndroidSchedulers.mainThread())
-                                        .subscribe(shopService -> {
-                                            if (shopService != null) {
-                                                shopServiceId = shopService.getId();
-                                                this.serviceName = shopService.getServices().getName();
+                            Log.e(TAG, "num of cancel: " + CurrentUser.getInstance().getNumOfCancel());
+                            if (CurrentUser.getInstance().getNumOfCancel() < 4) {
+                                txtConfirmProblemBadge.setVisibility(View.GONE);
+                                int serviceId = -1;
+                                if (selectedService != -1) {
+                                    serviceId = listAllShopServices.get(selectedService).getServices().getId();
+                                    viewModel.getShopServiceId(selectedShop.getId(), serviceId)
+                                            .subscribeOn(Schedulers.io())
+                                            .observeOn(AndroidSchedulers.mainThread())
+                                            .subscribe(shopService -> {
+                                                if (shopService != null) {
+                                                    shopServiceId = shopService.getId();
+                                                    this.serviceName = shopService.getServices().getName();
+                                                }
+                                            }, throwable -> {
+                                                Log.e(TAG, "getShopServiceId: " + throwable.getMessage());
+                                            });
+
+                                    SweetAlertDialog sweetAlertDialog = new SweetAlertDialog(this, SweetAlertDialog.NORMAL_TYPE);
+                                    sweetAlertDialog.setTitleText("Thông báo");
+                                    sweetAlertDialog.setConfirmText("Xác nhận");
+                                    sweetAlertDialog.setContentText("Xác nhận thực hiện đặt dịch vụ?");
+                                    sweetAlertDialog.setConfirmClickListener(sDialog -> {
+                                        sDialog.dismiss();
+                                        if (shopServiceId != -1) {
+                                            int returnCode = sendReqAndSaveRequestToSharePref();
+
+                                            SweetAlertDialog returnDialog = new SweetAlertDialog(this, SweetAlertDialog.ERROR_TYPE);
+                                            returnDialog.setTitleText("Thông báo");
+                                            returnDialog.setConfirmText("OK");
+                                            returnDialog.setConfirmClickListener(Dialog::dismiss);
+
+                                            if (returnCode == MyInstances.ERROR_VEHICLE_TYPE) {
+                                                returnDialog.setContentText("Xe bạn chọn và dịch vụ bạn chọn không tương đồng!");
+                                                returnDialog.show();
+                                                Log.e(TAG, "!isSucces: check vehicle va service name khong khop");
                                             }
-                                        }, throwable -> {
-                                            Log.e(TAG, "getShopServiceId: " + throwable.getMessage());
-                                        });
 
-                                SweetAlertDialog sweetAlertDialog = new SweetAlertDialog(this, SweetAlertDialog.NORMAL_TYPE);
-                                sweetAlertDialog.setTitleText("Thông báo");
-                                sweetAlertDialog.setConfirmText("Xác nhận");
-                                sweetAlertDialog.setContentText("Xác nhận thực hiện đặt dịch vụ?");
-                                sweetAlertDialog.setConfirmClickListener(sDialog -> {
-                                    sDialog.dismiss();
-                                    if (shopServiceId != -1) {
-                                        int returnCode = sendReqAndSaveRequestToSharePref();
+                                            if (returnCode == MyInstances.ERROR_VANDEKHAC) {
+                                                returnDialog.setContentText("Vui lòng nhập chi tiết vấn đề!");
+                                                edtVanDeKhac.requestFocus();
+                                                returnDialog.show();
+                                            }
 
-                                        SweetAlertDialog returnDialog = new SweetAlertDialog(this, SweetAlertDialog.ERROR_TYPE);
-                                        returnDialog.setTitleText("Thông báo");
-                                        returnDialog.setConfirmText("OK");
-                                        returnDialog.setConfirmClickListener(Dialog::dismiss);
-
-                                        if (returnCode == MyInstances.ERROR_VEHICLE_TYPE) {
-                                            returnDialog.setContentText("Xe bạn chọn và dịch vụ bạn chọn không tương đồng!");
-                                            returnDialog.show();
-                                            Log.e(TAG, "!isSucces: check vehicle va service name khong khop");
+                                            if (returnCode == MyInstances.ERROR_DOXANG_PRICE) {
+                                                returnDialog.setContentText("Vui lòng nhập giá tiền đổ xăng!");
+                                                edtDoXang.requestFocus();
+                                                returnDialog.show();
+                                            }
+                                        } else {
+                                            errorDialog.show();
+                                            Log.e(TAG, "shopServiceId != -1");
                                         }
+                                    });
+                                    sweetAlertDialog.setCancelButton("Hủy", SweetAlertDialog::dismissWithAnimation);
+                                    sweetAlertDialog.show();
 
-                                        if (returnCode == MyInstances.ERROR_VANDEKHAC) {
-                                            returnDialog.setContentText("Vui lòng nhập chi tiết vấn đề!");
-                                            edtVanDeKhac.requestFocus();
-                                            returnDialog.show();
-                                        }
-
-                                        if (returnCode == MyInstances.ERROR_DOXANG_PRICE) {
-                                            returnDialog.setContentText("Vui lòng nhập giá tiền đổ xăng!");
-                                            edtDoXang.requestFocus();
-                                            returnDialog.show();
-                                        }
-                                    } else {
-                                        errorDialog.show();
-                                        Log.e(TAG, "shopServiceId != -1");
-                                    }
-                                });
-                                sweetAlertDialog.setCancelButton("Hủy", SweetAlertDialog::dismissWithAnimation);
-                                sweetAlertDialog.show();
-
-                            } else { // else khi chua chon service name
-                                errorDialog.show();
-                                txtConfirmProblemBadge.setVisibility(View.VISIBLE);
-                                Log.e(TAG, "selectedService == -1: chua chon dich vu");
+                                } else { // else khi chua chon service name
+                                    errorDialog.show();
+                                    txtConfirmProblemBadge.setVisibility(View.VISIBLE);
+                                    Log.e(TAG, "selectedService == -1: chua chon dich vu");
+                                }
+                            } else {
+                                SweetAlertDialog err = new SweetAlertDialog(this, SweetAlertDialog.ERROR_TYPE);
+                                err.setTitleText("Thông báo");
+                                err.setConfirmText("Đóng");
+                                err.setContentText("Bạn đã hủy yêu cầu quá " +
+                                        CurrentUser.getInstance().getNumOfCancel() +
+                                        " lần, xin vui lòng thử lại sau 24 giờ.");
+                                err.setConfirmClickListener(Dialog::dismiss);
+                                err.show();
                             }
                         }); //end btn confirm request
                     }
@@ -359,7 +372,7 @@ public class ConfirmInfoActivity extends BaseActivity {
         btnImg.setOnClickListener(v -> {
             ImagePicker.Companion.with(this)
                     .crop()                    //Crop image(Optional), Check Customization for more option
-                    .compress(1024*2)            //Final image size will be less than 1 MB(Optional)
+                    .compress(1024 * 2)            //Final image size will be less than 1 MB(Optional)
                     .maxResultSize(200, 200)    //Final image resolution will be less than 1080 x 1080(Optional)
                     .start();
         });
@@ -382,7 +395,7 @@ public class ConfirmInfoActivity extends BaseActivity {
 //                image.setAdjustViewBounds(true);
 //
 //                imageLayout.addView(image);
-                imgScroll.setVisibility(View.VISIBLE);
+            imgScroll.setVisibility(View.VISIBLE);
 //            }
             if (file != null) {
                 // set path toi' hin`h do' thanh` bitmap

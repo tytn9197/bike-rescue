@@ -97,7 +97,6 @@
             app:srb_isIndicator="false"
             app:srb_drawableEmpty="@drawable/ic_love_empty"
             app:srb_drawableFilled="@drawable/ic_love_filled"
-            android:visibility="gone"
             />
 
     </RelativeLayout>

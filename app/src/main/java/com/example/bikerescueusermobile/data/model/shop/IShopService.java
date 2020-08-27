@@ -1,5 +1,7 @@
 package com.example.bikerescueusermobile.data.model.shop;
 
+import com.example.bikerescueusermobile.data.model.service.CountingService;
+
 import java.util.List;
 
 import io.reactivex.Single;
@@ -22,4 +24,10 @@ public interface IShopService {
 
     @GET("/shop/getShopByShopOwnerId/{shopOwnerId}")
     Single<Shop> getShopByShopOwnerId(@Header("Authorization") String token, @Path("shopOwnerId") int shopOwnerId);
+
+    @GET("/shop/countRequest/{id}")
+    Single<Integer> countAllByAccepted(@Path("id") int shopOwnerId, @Header("Authorization") String token);
+
+    @GET("/shop/countAllService/{id}")
+    Single<List<CountingService>> getAllCountService(@Path("id")int shopId, @Header("Authorization") String token);
 }

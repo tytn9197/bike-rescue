@@ -407,7 +407,8 @@ public class MapActivity extends DaggerAppCompatActivity implements
         CurrentUser.getInstance().setChosenShopOwnerId(ownerId);
 
         btnSendRequest.setOnClickListener(v -> {
-            if (distanceToShop > 0 && distanceToShop < 0.02) {
+            Log.e(TAG, "distanceToShop: " +  distanceToShop + " --- minimum: " + CurrentUser.getInstance().getMinimumDistance());
+            if (distanceToShop > 0 && distanceToShop < CurrentUser.getInstance().getMinimumDistance()) {
                 SweetAlertDialog errorDialog = new SweetAlertDialog(this, SweetAlertDialog.ERROR_TYPE);
                 errorDialog.setTitleText("Thông báo");
                 errorDialog.setConfirmText("OK");

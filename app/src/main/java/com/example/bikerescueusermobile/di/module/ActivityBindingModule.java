@@ -1,5 +1,6 @@
 package com.example.bikerescueusermobile.di.module;
 
+import com.example.bikerescueusermobile.ui.complain.ComplainActivity;
 import com.example.bikerescueusermobile.ui.confirm.ConfirmInfoActivity;
 import com.example.bikerescueusermobile.ui.create_request.RequestDetailActivity;
 import com.example.bikerescueusermobile.ui.loading_page.LoadPageActivity;
@@ -70,5 +71,7 @@ public abstract class ActivityBindingModule {
     @ContributesAndroidInjector
     abstract TrackingMapActivity trackingMapActivity();
 
+    @ContributesAndroidInjector
+    abstract ComplainActivity complainActivity();
 
 }

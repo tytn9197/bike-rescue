@@ -27,6 +27,7 @@ public class MyInstances {
     public static final String KEY_BIKER_REQUEST= "bikerReq";
     public static final String KEY_SHOP_REQUEST= "shopReq";
     public static final String KEY_LOGGED_IN= "user";
+    public static final String KEY_COUNT_CANCELATION= "KEY_COUNT_CANCELATION";
 
     //for noti message
     public static final String NOTI_CREATED = "NOTI_CREATED";
@@ -52,6 +53,7 @@ public class MyInstances {
     public static final double PRICE_WEIGHT = 0.3;
     public static final double RATING_WEIGHT = 0.2;
 
+    public static final long ONE_DAY_MILLISECONDS = 86400000;
 
 //    //for biker's request detail
 //    public static final String SENT_FROM_HISTORY = "SENT_FROM_HISTORY";

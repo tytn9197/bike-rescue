@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/backgroundGrey">
+    android:background="@color/gray_light">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -15,8 +15,9 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="200dp"
-            android:background="@color/core_color"
-            android:padding="20dp">
+            android:background="@color/fadded_grey"
+            android:padding="20dp"
+            android:visibility="gone">
 
             <ImageView
                 android:id="@+id/profile_img"
@@ -34,7 +35,7 @@
                 android:layout_toEndOf="@+id/profile_img"
                 android:includeFontPadding="false"
                 android:text="Phan Gia Cường"
-                android:textColor="@color/white"
+                android:textColor="@color/black"
                 android:textSize="20sp"
                 android:textStyle="bold" />
 
@@ -47,7 +48,7 @@
                 android:layout_toEndOf="@+id/profile_img"
                 android:includeFontPadding="false"
                 android:text="0907698838"
-                android:textColor="@color/white"
+                android:textColor="@color/black"
                 android:textSize="14sp"
                 android:textStyle="bold" />
         </RelativeLayout>
@@ -58,6 +59,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="-75dp"
             android:layout_marginBottom="-30dp"
+            android:visibility="gone"
             android:padding="20dp">
 
             <androidx.cardview.widget.CardView
@@ -65,7 +67,7 @@
                 android:layout_height="125dp"
                 android:layout_margin="20dp"
                 android:layout_weight="1"
-                app:cardBackgroundColor="@color/core_color"
+                app:cardBackgroundColor="@color/grey"
                 app:cardElevation="10dp">
 
                 <RelativeLayout
@@ -123,6 +125,24 @@
                 android:textStyle="bold"/>
 
             <TextView
+                android:id="@+id/shopProfileAddress"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:text="Địa chỉ: 61 Hoàng Thiều Hoa, Hiệp Tân, Tân Phú"
+                android:textColor="@color/black"
+                android:textSize="20sp"/>
+
+            <TextView
+                android:id="@+id/shopProfileOpenTime"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:text="Mở cửa từ 9h tới 20h"
+                android:textColor="@color/black"
+                android:textSize="20sp" />
+
+            <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="10dp"
@@ -151,7 +171,8 @@
                 android:checked="true"
                 android:text="Trạng thái hoạt động: "
                 android:textColor="@color/black"
-                android:textSize="20sp" />
+                android:textSize="20sp"
+                android:visibility="gone"/>
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -210,16 +231,18 @@
                 android:layout_marginTop="3dp"
                 android:background="@color/grey" />
 
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginTop="3dp"
-                android:background="@color/grey" />
+<!--            <View-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="1dp"-->
+<!--                android:layout_marginTop="3dp"-->
+<!--                android:background="@color/grey" />-->
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:visibility="gone"
+                >
 
                 <TextView
                     android:id="@+id/manageService"
@@ -235,11 +258,11 @@
                     android:textStyle="bold" />
             </LinearLayout>
 
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginTop="3dp"
-                android:background="@color/grey" />
+<!--            <View-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="1dp"-->
+<!--                android:layout_marginTop="3dp"-->
+<!--                android:background="@color/grey" />-->
 
             <View
                 android:layout_width="match_parent"

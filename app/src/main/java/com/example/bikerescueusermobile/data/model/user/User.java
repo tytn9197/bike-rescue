@@ -59,6 +59,16 @@ public class User implements Serializable {
     @SerializedName("rejectTime")
     private int rejectTime;
 
+    @SerializedName("minimumDistance")
+    private double minimumDistance;
+
+    @SerializedName("arriveDistance")
+    private double arriveDistance;
+
+    private int numOfCancel = 0;
+
+    private long lastLogin;
+
     private int chosenShopOwnerId;
 
     private int currentBikerId;

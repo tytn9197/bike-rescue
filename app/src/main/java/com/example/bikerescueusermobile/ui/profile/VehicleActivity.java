@@ -114,6 +114,10 @@ public class VehicleActivity extends BaseActivity implements VehicleSelectedList
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(listVehicles -> {
+                    if(listVehicles.size() > 0){
+                        updateContainer.setVisibility(View.GONE);
+                    }
+
                     rvVehicle.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
                     rvVehicle.setAdapter(new VehicleRecyclerViewAdapter(listVehicles, this));
                     rvVehicle.setLayoutManager(new LinearLayoutManager(this));

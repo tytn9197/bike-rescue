@@ -48,13 +48,8 @@ public class ShopHistoryFragment extends BaseFragment implements ShopHistorySele
     List<Request> requestList;
     List<Request> listHistory;
 
-
     @BindView(R.id.pullToRefreshShopReq)
     SwipeRefreshLayout pullToRefreshShopReq;
-
-
-    @BindView(R.id.shopHistoryToolbar)
-    Toolbar shopHistoryToolbar;
 
     private String TAG = "ShopHistoryFragment";
 
@@ -67,11 +62,6 @@ public class ShopHistoryFragment extends BaseFragment implements ShopHistorySele
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
-        //Toolbar
-        AppCompatActivity activity = (AppCompatActivity) getActivity();
-        activity.setSupportActionBar(shopHistoryToolbar);
-        activity.getSupportActionBar().setTitle("Danh sách yêu cầu đã thực hiện");
 
         requestList = new ArrayList<>();
         listHistory = new ArrayList<>();
@@ -86,7 +76,6 @@ public class ShopHistoryFragment extends BaseFragment implements ShopHistorySele
                         //Define
                         requestList.addAll(listReq);
                         listHistory.addAll(listReq);
-
 
                         if (getActivity() != null) {
                             mRecyclerView.addItemDecoration(new DividerItemDecoration((getActivity()), DividerItemDecoration.VERTICAL));

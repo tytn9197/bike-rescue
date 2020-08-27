@@ -20,6 +20,7 @@ import com.example.bikerescueusermobile.data.model.request.Request;
 import com.example.bikerescueusermobile.data.model.user.CurrentUser;
 import com.example.bikerescueusermobile.ui.create_request.RequestDetailActivity;
 import com.example.bikerescueusermobile.util.ViewModelFactory;
+import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,7 +31,7 @@ import butterknife.BindView;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 
-public class HistoryFragment extends BaseFragment implements HistorySelectedListener {
+public class HistoryFragment extends BaseFragment implements HistorySelectedListener, TimePickerDialog.OnTimeSetListener {
     @Override
     protected int layoutRes() {
         return R.layout.biker_history_fragment;
@@ -87,5 +88,10 @@ public class HistoryFragment extends BaseFragment implements HistorySelectedList
         Intent intent = new Intent(getActivity(), RequestDetailActivity.class);
         intent.putExtra("reqId", request.getId());
         startActivity(intent);
+    }
+
+    @Override
+    public void onTimeSet(TimePickerDialog view, int hourOfDay, int minute, int second) {
+
     }
 }
