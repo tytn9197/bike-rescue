@@ -20,6 +20,9 @@ public interface IVehicleService {
     @GET("/vehicles/getVehiclesByUserId")
     Single<List<Vehicle>> getVehicleByUserId(@Header("Authorization") String token,@Query("id") int id);
 
+    @GET("/vehicles/getVehiclesByUserIdStatusTrue")
+    Single<List<Vehicle>> getVehicleByUserIdStatusTrue(@Header("Authorization") String token,@Query("id") int id);
+
     @POST("/vehicles")
     Single<Vehicle> createVehicle(@Body VehicleDTO vehicle, @Header("Authorization") String token);
 

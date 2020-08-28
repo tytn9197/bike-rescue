@@ -321,12 +321,12 @@ public class ConfirmInfoActivity extends BaseActivity {
         getSupportActionBar().setTitle("Xác nhận thông tin");
 
         //get all vehicle title
-        viewModel.getVehicleByUserId(CurrentUser.getInstance().getId())
+        viewModel.getVehicleByUserIdStatusTrue(CurrentUser.getInstance().getId())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(listVehicles -> {
-                    listUserVehicle = listVehicles;
                     if (listVehicles != null && listVehicles.size() > 0) {
+                        listUserVehicle = listVehicles;
                         ArrayAdapter<String> vehiclesName = new ArrayAdapter<>(this,
                                 android.R.layout.simple_list_item_1);
 
@@ -360,7 +360,7 @@ public class ConfirmInfoActivity extends BaseActivity {
                         Log.e(TAG, "listVehicles != null && listVehicles.size() > 0  -> false");
                     }
                 }, throwable -> {
-                    Log.e(TAG, "getVehicleByUserId: " + throwable.getMessage());
+                    Log.e(TAG, "getVehicleByUserIdStatusTrue: " + throwable.getMessage());
                 });
 
         //setup user data

@@ -66,6 +66,11 @@ public class ConfirmViewModel extends ViewModel {
         return vehicleRepository.getVehicleByUserId(CurrentUser.getInstance().getAccessToken(), id);
     }
 
+    public Single<List<Vehicle>> getVehicleByUserIdStatusTrue(int id){
+        loading.setValue(true);
+        return vehicleRepository.getVehicleByUserIdStatusTrue(CurrentUser.getInstance().getAccessToken(), id);
+    }
+
     public Single<ShopServiceTable> getShopServiceId(int shopId, int serivceID){
         loading.setValue(true);
         return shopServicesRepository.getShopServiceId(shopId,serivceID);

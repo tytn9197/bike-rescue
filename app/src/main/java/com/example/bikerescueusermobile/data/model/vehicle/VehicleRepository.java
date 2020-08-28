@@ -24,6 +24,10 @@ public class VehicleRepository {
         return vehicleService.getVehicleByUserId(token,id);
     }
 
+    public Single<List<Vehicle>> getVehicleByUserIdStatusTrue(String token, int id){
+        return vehicleService.getVehicleByUserIdStatusTrue(token,id);
+    }
+
     public Single<Vehicle> createVehicle(VehicleDTO vehicle){
         return vehicleService.createVehicle(vehicle, CurrentUser.getInstance().getAccessToken());
     }
