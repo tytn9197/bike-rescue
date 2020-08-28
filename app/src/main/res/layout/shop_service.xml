@@ -88,7 +88,7 @@
             android:layout_margin="2dp"
             android:contentDescription="@string/app_name"
             android:padding="3dp"
-            android:src="@drawable/ic_shop_100" />
+            android:src="@drawable/ic_wrench" />
 
         <TextView
             android:id="@+id/txtServicePriceLabel"

@@ -4,6 +4,7 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.example.bikerescueusermobile.data.model.service.CountingService;
+import com.example.bikerescueusermobile.data.model.service.Service;
 import com.example.bikerescueusermobile.data.model.shop.Shop;
 import com.example.bikerescueusermobile.data.model.shop.ShopRepository;
 import com.example.bikerescueusermobile.data.model.shop_services.ShopServiceTable;
@@ -40,11 +41,15 @@ public class ServiceViewModel extends ViewModel {
         return shopServicesRepository.getShopServiceByShopOwnerId(shopOwnerId, CurrentUser.getInstance().getAccessToken());
     }
 
-    public Single<Integer> countAllByAccepted(int shopOwnerId){
-        return shopRepository.countAllByAccepted(shopOwnerId);
+    public Single<Integer> countAllByAccepted(int shopOwnerId, String from, String to){
+        return shopRepository.countAllByAccepted(shopOwnerId, from, to);
     }
 
-    public Single<List<CountingService>> getAllCountService(int shopId){
-        return shopRepository.getAllCountService(shopId);
+    public Single<List<CountingService>> getAllCountService(int shopId, String from, String to){
+        return shopRepository.getAllCountService(shopId, from, to);
+    }
+
+    public Single<List<Service>> getAllService(){
+        return shopRepository.getAllService();
     }
 }

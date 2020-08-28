@@ -43,8 +43,8 @@ public class UserRepository {
         return userService.getUserLatLongByReqId(userId, isBikerTracking, CurrentUser.getInstance().getAccessToken());
     }
 
-    public Single<List<StatusSuccessDTO>> getSuccessReq(int id){
-        return userService.getSuccessReq(id, CurrentUser.getInstance().getAccessToken());
+    public Single<List<StatusSuccessDTO>> getSuccessReq(int id, String from, String to){
+        return userService.getSuccessReq(id, from, to, CurrentUser.getInstance().getAccessToken());
     }
 
     public Single<Double> getNumOfStarByShopOwnerId(int id){

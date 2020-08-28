@@ -18,8 +18,8 @@ public class RequestRepository {
     }
 
     //function
-    public Single<List<Request>> getRequestByShopId(String token, int shopId) {
-        return iRequestService.getRequestByShopId(token, shopId);
+    public Single<List<Request>> getRequestByShopId(String token, int shopId, String from, String to) {
+        return iRequestService.getRequestByShopId(token, shopId, from, to);
     }
 
     public Single<Response<RequestDTO>> createRequest(RequestDTO request, List<MultipartBody.Part> listImg) {
@@ -42,8 +42,8 @@ public class RequestRepository {
         return iRequestService.finishedRequest(reqID, price, CurrentUser.getInstance().getAccessToken());
     }
 
-    public Single<List<Request>> getRequestByBikerId(int bikerId) {
-        return iRequestService.getRequestByBikerId(bikerId ,CurrentUser.getInstance().getAccessToken());
+    public Single<List<Request>> getRequestByBikerId(int bikerId, String from, String to) {
+        return iRequestService.getRequestByBikerId(bikerId, from, to, CurrentUser.getInstance().getAccessToken());
     }
 
     public Single<ReviewRequestDTO> reviewRequest(int requestId, ReviewRequestDTO reviewRequestDTO){

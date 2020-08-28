@@ -42,8 +42,8 @@ public interface IUserService {
                                               @Query("isBikerTracking") boolean isBikerTracking,
                                               @Header("Authorization") String token);
 
-    @GET("/shop/requestSuccess/{id}")
-    Single<List<StatusSuccessDTO>> getSuccessReq(@Path("id") int id, @Header("Authorization") String token);
+    @GET("/shop/requestSuccessFromTo/{id}")
+    Single<List<StatusSuccessDTO>> getSuccessReq(@Path("id") int id, @Query("from") String from, @Query("to") String to, @Header("Authorization") String token);
 
     @GET("/shop/getNumOfStarByShopOwnerId/{id}")
     Single<Double> getNumOfStarByShopOwnerId(@Path("id") int id, @Header("Authorization") String token);

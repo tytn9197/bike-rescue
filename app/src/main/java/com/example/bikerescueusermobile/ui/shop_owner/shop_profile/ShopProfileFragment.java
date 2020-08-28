@@ -178,16 +178,16 @@ public class ShopProfileFragment extends BaseFragment {
         //setup viewmodel
         viewModel = ViewModelProviders.of(this, viewModelFactory).get(ShopUpdateViewModel.class);
 
-        viewModel.getSuccessReq(CurrentUser.getInstance().getId())
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(listReq -> {
-                    if(listReq != null && listReq.size() > 0){
-                        booking.setText("" + listReq.size());
-                    }else{
-                        booking.setText("0");
-                    }
-                });
+//        viewModel.getSuccessReq(CurrentUser.getInstance().getId())
+//                .subscribeOn(Schedulers.io())
+//                .observeOn(AndroidSchedulers.mainThread())
+//                .subscribe(listReq -> {
+//                    if(listReq != null && listReq.size() > 0){
+//                        booking.setText("" + listReq.size());
+//                    }else{
+//                        booking.setText("0");
+//                    }
+//                });
 
         shopOwnerStatus.setOnCheckedChangeListener((buttonView, isChecked) -> {
             shopOwnerStatus.setEnabled(false);

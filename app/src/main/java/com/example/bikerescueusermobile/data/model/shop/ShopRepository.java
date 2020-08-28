@@ -1,6 +1,7 @@
 package com.example.bikerescueusermobile.data.model.shop;
 
 import com.example.bikerescueusermobile.data.model.service.CountingService;
+import com.example.bikerescueusermobile.data.model.service.Service;
 import com.example.bikerescueusermobile.data.model.shop_services.IShopServicesService;
 import com.example.bikerescueusermobile.data.model.shop_services.ShopService;
 import com.example.bikerescueusermobile.data.model.user.CurrentUser;
@@ -34,11 +35,15 @@ public class ShopRepository {
         return shopServices.getShopByShopOwnerId(token, shopOwnerId);
     }
 
-    public Single<Integer> countAllByAccepted(int shopOwnerId){
-        return shopServices.countAllByAccepted(shopOwnerId, CurrentUser.getInstance().getAccessToken());
+    public Single<Integer> countAllByAccepted(int shopOwnerId, String from, String to){
+        return shopServices.countAllByAccepted(shopOwnerId, from, to, CurrentUser.getInstance().getAccessToken());
     }
 
-    public Single<List<CountingService>> getAllCountService(int shopId){
-        return shopServices.getAllCountService(shopId, CurrentUser.getInstance().getAccessToken());
+    public Single<List<CountingService>> getAllCountService(int shopId, String from, String to){
+        return shopServices.getAllCountService(shopId, from, to, CurrentUser.getInstance().getAccessToken());
+    }
+
+    public Single<List<Service>> getAllService(){
+        return shopServices.getAllService(CurrentUser.getInstance().getAccessToken());
     }
 }

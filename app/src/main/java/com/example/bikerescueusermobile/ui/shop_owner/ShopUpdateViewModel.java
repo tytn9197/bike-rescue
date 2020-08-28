@@ -35,8 +35,8 @@ public class ShopUpdateViewModel extends ViewModel {
         return userRepository.updateInfo(CurrentUser.getInstance().getAccessToken(), id, user);
     }
 
-    public Single<List<StatusSuccessDTO>> getSuccessReq(int id){
-        return userRepository.getSuccessReq(id);
+    public Single<List<StatusSuccessDTO>> getSuccessReq(int id, String from, String to){
+        return userRepository.getSuccessReq(id, from, to);
     }
 
     public Single<Double> getNumOfStarByShopOwnerId(int id){

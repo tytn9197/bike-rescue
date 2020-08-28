@@ -109,10 +109,14 @@ public class ServiceRecycleViewAdapter extends RecyclerView.Adapter<ServiceRecyc
             }
 
 
-            if(shopServiceTable.getServices().isStatus() == true){
-                txtStatus.setText("Kích hoạt");
+            if(shopServiceTable.getServices().isStatus()){
+                txtStatus.setText("Hoạt động");
                 txtStatus.setTextColor(Color.parseColor("#0EA92D"));
+            } else{
+                txtStatus.setText("Không hoạt động");
+                txtStatus.setTextColor(Color.RED);
             }
+
             txtStatus.setLayoutParams(txtServiceFeedStatusParams);
             shopServiceFeedWrapper.setOnClickListener(v -> listener.onDetailSelected(shopServiceTable));
         }

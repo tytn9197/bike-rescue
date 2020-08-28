@@ -24,6 +24,9 @@ public class Service implements Serializable {
     @SerializedName("status")
     private boolean status;
 
+    @SerializedName("categoryId")
+    private int categoryId;
+
     @SerializedName("category")
     private Category category;
 
