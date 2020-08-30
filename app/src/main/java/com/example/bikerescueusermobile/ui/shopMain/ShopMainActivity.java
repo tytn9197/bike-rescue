@@ -84,6 +84,7 @@ public class ShopMainActivity extends BaseActivity {
     ViewModelFactory viewModelFactory;
 
     private Fragment fragment; // use it to change fragment
+    private boolean isHomeFragmentRunning = false;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -139,6 +140,7 @@ public class ShopMainActivity extends BaseActivity {
             new NavigationView.OnNavigationItemSelectedListener() {
                 @Override
                 public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                    isHomeFragmentRunning = false;
                     switch (item.getItemId()) {
                         case R.id.nav_feed:
                             fragment = new ShopChartFragment();
@@ -203,31 +205,32 @@ public class ShopMainActivity extends BaseActivity {
                 Gson gson = new Gson();
 
                 MessageRequestFB responeReq = gson.fromJson(message, MessageRequestFB.class);
+                if (!isHomeFragmentRunning) {
+                    if (responeReq.getMessage().equals(MyInstances.NOTI_CREATED)) {
+                        String sharedPreferenceStr = gson.toJson(new Request(responeReq.getReqId()));
+                        SharedPreferenceHelper.setSharedPreferenceString(ShopMainActivity.this, MyInstances.KEY_SHOP_REQUEST, sharedPreferenceStr);
+                        SweetAlertDialog noti = new SweetAlertDialog(ShopMainActivity.this, SweetAlertDialog.NORMAL_TYPE);
+                        noti.setTitleText("Thông báo");
+                        noti.setConfirmText("Đóng");
+                        noti.setContentText("Bạn có yêu cầu mới!");
+                        noti.setConfirmText("Xem thông báo");
+                        noti.setConfirmClickListener(dialog -> {
+                            dialog.dismiss();
+                            fragment = new ShopHomeFragment();
+                            replaceFragment();
+                        });
+                        noti.show();
+                    }
 
-                if (responeReq.getMessage().equals(MyInstances.NOTI_CREATED)) {
-                    String sharedPreferenceStr = gson.toJson(new Request(responeReq.getReqId()));
-                    SharedPreferenceHelper.setSharedPreferenceString(ShopMainActivity.this, MyInstances.KEY_SHOP_REQUEST, sharedPreferenceStr);
-                    SweetAlertDialog noti = new SweetAlertDialog(ShopMainActivity.this, SweetAlertDialog.NORMAL_TYPE);
-                    noti.setTitleText("Thông báo");
-                    noti.setConfirmText("Đóng");
-                    noti.setContentText("Bạn có yêu cầu mới!");
-                    noti.setConfirmText("Xem thông báo");
-                    noti.setConfirmClickListener(dialog -> {
-                        dialog.dismiss();
-                        fragment = new ShopHomeFragment();
-                        replaceFragment();
-                    });
-                    noti.show();
-                }
-
-                if (responeReq.getMessage().equals(MyInstances.NOTI_CANELED)) {
-                    SharedPreferenceHelper.setSharedPreferenceString(ShopMainActivity.this, MyInstances.KEY_SHOP_REQUEST, "");
-                    SweetAlertDialog cancelReq = new SweetAlertDialog(ShopMainActivity.this, SweetAlertDialog.NORMAL_TYPE);
-                    cancelReq.setTitleText("Thông báo");
-                    cancelReq.setConfirmText("Đóng");
-                    cancelReq.setContentText("Khách đã hủy yêu cầu." + "\nLý do hủy: " + responeReq.getReason());
-                    cancelReq.setConfirmClickListener(Dialog::dismiss);
-                    cancelReq.show();
+                    if (responeReq.getMessage().equals(MyInstances.NOTI_CANELED)) {
+                        SharedPreferenceHelper.setSharedPreferenceString(ShopMainActivity.this, MyInstances.KEY_SHOP_REQUEST, "");
+                        SweetAlertDialog cancelReq = new SweetAlertDialog(ShopMainActivity.this, SweetAlertDialog.NORMAL_TYPE);
+                        cancelReq.setTitleText("Thông báo");
+                        cancelReq.setConfirmText("Đóng");
+                        cancelReq.setContentText("Khách đã hủy yêu cầu." + "\nLý do hủy: " + responeReq.getReason());
+                        cancelReq.setConfirmClickListener(Dialog::dismiss);
+                        cancelReq.show();
+                    }
                 }
             }
         }
@@ -259,6 +262,7 @@ public class ShopMainActivity extends BaseActivity {
 
         @Override
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+            isHomeFragmentRunning = false;
             switch (item.getItemId()) {
                 case R.id.nav_chart:
                     fragment = new ShopChartFragment();
@@ -266,6 +270,7 @@ public class ShopMainActivity extends BaseActivity {
                     return true;
                 case R.id.nav_home:
                     fragment = new ShopHomeFragment();
+                    isHomeFragmentRunning = true;
                     replaceFragment();
                     return true;
                 case R.id.nav_history:
@@ -284,6 +289,7 @@ public class ShopMainActivity extends BaseActivity {
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.frame_container, new ShopHomeFragment())
                     .commit();
+            isHomeFragmentRunning = true;
         }
     }
 }

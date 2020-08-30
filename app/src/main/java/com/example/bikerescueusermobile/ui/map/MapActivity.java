@@ -193,7 +193,7 @@ public class MapActivity extends DaggerAppCompatActivity implements
         if (shop.getUser() != null)
             initShopDetail(shop, shop.getUser().getId(), false);
 
-        if(shop.getUserNameOnly() != null)
+        if (shop.getUserNameOnly() != null)
             initShopDetail(shop, shop.getUserNameOnly().getId(), false);
 
         //set-up cluster google map
@@ -225,7 +225,7 @@ public class MapActivity extends DaggerAppCompatActivity implements
         double totalDistance = 0;
         for (int i = 0; i < shops.size(); i++) {
             totalDistance += shops.get(i).getDistanceFromUser();
-            double price = Double.parseDouble(shops.get(i).getDescription());
+            double price = shops.get(i).getShopPrice();
             if (price > 0) {
                 totalPrice += price;
             }
@@ -234,46 +234,51 @@ public class MapActivity extends DaggerAppCompatActivity implements
         Log.e(TAG, "total price: " + totalPrice + "  --- total dis:" + totalDistance);
 
         List<Shop> sortedList = new ArrayList<>();
-        if (sortedList.size() == 1) {
-
-        } else if (totalPrice == 0) {
-            // neu khong co gia thi se sort theo khoang cach
-            Log.e(TAG, "price = 0");
+        if (shops.size() == 1) {
+            Log.e(TAG, "shops.size() == 1");
             sortedList.addAll(shops);
-            int size = sortedList.size();
-            for (int i = 0; i < size - 1; i++)
-                for (int j = 0; j < size - i - 1; j++)
-                    if (sortedList.get(j).getDistanceFromUser() > sortedList.get(j + 1).getDistanceFromUser()) {
-                        // swap arr[j+1] and arr[j]
-                        Shop temp = sortedList.get(j);
-                        sortedList.set(j, sortedList.get(j + 1));
-                        sortedList.set(j + 1, temp);
-                    }
         } else {
-            // neu co gia ro rang => tinh weigh roi moi sort theo trong so
-            Log.e(TAG, "price != 0");
-            for (int i = 0; i < shops.size(); i++) {
-                double score = 0;
-                double ratingScore = getRatingScore(Double.parseDouble(shops.get(i).getShopRatingStar())) * MyInstances.RATING_WEIGHT;
-                double distanceScore = getScoreInverse(shops.get(i).getDistanceFromUser(), totalDistance) * MyInstances.DISTANCE_WEIGHT;
-                double priceScore = getScoreInverse(Double.parseDouble(shops.get(i).getDescription()), totalPrice) * MyInstances.PRICE_WEIGHT;
+            if (totalPrice == 0) {
+                // neu khong co gia thi se sort theo khoang cach
+                Log.e(TAG, "price = 0");
+                sortedList.addAll(shops);
+                int size = sortedList.size();
+                for (int i = 0; i < size - 1; i++)
+                    for (int j = 0; j < size - i - 1; j++)
+                        if (sortedList.get(j).getDistanceFromUser() > sortedList.get(j + 1).getDistanceFromUser()) {
+                            // swap arr[j+1] and arr[j]
+                            Shop temp = sortedList.get(j);
+                            sortedList.set(j, sortedList.get(j + 1));
+                            sortedList.set(j + 1, temp);
+                        }
+            } else {
+                // neu co gia ro rang => tinh weigh roi moi sort theo trong so
+                Log.e(TAG, "price != 0");
+                for (int i = 0; i < shops.size(); i++) {
+                    double score = 0;
+                    double ratingScore = getRatingScore(Double.parseDouble(shops.get(i).getShopRatingStar())) * MyInstances.RATING_WEIGHT;
+                    double distanceScore = getScoreInverse(shops.get(i).getDistanceFromUser(), totalDistance) * MyInstances.DISTANCE_WEIGHT;
+                    double priceScore = getScoreInverse(shops.get(i).getShopPrice(), totalPrice) * MyInstances.PRICE_WEIGHT;
+                    double completedReqScore = shops.get(i).getSuccessRate() * 100 * MyInstances.COMPLETED_REQ_WEIGHT;
+                    Log.e(TAG, "getSuccessRate: " + shops.get(i).getSuccessRate());
 
-                score = ratingScore + distanceScore + priceScore;
-                shops.get(i).setScore(score);
-                Log.e(TAG, "score shop " + i + " ---- score = " + score);
+                    score = ratingScore + distanceScore + priceScore + completedReqScore;
+                    shops.get(i).setScore(score);
+                    Log.e(TAG, "score shop " + i + " ---- score = " + score);
+                }
+
+                //bubble sort
+                sortedList.addAll(shops);
+                int size = sortedList.size();
+                for (int i = 0; i < size - 1; i++)
+                    for (int j = 0; j < size - i - 1; j++)
+                        if (sortedList.get(j).getScore() < sortedList.get(j + 1).getScore()) {
+                            // swap arr[j+1] and arr[j]
+                            Shop temp = sortedList.get(j);
+                            sortedList.set(j, sortedList.get(j + 1));
+                            sortedList.set(j + 1, temp);
+                        }
             }
-
-            //bubble sort
-            sortedList.addAll(shops);
-            int size = sortedList.size();
-            for (int i = 0; i < size - 1; i++)
-                for (int j = 0; j < size - i - 1; j++)
-                    if (sortedList.get(j).getScore() < sortedList.get(j + 1).getScore()) {
-                        // swap arr[j+1] and arr[j]
-                        Shop temp = sortedList.get(j);
-                        sortedList.set(j, sortedList.get(j + 1));
-                        sortedList.set(j + 1, temp);
-                    }
         }
 
 
@@ -370,9 +375,9 @@ public class MapActivity extends DaggerAppCompatActivity implements
                             String price = "Giá: liên hệ";
                             if (min != -1 && max != -1) {
                                 price = "Giá: " +
-                                        min.intValue() + "k"
+                                        MyMethods.convertMoney(min.intValue() * 1000) + " vnd"
                                         + " ~ " +
-                                        max.intValue() + "k";
+                                        MyMethods.convertMoney(max.intValue() * 1000) + " vnd";
                             }
                             txtMapEstimatePrice.setText(price);
                         }
@@ -390,7 +395,7 @@ public class MapActivity extends DaggerAppCompatActivity implements
                         if (shopService.getPrice() != null) {
                             String price = "Giá: liên hệ";
                             if (shopService.getPrice() != -1) {
-                                price = "Giá: " + shopService.getPrice().intValue() + "k/" + shopService.getServices().getUnit();
+                                price = "Giá: " + MyMethods.convertMoney(shopService.getPrice().intValue() * 1000) + " vnd/" + shopService.getServices().getUnit();
                             }
                             txtMapEstimatePrice.setText(price);
                         }
@@ -407,7 +412,7 @@ public class MapActivity extends DaggerAppCompatActivity implements
         CurrentUser.getInstance().setChosenShopOwnerId(ownerId);
 
         btnSendRequest.setOnClickListener(v -> {
-            Log.e(TAG, "distanceToShop: " +  distanceToShop + " --- minimum: " + CurrentUser.getInstance().getMinimumDistance());
+            Log.e(TAG, "distanceToShop: " + distanceToShop + " --- minimum: " + CurrentUser.getInstance().getMinimumDistance());
             if (distanceToShop > 0 && distanceToShop < CurrentUser.getInstance().getMinimumDistance()) {
                 SweetAlertDialog errorDialog = new SweetAlertDialog(this, SweetAlertDialog.ERROR_TYPE);
                 errorDialog.setTitleText("Thông báo");

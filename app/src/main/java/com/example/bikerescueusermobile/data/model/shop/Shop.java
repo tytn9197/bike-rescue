@@ -60,6 +60,12 @@ public class Shop implements Serializable {
     @SerializedName("closeTime")
     private String closeTime;
 
+    @SerializedName("shopPrice")
+    private Double shopPrice;
+
+    @SerializedName("successRate")
+    private Double successRate;
+
     private double score;
     /**
      * distance from biker to shop address in km

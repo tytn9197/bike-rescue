@@ -39,6 +39,10 @@ public class ShopRepository {
         return shopServices.countAllByAccepted(shopOwnerId, from, to, CurrentUser.getInstance().getAccessToken());
     }
 
+    public Single<Integer> countAllByAcceptedOnAlgo(int shopOwnerId){
+        return shopServices.countAllByAcceptedOnAlgo(shopOwnerId, CurrentUser.getInstance().getAccessToken());
+    }
+
     public Single<List<CountingService>> getAllCountService(int shopId, String from, String to){
         return shopServices.getAllCountService(shopId, from, to, CurrentUser.getInstance().getAccessToken());
     }

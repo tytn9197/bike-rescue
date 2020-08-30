@@ -20,8 +20,8 @@ public class HistoryViewModel extends ViewModel {
         this.requestRepository = requestRepository;
     }
 
-    public Single<List<Request>> getRequestByBikerId(int bikerId, String from, String to) {
-        return requestRepository.getRequestByBikerId(bikerId, from, to);
+    public Single<List<Request>> getRequestByBikerId(int bikerId, String from, String to, String status) {
+        return requestRepository.getRequestByBikerId(bikerId, from, to, status);
     }
 
 }

@@ -45,6 +45,10 @@ public class ServiceViewModel extends ViewModel {
         return shopRepository.countAllByAccepted(shopOwnerId, from, to);
     }
 
+    public Single<Integer> countAllByAcceptedOnAlgo(int shopOwnerId){
+        return shopRepository.countAllByAcceptedOnAlgo(shopOwnerId);
+    }
+
     public Single<List<CountingService>> getAllCountService(int shopId, String from, String to){
         return shopRepository.getAllCountService(shopId, from, to);
     }

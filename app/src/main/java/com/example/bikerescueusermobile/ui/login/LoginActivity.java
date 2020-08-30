@@ -153,7 +153,9 @@ public class LoginActivity extends BaseActivity {
                     }, throwable -> {
                         viewModel.setLoading(false);
                         errorTextView.setVisibility(View.VISIBLE);
-                        if (throwable.getMessage().contains("No address associated with hostname") || throwable.getMessage().contains("network")) {
+                        if (throwable.getMessage().contains("address")
+                                || throwable.getMessage().contains("network")
+                                || throwable.getMessage().contains("connect")) {
                             errorTextView.setText("Lỗi mạng!!");
                         } else {
                             errorTextView.setText("Số điện thoại hoặc mật khẩu không đúng!!");
