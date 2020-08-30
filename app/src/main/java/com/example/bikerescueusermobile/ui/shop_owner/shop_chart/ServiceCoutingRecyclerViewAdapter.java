@@ -18,6 +18,7 @@ import com.example.bikerescueusermobile.data.model.service.CountingService;
 import com.example.bikerescueusermobile.data.model.shop_services.ShopServiceTable;
 import com.example.bikerescueusermobile.ui.shop_owner.services.ServiceRecycleViewAdapter;
 import com.example.bikerescueusermobile.ui.shop_owner.services.ShopServiceSelectedListener;
+import com.example.bikerescueusermobile.util.MyMethods;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -27,9 +28,11 @@ import butterknife.ButterKnife;
 
 public class ServiceCoutingRecyclerViewAdapter extends RecyclerView.Adapter<ServiceCoutingRecyclerViewAdapter.ViewHolder> {
     private List<CountingService> data;
+    private boolean isPrice;
 
-    public ServiceCoutingRecyclerViewAdapter(List<CountingService> data) {
+    public ServiceCoutingRecyclerViewAdapter(List<CountingService> data, boolean isPrice) {
         this.data = data;
+        this.isPrice = isPrice;
     }
 
     @NonNull
@@ -67,8 +70,13 @@ public class ServiceCoutingRecyclerViewAdapter extends RecyclerView.Adapter<Serv
 
         @SuppressLint("SetTextI18n")
         void bind(CountingService countingService) {
-            txtCountingName.setText(countingService.getServiceName());
-            txtCountingNumber.setText("" + countingService.getCountRequest());
+            if(!isPrice) {
+                txtCountingName.setText(countingService.getServiceName());
+                txtCountingNumber.setText("" + countingService.getCountRequest());
+            } else {
+                txtCountingName.setText(countingService.getServiceName());
+                txtCountingNumber.setText("" + MyMethods.convertMoney(countingService.getCountRequest()*1000) + " vnd");
+            }
         }
     }
 }

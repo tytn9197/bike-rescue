@@ -46,4 +46,8 @@ public class ShopRepository {
     public Single<List<Service>> getAllService(){
         return shopServices.getAllService(CurrentUser.getInstance().getAccessToken());
     }
+
+    public Single<Double> sumPriceRequestFromTo(int shopOwnerId, String from, String to){
+        return shopServices.sumPriceRequestFromTo(shopOwnerId, from, to, CurrentUser.getInstance().getAccessToken());
+    }
 }

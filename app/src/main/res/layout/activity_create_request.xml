@@ -220,6 +220,16 @@
         <!--        android:text="Thanh toán tiền mặt"-->
         <!--        android:textColor="@color/light_red" />-->
 
+        <TextView
+            android:id="@+id/txtReqDetailFinishPrice"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:text="Giá: 20k "
+            android:textColor="@color/black"
+            android:textSize="17sp"
+            android:visibility="gone"/>
+
         <Button
             android:id="@+id/btnReqDetailTracking"
             android:layout_width="match_parent"

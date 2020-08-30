@@ -124,6 +124,9 @@ public class RequestDetailActivity extends BaseActivity {
     @BindView(R.id.btnReqDetailCallShop)
     Button btnReqDetailCallShop;
 
+    @BindView(R.id.txtReqDetailFinishPrice)
+    TextView txtFinishPrice;
+
     @Inject
     ViewModelFactory viewModelFactory;
 
@@ -257,7 +260,7 @@ public class RequestDetailActivity extends BaseActivity {
         TextView txtPrice = reviewView.findViewById(R.id.txtReviewPrice);
 
         txtReqCode.setText(code);
-        txtPrice.setText(String.format("Giá: %1.0f k VND", price));
+        txtPrice.setText("Giá: " + MyMethods.convertMoney((float)price*1000) + " vnd");
 
         reviewDialog.setView(reviewView);
         reviewView.findViewById(R.id.btn_confirm).setOnClickListener(confirmView -> {
@@ -399,6 +402,11 @@ public class RequestDetailActivity extends BaseActivity {
         }
 
         btnReqDetailCallShop.setVisibility(View.GONE);
+
+        if(request.getStatus().equals(MyInstances.STATUS_FINISHED)){
+            txtFinishPrice.setVisibility(View.VISIBLE);
+            txtFinishPrice.setText(" Giá: " + MyMethods.convertMoney(request.getPrice().floatValue()) + " vnd");
+        }
     }
 
     @SuppressLint("SetTextI18n")

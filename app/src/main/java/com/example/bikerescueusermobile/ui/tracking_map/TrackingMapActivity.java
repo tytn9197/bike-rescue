@@ -39,6 +39,7 @@ import com.example.bikerescueusermobile.ui.login.LoginModel;
 import com.example.bikerescueusermobile.ui.login.UpdateLocationService;
 import com.example.bikerescueusermobile.ui.shop_owner.shop_home.ShopHomeFragment;
 import com.example.bikerescueusermobile.util.MyInstances;
+import com.example.bikerescueusermobile.util.MyMethods;
 import com.example.bikerescueusermobile.util.SharedPreferenceHelper;
 import com.example.bikerescueusermobile.util.ViewModelFactory;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -529,7 +530,7 @@ public class TrackingMapActivity extends DaggerAppCompatActivity implements
         TextView txtPrice = reviewView.findViewById(R.id.txtReviewPrice);
 
         txtReqCode.setText(code);
-        txtPrice.setText(String.format("Giá: %1.0f k VND", price));
+        txtPrice.setText("Giá: " + MyMethods.convertMoney((float)price*1000) + " vnd");
 
         reviewDialog.setView(reviewView);
         reviewView.findViewById(R.id.btn_confirm).setOnClickListener(confirmView -> {

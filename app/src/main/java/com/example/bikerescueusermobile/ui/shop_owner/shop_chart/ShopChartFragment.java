@@ -1,10 +1,15 @@
 package com.example.bikerescueusermobile.ui.shop_owner.shop_chart;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -21,27 +26,32 @@ import com.example.bikerescueusermobile.data.model.shop_services.ShopServiceTabl
 import com.example.bikerescueusermobile.data.model.user.CurrentUser;
 import com.example.bikerescueusermobile.ui.favorite.FavoriteRecyclerViewAdapter;
 import com.example.bikerescueusermobile.ui.history.HistoryFragment;
+import com.example.bikerescueusermobile.ui.shop_owner.ShopUpdateInfoActivity;
 import com.example.bikerescueusermobile.ui.shop_owner.ShopUpdateViewModel;
 import com.example.bikerescueusermobile.ui.shop_owner.services.ServiceRecycleViewAdapter;
 import com.example.bikerescueusermobile.ui.shop_owner.services.ServiceViewModel;
 import com.example.bikerescueusermobile.ui.shop_owner.shop_history.ShopHistoryFragment;
+import com.example.bikerescueusermobile.ui.shop_owner.shop_history.ShopHistoryRecyclerViewAdapter;
 import com.example.bikerescueusermobile.ui.shop_owner.shop_history.ShopHistoryViewModel;
 import com.example.bikerescueusermobile.util.DateSpliter;
+import com.example.bikerescueusermobile.util.MyMethods;
 import com.example.bikerescueusermobile.util.ViewModelFactory;
 import com.wdullaer.materialdatetimepicker.date.DatePickerDialog;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.ThreadLocalRandom;
 
 import javax.inject.Inject;
 
 import butterknife.BindView;
+import cn.pedant.SweetAlert.SweetAlertDialog;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 
-public class ShopChartFragment extends BaseFragment implements DatePickerDialog.OnDateSetListener{
+public class ShopChartFragment extends BaseFragment implements DatePickerDialog.OnDateSetListener {
     @Override
     protected int layoutRes() {
         return R.layout.fragment_shop_chart;
@@ -55,14 +65,20 @@ public class ShopChartFragment extends BaseFragment implements DatePickerDialog.
     @BindView(R.id.txtSuccessReq)
     TextView txtSuccessReq;
 
-    @BindView(R.id.txtAllReq)
-    TextView txtAllReq;
+//    @BindView(R.id.txtAllReq)
+//    TextView txtAllReq;
 
     @BindView(R.id.edtToDate)
     EditText edtToDate;
 
     @BindView(R.id.edtFromDate)
     EditText edtFromDate;
+
+    @BindView(R.id.txtDoanhThu)
+    TextView txtDoanhThu;
+
+    @BindView(R.id.doanhThuLayout)
+    LinearLayout doanhThuLayout;
 
     @Inject
     ViewModelFactory viewModelFactory;
@@ -152,7 +168,51 @@ public class ShopChartFragment extends BaseFragment implements DatePickerDialog.
         }
     }
 
+    @SuppressLint("SetTextI18n")
     private void getHistory(String from, String to) {
+        doanhThuLayout.setOnClickListener(v -> {
+            LayoutInflater factory = LayoutInflater.from(getActivity());
+            final View doanhthuView = factory.inflate(R.layout.dialog_doanhthu, null);
+            AlertDialog doanhthuDialog = new AlertDialog.Builder(getActivity()).create();
+            doanhthuDialog.setView(doanhthuView);
+
+            RecyclerView rv = doanhthuView.findViewById(R.id.rvDoanhThuDetail);
+            doanhthuView.findViewById(R.id.btn_return).setOnClickListener(v1 -> doanhthuDialog.dismiss());
+
+            ViewModelProviders.of(this, viewModelFactory).get(ShopHistoryViewModel.class)
+                    .getRequestByShopId(CurrentUser.getInstance().getId(), from, to)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(listReq -> {
+                        if (listReq != null) {
+                            List<CountingService> list = new ArrayList<>();
+                            for (int i = 0; i < listReq.size(); i++) {
+                                if (listReq.get(i).getPrice().longValue() > 0) {
+                                    CountingService countingService = new CountingService();
+                                    countingService.setServiceName(listReq.get(i).getListReqShopService().get(0).getShopService().getServices().getName());
+                                    countingService.setCountRequest(listReq.get(i).getPrice().longValue());
+                                    list.add(countingService);
+                                }
+                            }
+                            if (list.size() > 0) {
+                                rv.addItemDecoration(new DividerItemDecoration(getActivity(), DividerItemDecoration.VERTICAL));
+                                rv.setAdapter(new ServiceCoutingRecyclerViewAdapter(list, true));
+                                rv.setLayoutManager(new LinearLayoutManager(getActivity()));
+                                doanhthuDialog.show();
+                            } else {
+                                SweetAlertDialog errorDialog = new SweetAlertDialog(getActivity(), SweetAlertDialog.ERROR_TYPE);
+                                errorDialog.setTitleText("Thông báo");
+                                errorDialog.setContentText("Không có dịch vụ nào!");
+                                errorDialog.setConfirmText("OK");
+                                errorDialog.setConfirmClickListener(Dialog::dismiss);
+                                errorDialog.show();
+                            }
+                        }
+                    }, throwable -> {
+                        Log.e(TAG, "getRequestByShopId: " + throwable.getMessage());
+                    });
+        });
+
         viewModel.getAllCountService(CurrentUser.getInstance().getShop().getId(), from, to)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -160,11 +220,11 @@ public class ShopChartFragment extends BaseFragment implements DatePickerDialog.
                     int count = 0;
 
                     if (listServices != null) {
-                        for (CountingService countingService: listServices){
+                        for (CountingService countingService : listServices) {
                             count += countingService.getCountRequest();
                         }
 
-                        mRecyclerView.setAdapter(new ServiceCoutingRecyclerViewAdapter(listServices));
+                        mRecyclerView.setAdapter(new ServiceCoutingRecyclerViewAdapter(listServices, false));
                         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
                         Log.e(TAG, "count: " + count);
@@ -173,27 +233,38 @@ public class ShopChartFragment extends BaseFragment implements DatePickerDialog.
                     Log.e(TAG, "getAllCountService: " + throwable.getMessage());
                 });
 
-        viewModel.countAllByAccepted(CurrentUser.getInstance().getId(), from, to)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(total -> {
-                    txtAllReq.setText("" + total);
-                }, throwable -> {
-                    Log.e(TAG, "countAllByAccepted: " + throwable.getMessage());
-                });
-
         ViewModelProviders.of(this, viewModelFactory).get(ShopUpdateViewModel.class)
                 .getSuccessReq(CurrentUser.getInstance().getId(), from, to)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(listReq -> {
-                    if(listReq != null && listReq.size() > 0){
-                        txtSuccessReq.setText("" + listReq.size());
-                    }else{
-                        txtSuccessReq.setText("0");
+                    int success = 0;
+                    if (listReq != null && listReq.size() > 0) {
+                        success = listReq.size();
                     }
+
+                    txtSuccessReq.setText("" + success);
                 }, throwable -> {
                     Log.e(TAG, "getSuccessReq: " + throwable.getMessage());
+                });
+
+        viewModel.sumPriceRequestFromTo(CurrentUser.getInstance().getId(), from, to)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(doanhthu -> {
+//                    String strDoanhThu = "";
+//                    if (doanhthu > 1000000) {
+//                        strDoanhThu = "" + doanhthu.intValue() / 1000000 + " tỷ "
+//                                + (doanhthu.intValue() / 1000) % 1000 + " tr "
+//                                + doanhthu.intValue() % 1000 + "k VND";
+//                    } else if (doanhthu > 1000) {
+//                        strDoanhThu = "" + doanhthu.intValue() / 1000 + " tr " + doanhthu.intValue() % 1000 + "k VND";
+//                    } else {
+//                        strDoanhThu = "" + doanhthu.intValue() + "k VND";
+//                    }
+                    txtDoanhThu.setText("" + MyMethods.convertMoney(doanhthu.floatValue()*1000) + " vnd");
+                }, throwable -> {
+                    Log.e(TAG, "countAllByAccepted: " + throwable.getMessage());
                 });
     }
 }

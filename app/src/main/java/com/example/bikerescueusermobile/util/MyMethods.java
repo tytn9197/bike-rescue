@@ -24,6 +24,7 @@ import com.mapbox.mapboxsdk.geometry.LatLng;
 import java.io.ByteArrayOutputStream;
 import java.sql.Timestamp;
 import java.text.DateFormat;
+import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -188,5 +189,9 @@ public class MyMethods {
                     min = arr.get(i).getPrice();
 
         return min;
+    }
+
+    public static String convertMoney(float price){
+        return NumberFormat.getNumberInstance(Locale.CHINESE).format(price);
     }
 }

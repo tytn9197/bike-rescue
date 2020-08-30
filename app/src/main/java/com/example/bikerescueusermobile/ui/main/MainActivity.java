@@ -331,7 +331,7 @@ public class MainActivity extends BaseActivity {
         TextView txtPrice = reviewView.findViewById(R.id.txtReviewPrice);
 
         txtReqCode.setText(code);
-        txtPrice.setText(String.format("Giá: %1.0f k VND", price));
+        txtPrice.setText("Giá: " + MyMethods.convertMoney((float)price*1000) + " vnd");
 
         reviewDialog.setView(reviewView);
         reviewView.findViewById(R.id.btn_confirm).setOnClickListener(confirmView -> {

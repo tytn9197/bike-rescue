@@ -27,11 +27,20 @@ public interface IShopService {
     Single<Shop> getShopByShopOwnerId(@Header("Authorization") String token, @Path("shopOwnerId") int shopOwnerId);
 
     @GET("/shop/countRequestFromTo/{id}")
-    Single<Integer> countAllByAccepted(@Path("id") int shopOwnerId, @Query("from") String from, @Query("to") String to, @Header("Authorization") String token);
+    Single<Integer> countAllByAccepted(@Path("id") int shopOwnerId,
+                                       @Query("from") String from, @Query("to") String to,
+                                       @Header("Authorization") String token);
 
     @GET("/shop/countAllServiceFromTo/{id}")
-    Single<List<CountingService>> getAllCountService(@Path("id")int shopId,@Query("from") String from, @Query("to") String to, @Header("Authorization") String token);
+    Single<List<CountingService>> getAllCountService(@Path("id")int shopId,
+                                                     @Query("from") String from, @Query("to") String to,
+                                                     @Header("Authorization") String token);
 
     @GET("/shop/getAllService")
     Single<List<Service>> getAllService(@Header("Authorization") String token);
+
+    @GET("/shop/sumPriceRequestFromTo/{id}")
+    Single<Double> sumPriceRequestFromTo(@Path("id") int shopOwnerId,
+                                          @Query("from") String from, @Query("to") String to,
+                                          @Header("Authorization") String token);
 }

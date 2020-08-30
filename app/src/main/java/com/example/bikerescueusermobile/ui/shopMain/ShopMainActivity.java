@@ -25,6 +25,7 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
@@ -197,7 +198,7 @@ public class ShopMainActivity extends BaseActivity {
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if (context != null) {
+            if (context != null && getLifecycle().getCurrentState().isAtLeast(Lifecycle.State.STARTED)) {
                 String message = intent.getStringExtra("message");
                 Gson gson = new Gson();
 
@@ -205,19 +206,23 @@ public class ShopMainActivity extends BaseActivity {
 
                 if (responeReq.getMessage().equals(MyInstances.NOTI_CREATED)) {
                     String sharedPreferenceStr = gson.toJson(new Request(responeReq.getReqId()));
-                    SharedPreferenceHelper.setSharedPreferenceString(context, MyInstances.KEY_SHOP_REQUEST, sharedPreferenceStr);
-                    SweetAlertDialog noti = new SweetAlertDialog(context, SweetAlertDialog.NORMAL_TYPE);
+                    SharedPreferenceHelper.setSharedPreferenceString(ShopMainActivity.this, MyInstances.KEY_SHOP_REQUEST, sharedPreferenceStr);
+                    SweetAlertDialog noti = new SweetAlertDialog(ShopMainActivity.this, SweetAlertDialog.NORMAL_TYPE);
                     noti.setTitleText("Thông báo");
                     noti.setConfirmText("Đóng");
                     noti.setContentText("Bạn có yêu cầu mới!");
                     noti.setConfirmText("Xem thông báo");
-                    noti.setConfirmClickListener(Dialog::dismiss);
+                    noti.setConfirmClickListener(dialog -> {
+                        dialog.dismiss();
+                        fragment = new ShopHomeFragment();
+                        replaceFragment();
+                    });
                     noti.show();
                 }
 
                 if (responeReq.getMessage().equals(MyInstances.NOTI_CANELED)) {
-                    SharedPreferenceHelper.setSharedPreferenceString(context, MyInstances.KEY_SHOP_REQUEST, "");
-                    SweetAlertDialog cancelReq = new SweetAlertDialog(context, SweetAlertDialog.NORMAL_TYPE);
+                    SharedPreferenceHelper.setSharedPreferenceString(ShopMainActivity.this, MyInstances.KEY_SHOP_REQUEST, "");
+                    SweetAlertDialog cancelReq = new SweetAlertDialog(ShopMainActivity.this, SweetAlertDialog.NORMAL_TYPE);
                     cancelReq.setTitleText("Thông báo");
                     cancelReq.setConfirmText("Đóng");
                     cancelReq.setContentText("Khách đã hủy yêu cầu." + "\nLý do hủy: " + responeReq.getReason());

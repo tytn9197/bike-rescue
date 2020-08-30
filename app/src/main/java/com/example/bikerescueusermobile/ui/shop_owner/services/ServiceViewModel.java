@@ -52,4 +52,8 @@ public class ServiceViewModel extends ViewModel {
     public Single<List<Service>> getAllService(){
         return shopRepository.getAllService();
     }
+
+    public Single<Double> sumPriceRequestFromTo(int shopOwnerId, String from, String to){
+        return shopRepository.sumPriceRequestFromTo(shopOwnerId, from, to);
+    }
 }

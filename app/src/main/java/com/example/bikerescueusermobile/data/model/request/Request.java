@@ -32,6 +32,9 @@ public class Request {
     @SerializedName("longtitude")
     private String longtitude;
 
+    @SerializedName("price")
+    private Double price;
+
     @SerializedName("address")
     private String address;
 
