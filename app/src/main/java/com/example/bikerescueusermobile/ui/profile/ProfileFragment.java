@@ -74,6 +74,7 @@ public class ProfileFragment extends BaseFragment {
         logout.setOnClickListener(v -> {
             SharedPreferenceHelper.setSharedPreferenceString(getActivity(), MyInstances.KEY_LOGGED_IN, "");
             Intent intentLog = new Intent(getActivity(), LoginActivity.class);
+            SharedPreferenceHelper.setSharedPreferenceString(getActivity(), MyInstances.KEY_COUNT_CANCELATION, "");
             startActivity(intentLog);
             getActivity().finish();
         });

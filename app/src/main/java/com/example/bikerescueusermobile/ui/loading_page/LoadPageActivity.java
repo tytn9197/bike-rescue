@@ -47,26 +47,22 @@ public class LoadPageActivity extends BaseActivity {
         gson = new Gson();
 
 //        SharedPreferenceHelper.setSharedPreferenceString(LoadPageActivity.this, MyInstances.KEY_LOGGED_IN, "");
-        try {
-            Thread.sleep(1200);
+        Thread loadTime = new Thread() {
+            @Override
+            public void run() {
+                try {
+                    sleep(1200);
 
-            //GET DEVICE TOKEN
-            FirebaseInstanceId.getInstance().getInstanceId()
-                    .addOnCompleteListener(task -> {
-                        if (!task.isSuccessful()) {
-                            return;
-                        }
-
-                        // Get new Instance ID token
-                        Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
-                        intent.putExtra("deviceToken", task.getResult().getToken());
-                        startActivity(intent);
-
-                        finish();
-                    });
-        } catch (InterruptedException e) {
-            Log.e("LOADPAGE", "Thread exception: " + e.getMessage());
-        }
+                    Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+                    startActivity(intent);
+                    finish();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                    Log.e("LOADPAGE", "Thread exception: " + e.getMessage());
+                }
+            }
+        };
+        loadTime.start();
     }
 
     @Override
