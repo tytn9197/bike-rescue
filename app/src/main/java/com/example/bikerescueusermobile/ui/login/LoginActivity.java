@@ -285,7 +285,7 @@ public class LoginActivity extends BaseActivity {
         CurrentUser.getInstance().setAccessToken("Bearer " + user.getAccessToken());
         CurrentUser.getInstance().setAvatarUrl(user.getAvatarUrl());
         CurrentUser.getInstance().setId(user.getId());
-        CurrentUser.getInstance().setDeviceToken(user.getDeviceToken());
+//        CurrentUser.getInstance().setDeviceToken(user.getDeviceToken());
         CurrentUser.getInstance().setAddress(user.getAddress());
         CurrentUser.getInstance().setEmail(user.getEmail());
         CurrentUser.getInstance().setPhoneNumber(user.getPhoneNumber());
