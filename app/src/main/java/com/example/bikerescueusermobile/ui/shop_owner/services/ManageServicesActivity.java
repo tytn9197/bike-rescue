@@ -86,7 +86,7 @@ public class ManageServicesActivity extends BaseActivity implements ShopServiceS
         //setup viewmodel
         viewModel = ViewModelProviders.of(this, viewModelFactory).get(ServiceViewModel.class);
 
-        viewModel.getAllShopServiceByShopId(CurrentUser.getInstance().getShop().getId())
+        viewModel.getShopServiceByShopOwnerId(CurrentUser.getInstance().getId())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(listServices -> {
@@ -153,7 +153,8 @@ public class ManageServicesActivity extends BaseActivity implements ShopServiceS
             }
         });
 
-        listService.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item));
+//        listService.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item));
+        serviceNames = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item);
         if (listSystemService.size() > 0) {
             for (int i = 0; i < listSystemService.size(); i++) {
                 serviceNames.add(listSystemService.get(i).getServiceName());
@@ -174,13 +175,14 @@ public class ManageServicesActivity extends BaseActivity implements ShopServiceS
                 lienHeMode();
             }
             status.setChecked(service.isStatus());
-            listService.setAdapter(serviceNames);
+//            listService.setAdapter(serviceNames);
+            listService.setSelection(listSerPosition);
             listService.setEnabled(false);
             listService.setClickable(false);
             cbLienHe.setEnabled(false);
             cbLienHe.setClickable(false);
 
-        } else {
+        } else {    
             btnConfirm.setText("Thêm");
         }
 
