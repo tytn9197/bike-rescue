@@ -6,8 +6,11 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ProgressBar;
+import android.widget.Spinner;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -26,6 +29,7 @@ import com.example.bikerescueusermobile.data.model.user.CurrentUser;
 import com.example.bikerescueusermobile.ui.create_request.RequestDetailActivity;
 import com.example.bikerescueusermobile.ui.history.HistoryFragment;
 import com.example.bikerescueusermobile.util.DateSpliter;
+import com.example.bikerescueusermobile.util.MyInstances;
 import com.example.bikerescueusermobile.util.ViewModelFactory;
 import com.wdullaer.materialdatetimepicker.date.DatePickerDialog;
 
@@ -40,7 +44,8 @@ import cn.pedant.SweetAlert.SweetAlertDialog;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 
-public class ShopHistoryFragment extends BaseFragment implements ShopHistorySelectedListener, DatePickerDialog.OnDateSetListener {
+public class ShopHistoryFragment extends BaseFragment implements ShopHistorySelectedListener,
+        DatePickerDialog.OnDateSetListener, AdapterView.OnItemSelectedListener {
 
     @Override
     protected int layoutRes() {
@@ -58,6 +63,9 @@ public class ShopHistoryFragment extends BaseFragment implements ShopHistorySele
 
     @BindView(R.id.edtFromDate)
     EditText edtFromDate;
+
+    @BindView(R.id.spinStatus)
+    Spinner spinStatus;
 
     private String TAG = "ShopHistoryFragment";
 
@@ -126,11 +134,19 @@ public class ShopHistoryFragment extends BaseFragment implements ShopHistorySele
 
             dpd.show(getParentFragmentManager(), "Datepickerdialog");
         });
+
         //setup viewmodel
         viewModel = ViewModelProviders.of(this, viewModelFactory).get(ShopHistoryViewModel.class);
         mRecyclerView.addItemDecoration(new DividerItemDecoration((getActivity()), DividerItemDecoration.VERTICAL));
 
-        getHistory(from, to);
+        ArrayAdapter<String> statuses = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1);
+        statuses.add("Hoàn thành");
+        statuses.add("Đã hủy");
+        spinStatus.setAdapter(statuses);
+        spinStatus.setPrompt("Hoàn thành");
+        spinStatus.setOnItemSelectedListener(this);
+
+        getHistory(from, to, 0);
     }
 
     @Override
@@ -145,16 +161,22 @@ public class ShopHistoryFragment extends BaseFragment implements ShopHistorySele
         if (isFromDateClick) {
             from = "" + year + "-" + (monthOfYear + 1) + "-" + dayOfMonth;
             edtFromDate.setHint("" + dayOfMonth + "-" + (monthOfYear + 1) + "-" + year);
-            getHistory(from, to);
+            getHistory(from, to, spinStatus.getSelectedItemPosition());
         } else {
             to = "" + year + "-" + (monthOfYear + 1) + "-" + dayOfMonth;
             edtToDate.setHint("" + dayOfMonth + "-" + (monthOfYear + 1) + "-" + year);
-            getHistory(from, to);
+            getHistory(from, to, spinStatus.getSelectedItemPosition());
         }
     }
 
-    private void getHistory(String from, String to) {
-        viewModel.getRequestByShopId(CurrentUser.getInstance().getId(), from, to)
+    private void getHistory(String from, String to, int statusPos) {
+        String status = "";
+        if(statusPos == 0){
+            status = MyInstances.STATUS_FINISHED;
+        } else {
+            status = MyInstances.STATUS_CANCELED;
+        }
+        viewModel.getRequestByShopId(CurrentUser.getInstance().getId(), from, to, status)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(listReq -> {
@@ -164,12 +186,22 @@ public class ShopHistoryFragment extends BaseFragment implements ShopHistorySele
                             mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
                             pullToRefreshShopReq.setOnRefreshListener(() -> {
                                 pullToRefreshShopReq.setRefreshing(false);
-                                getHistory(from, to);
+                                getHistory(from, to, statusPos);
                             });
                         }
                     }
                 }, throwable -> {
                     Log.e(TAG, "getRequestByShopId: " + throwable.getMessage());
                 });
+    }
+
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        getHistory(from, to, position);
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) {
+
     }
 }

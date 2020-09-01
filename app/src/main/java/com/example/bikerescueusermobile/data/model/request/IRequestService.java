@@ -19,7 +19,10 @@ import retrofit2.http.Query;
 public interface IRequestService {
 
     @GET("/shop/getRequestByShopOwnerIdFromTo/{shopOwnerId}")
-    Single<List<Request>> getRequestByShopId(@Header("Authorization") String token, @Path("shopOwnerId") int shopId, @Query("from") String from, @Query("to") String to);
+    Single<List<Request>> getRequestByShopId(@Header("Authorization") String token,
+                                             @Path("shopOwnerId") int shopId,
+                                             @Query("from") String from, @Query("to") String to,
+                                             @Query("status") String status);
 
     @Multipart
     @POST("/biker/create-request")
@@ -44,7 +47,9 @@ public interface IRequestService {
 
     @GET("/biker/getRequestByBikerIdFromTo/{bikerId}")
     Single<List<Request>> getRequestByBikerId(@Path("bikerId") int bikerId, @Query("from") String fromDate,
-                                              @Query("to") String toDate, @Header("Authorization") String token);
+                                              @Query("to") String toDate,
+                                              @Query("status") String status,
+                                              @Header("Authorization") String token);
 
     @PUT("/biker/reviewRequest")
     Single<ReviewRequestDTO> reviewRequest(@Query("id") int requestId,

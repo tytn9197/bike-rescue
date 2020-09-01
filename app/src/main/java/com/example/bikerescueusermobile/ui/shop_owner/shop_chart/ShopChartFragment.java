@@ -34,6 +34,7 @@ import com.example.bikerescueusermobile.ui.shop_owner.shop_history.ShopHistoryFr
 import com.example.bikerescueusermobile.ui.shop_owner.shop_history.ShopHistoryRecyclerViewAdapter;
 import com.example.bikerescueusermobile.ui.shop_owner.shop_history.ShopHistoryViewModel;
 import com.example.bikerescueusermobile.util.DateSpliter;
+import com.example.bikerescueusermobile.util.MyInstances;
 import com.example.bikerescueusermobile.util.MyMethods;
 import com.example.bikerescueusermobile.util.ViewModelFactory;
 import com.wdullaer.materialdatetimepicker.date.DatePickerDialog;
@@ -180,7 +181,7 @@ public class ShopChartFragment extends BaseFragment implements DatePickerDialog.
             doanhthuView.findViewById(R.id.btn_return).setOnClickListener(v1 -> doanhthuDialog.dismiss());
 
             ViewModelProviders.of(this, viewModelFactory).get(ShopHistoryViewModel.class)
-                    .getRequestByShopId(CurrentUser.getInstance().getId(), from, to)
+                    .getRequestByShopId(CurrentUser.getInstance().getId(), from, to, MyInstances.STATUS_FINISHED)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(listReq -> {
@@ -252,19 +253,10 @@ public class ShopChartFragment extends BaseFragment implements DatePickerDialog.
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(doanhthu -> {
-//                    String strDoanhThu = "";
-//                    if (doanhthu > 1000000) {
-//                        strDoanhThu = "" + doanhthu.intValue() / 1000000 + " tỷ "
-//                                + (doanhthu.intValue() / 1000) % 1000 + " tr "
-//                                + doanhthu.intValue() % 1000 + "k VND";
-//                    } else if (doanhthu > 1000) {
-//                        strDoanhThu = "" + doanhthu.intValue() / 1000 + " tr " + doanhthu.intValue() % 1000 + "k VND";
-//                    } else {
-//                        strDoanhThu = "" + doanhthu.intValue() + "k VND";
-//                    }
-                    txtDoanhThu.setText("" + MyMethods.convertMoney(doanhthu.floatValue()*1000) + " vnd");
+                    txtDoanhThu.setText("" + MyMethods.convertMoney(doanhthu.floatValue() * 1000) + " vnd");
                 }, throwable -> {
-                    Log.e(TAG, "countAllByAccepted: " + throwable.getMessage());
+                    Log.e(TAG, "sumPriceRequestFromTo: " + throwable.getMessage());
+                    txtDoanhThu.setText("" + 0 + " vnd");
                 });
     }
 }

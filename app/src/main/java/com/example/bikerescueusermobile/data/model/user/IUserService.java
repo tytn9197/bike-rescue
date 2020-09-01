@@ -45,6 +45,10 @@ public interface IUserService {
     @GET("/shop/requestSuccessFromTo/{id}")
     Single<List<StatusSuccessDTO>> getSuccessReq(@Path("id") int id, @Query("from") String from, @Query("to") String to, @Header("Authorization") String token);
 
+    @GET("/shop/requestSuccess/{id}")
+    Single<List<StatusSuccessDTO>> getSuccessReqOnAlgo(@Path("id") int id, @Header("Authorization") String token);
+
+
     @GET("/shop/getNumOfStarByShopOwnerId/{id}")
     Single<Double> getNumOfStarByShopOwnerId(@Path("id") int id, @Header("Authorization") String token);
 

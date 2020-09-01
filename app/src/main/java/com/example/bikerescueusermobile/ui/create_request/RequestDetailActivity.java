@@ -405,7 +405,7 @@ public class RequestDetailActivity extends BaseActivity {
 
         if(request.getStatus().equals(MyInstances.STATUS_FINISHED)){
             txtFinishPrice.setVisibility(View.VISIBLE);
-            txtFinishPrice.setText(" Giá: " + MyMethods.convertMoney(request.getPrice().floatValue()) + " vnd");
+            txtFinishPrice.setText(" Giá: " + MyMethods.convertMoney(request.getPrice().floatValue()*1000) + " vnd");
         }
     }
 

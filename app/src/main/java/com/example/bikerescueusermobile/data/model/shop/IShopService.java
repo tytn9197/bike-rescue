@@ -20,7 +20,7 @@ public interface IShopService {
     @GET("/shop/shops")
     Single<List<Shop>> getAllShop(@Header("Authorization") String token);
 
-    @GET("/shop/getShopByService")
+    @GET("/shop/getClusterShopByService")
     Single<List<Shop>> getShopByServiceName(@Header("Authorization") String token, @Query("name") String serviceName);
 
     @GET("/shop/getShopByShopOwnerId/{shopOwnerId}")
@@ -29,6 +29,10 @@ public interface IShopService {
     @GET("/shop/countRequestFromTo/{id}")
     Single<Integer> countAllByAccepted(@Path("id") int shopOwnerId,
                                        @Query("from") String from, @Query("to") String to,
+                                       @Header("Authorization") String token);
+
+    @GET("/shop/countRequest/{id}")
+    Single<Integer> countAllByAcceptedOnAlgo(@Path("id") int shopOwnerId,
                                        @Header("Authorization") String token);
 
     @GET("/shop/countAllServiceFromTo/{id}")

@@ -27,8 +27,8 @@ public class ShopHistoryViewModel extends ViewModel {
         return loading;
     }
 
-    public Single<List<Request>> getRequestByShopId(int shopId, String from, String to) {
+    public Single<List<Request>> getRequestByShopId(int shopId, String from, String to, String status) {
         loading.setValue(true);
-        return requestRepository.getRequestByShopId(CurrentUser.getInstance().getAccessToken(), shopId, from, to);
+        return requestRepository.getRequestByShopId(CurrentUser.getInstance().getAccessToken(), shopId, from, to, status);
     }
 }

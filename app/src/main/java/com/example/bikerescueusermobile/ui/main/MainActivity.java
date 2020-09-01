@@ -257,6 +257,7 @@ public class MainActivity extends BaseActivity {
                         case R.id.nav_logout:
                             SharedPreferenceHelper.setSharedPreferenceString(MainActivity.this, MyInstances.KEY_LOGGED_IN, "");
                             Intent intentLog = new Intent(MainActivity.this, LoginActivity.class);
+                            SharedPreferenceHelper.setSharedPreferenceString(MainActivity.this, MyInstances.KEY_COUNT_CANCELATION, "");
                             startActivity(intentLog);
                             finish();
                             return true;

@@ -94,188 +94,203 @@ public class LoginActivity extends BaseActivity {
             startActivity(intent);
         });
 
-        deviceToken = getIntent().getStringExtra("deviceToken");
-
-        viewModel = ViewModelProviders.of(this, viewModelFactory).get(LoginModel.class);
-        gson = new Gson();
-        btnLogin.setOnClickListener(view -> {
-            hideErrorText();
-            LoginData loginData = new LoginData(edtName.getText().toString(), edtPass.getText().toString(), this.deviceToken);
-            viewModel.login(loginData)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(user -> {
-                        viewModel.setLoading(false);
-                        if (user != null) {
-                            user.setPasswordLogin(edtPass.getText().toString());
-                            String sharedPreferenceStr = gson.toJson(user);
-                            SharedPreferenceHelper.setSharedPreferenceString(LoginActivity.this, MyInstances.KEY_LOGGED_IN, sharedPreferenceStr);
-                            setDataToCurrentUser(user, edtPass.getText().toString());
-
-                            //login success -> set user latlong
-                            final FusedLocationProviderClient mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-
-                            mFusedLocationClient.getLastLocation().addOnSuccessListener(this, location -> {
-                                if (location != null) {
-                                    UserLatLong userLatln = new UserLatLong(
-                                            user.getId(),
-                                            "" + location.getLatitude(),
-                                            "" + location.getLongitude());
-
-                                    viewModel.setUserLatLong(userLatln, "Bearer " + user.getAccessToken())
-                                            .subscribeOn(Schedulers.io())
-                                            .observeOn(AndroidSchedulers.mainThread())
-                                            .subscribe(uLatlng -> {
-                                                CurrentUser.getInstance().setLatitude("" + uLatlng.getLatitude());
-                                                CurrentUser.getInstance().setLongtitude("" + uLatlng.getLongtitude());
-                                            }, throwable -> {
-                                                Log.e(TAG, "setUserLatLong: " + throwable.getMessage());
-                                            });
-                                }
-                            });
-
-
-                            if (user.getRoleId() == 3) {
-                                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                                startActivity(intent);
-                                finish();
-                            } else if (user.getRoleId() == 2) {
-                                CurrentUser.getInstance().setShop(user.getShop());
-                                Intent intent = new Intent(LoginActivity.this, ShopMainActivity.class);
-                                startActivity(intent);
-                                finish();
-                            } else {
-                                errorTextView.setVisibility(View.VISIBLE);
-                                errorTextView.setText("Số điện thoại hoặc mật khẩu không đúng!!!!");
-                            }
-                        }
-
-                    }, throwable -> {
-                        viewModel.setLoading(false);
-                        errorTextView.setVisibility(View.VISIBLE);
-                        if (throwable.getMessage().contains("No address associated with hostname") || throwable.getMessage().contains("network")) {
-                            errorTextView.setText("Lỗi mạng!!");
-                        } else {
-                            errorTextView.setText("Số điện thoại hoặc mật khẩu không đúng!!");
-                        }
-                        Log.e("LoginActivity", "" + throwable.getMessage());
-                    });
-            viewModel.getLoading().observe(this, isLoading -> {
-                if (isLoading != null) {
-                    if (isLoading) {
-                        edtName.setEnabled(false);
-                        edtPass.setEnabled(false);
-                        btnLogin.setVisibility(View.GONE);
-                        viewRegister.setVisibility(View.GONE);
-                        errorTextView.setVisibility(View.GONE);
-                        btnForgotPassword.setVisibility(View.GONE);
-                        rotateLoading.start();
-                    } else {
-                        edtName.setEnabled(true);
-                        edtPass.setEnabled(true);
-                        btnLogin.setVisibility(View.VISIBLE);
-                        viewRegister.setVisibility(View.VISIBLE);
-                        errorTextView.setVisibility(View.VISIBLE);
-                        btnForgotPassword.setVisibility(View.VISIBLE);
-                        rotateLoading.stop();
+        //GET DEVICE TOKEN
+        FirebaseInstanceId.getInstance().getInstanceId()
+                .addOnCompleteListener(task -> {
+                    if (!task.isSuccessful()) {
+                        return;
                     }
-                }
-            });
-        });
 
-        edtPass.setOnClickListener(v -> {
-            hideErrorText();
-        });
+                    deviceToken = task.getResult().getToken();
 
-        edtName.setOnClickListener(v -> {
-            hideErrorText();
-        });
+                    Log.e(TAG, "device token: " + task.getResult().getToken());
 
-        String shareUser = SharedPreferenceHelper.getSharedPreferenceString(this, MyInstances.KEY_LOGGED_IN, "");
+                    viewModel = ViewModelProviders.of(this, viewModelFactory).get(LoginModel.class);
+                    gson = new Gson();
+                    btnLogin.setOnClickListener(view -> {
+                        hideErrorText();
+                        LoginData loginData = new LoginData(edtName.getText().toString(), edtPass.getText().toString(), this.deviceToken);
+                        viewModel.login(loginData)
+                                .subscribeOn(Schedulers.io())
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .subscribe(user -> {
+                                    viewModel.setLoading(false);
+                                    if (user != null) {
+                                        user.setPasswordLogin(edtPass.getText().toString());
+                                        String sharedPreferenceStr = gson.toJson(user);
+                                        SharedPreferenceHelper.setSharedPreferenceString(LoginActivity.this, MyInstances.KEY_LOGGED_IN, sharedPreferenceStr);
+                                        setDataToCurrentUser(user, edtPass.getText().toString());
 
-        if (!shareUser.trim().equals("")) {
-            User loginUser = gson.fromJson(shareUser, User.class);
-            LoginData loginData = new LoginData(loginUser.getPhoneNumber(), loginUser.getPasswordLogin(), this.deviceToken);
-            viewModel.login(loginData)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(user -> {
-                        viewModel.setLoading(false);
-                        if (user != null) {
-                            setDataToCurrentUser(user, loginUser.getPasswordLogin());
+                                        //login success -> set user latlong
+                                        final FusedLocationProviderClient mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
-                            //login success -> set user latlong
-                            final FusedLocationProviderClient mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+                                        mFusedLocationClient.getLastLocation().addOnSuccessListener(this, location -> {
+                                            if (location != null) {
+                                                UserLatLong userLatln = new UserLatLong(
+                                                        user.getId(),
+                                                        "" + location.getLatitude(),
+                                                        "" + location.getLongitude());
+                                                CurrentUser.getInstance().setLatitude("" + location.getLatitude());
+                                                CurrentUser.getInstance().setLongtitude("" + location.getLongitude());
+//                                                viewModel.setUserLatLong(userLatln, "Bearer " + user.getAccessToken())
+//                                                        .subscribeOn(Schedulers.io())
+//                                                        .observeOn(AndroidSchedulers.mainThread())
+//                                                        .subscribe(uLatlng -> {
+//
+//                                                        }, throwable -> {
+//                                                            Log.e(TAG, "setUserLatLong: " + throwable.getMessage());
+//                                                        });
+                                            }
+                                        });
 
-                            mFusedLocationClient.getLastLocation().addOnSuccessListener(this, location -> {
-                                if (location != null) {
-                                    UserLatLong userLatln = new UserLatLong(
-                                            user.getId(),
-                                            "" + location.getLatitude(),
-                                            "" + location.getLongitude());
 
-                                    viewModel.setUserLatLong(userLatln, "Bearer " + user.getAccessToken())
-                                            .subscribeOn(Schedulers.io())
-                                            .observeOn(AndroidSchedulers.mainThread())
-                                            .subscribe(uLatlng -> {
-                                                CurrentUser.getInstance().setLatitude("" + uLatlng.getLatitude());
-                                                CurrentUser.getInstance().setLongtitude("" + uLatlng.getLongtitude());
-                                            }, throwable -> {
-                                                Log.e(TAG, "setUserLatLong: " + throwable.getMessage());
-                                            });
+                                        if (user.getRoleId() == 3) {
+                                            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                                            startActivity(intent);
+                                            finish();
+                                        } else if (user.getRoleId() == 2) {
+                                            if (user.getShop() != null)
+                                                CurrentUser.getInstance().setShop(user.getShop());
+                                            Intent intent = new Intent(LoginActivity.this, ShopMainActivity.class);
+                                            startActivity(intent);
+                                            finish();
+                                        } else {
+                                            errorTextView.setVisibility(View.VISIBLE);
+                                            errorTextView.setText("Số điện thoại hoặc mật khẩu không đúng!!!!");
+                                        }
+                                    }
+
+                                }, throwable -> {
+                                    viewModel.setLoading(false);
+                                    errorTextView.setVisibility(View.VISIBLE);
+                                    if (throwable.getMessage().contains("address")
+                                            || throwable.getMessage().contains("network")
+                                            || throwable.getMessage().contains("connect")) {
+                                        errorTextView.setText("Lỗi mạng!!");
+                                    } else {
+                                        errorTextView.setText("Số điện thoại hoặc mật khẩu không đúng!!");
+                                    }
+                                    Log.e("LoginActivity", "" + throwable.getMessage());
+                                });
+                        viewModel.getLoading().observe(this, isLoading -> {
+                            if (isLoading != null) {
+                                if (isLoading) {
+                                    edtName.setEnabled(false);
+                                    edtPass.setEnabled(false);
+                                    btnLogin.setVisibility(View.GONE);
+                                    viewRegister.setVisibility(View.GONE);
+                                    errorTextView.setVisibility(View.GONE);
+                                    btnForgotPassword.setVisibility(View.GONE);
+                                    rotateLoading.start();
+                                } else {
+                                    edtName.setEnabled(true);
+                                    edtPass.setEnabled(true);
+                                    btnLogin.setVisibility(View.VISIBLE);
+                                    viewRegister.setVisibility(View.VISIBLE);
+                                    errorTextView.setVisibility(View.VISIBLE);
+                                    btnForgotPassword.setVisibility(View.VISIBLE);
+                                    rotateLoading.stop();
                                 }
-                            });
-
-
-                            if (user.getRoleId() == 3) {
-                                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                                startActivity(intent);
-                                finish();
-                            } else if (user.getRoleId() == 2) {
-                                if (user.getShop() != null)
-                                    CurrentUser.getInstance().setShop(user.getShop());
-                                Intent intent = new Intent(LoginActivity.this, ShopMainActivity.class);
-                                startActivity(intent);
-                                finish();
-                            } else {
-                                errorTextView.setVisibility(View.VISIBLE);
-                                errorTextView.setText("Số điện thoại hoặc mật khẩu không đúng!!!!");
                             }
-                        }
-
-                    }, throwable -> {
-                        viewModel.setLoading(false);
-                        errorTextView.setVisibility(View.VISIBLE);
-                        if (throwable.getMessage().contains("No address associated with hostname") || throwable.getMessage().contains("network")) {
-                            errorTextView.setText("Lỗi mạng!!");
-                        } else {
-                            errorTextView.setText("Số điện thoại hoặc mật khẩu không đúng!!");
-                        }
-                        Log.e("LoginActivity", "" + throwable.getMessage());
+                        });
                     });
-            viewModel.getLoading().observe(this, isLoading -> {
-                if (isLoading != null) {
-                    if (isLoading) {
-                        edtName.setEnabled(false);
-                        edtPass.setEnabled(false);
-                        btnLogin.setVisibility(View.GONE);
-                        viewRegister.setVisibility(View.GONE);
-                        errorTextView.setVisibility(View.GONE);
-                        btnForgotPassword.setVisibility(View.GONE);
-                        rotateLoading.start();
-                    } else {
-                        edtName.setEnabled(true);
-                        edtPass.setEnabled(true);
-                        btnLogin.setVisibility(View.VISIBLE);
-                        viewRegister.setVisibility(View.VISIBLE);
-                        errorTextView.setVisibility(View.VISIBLE);
-                        btnForgotPassword.setVisibility(View.VISIBLE);
-                        rotateLoading.stop();
+
+                    edtPass.setOnClickListener(v -> {
+                        hideErrorText();
+                    });
+
+                    edtName.setOnClickListener(v -> {
+                        hideErrorText();
+                    });
+
+                    String shareUser = SharedPreferenceHelper.getSharedPreferenceString(this, MyInstances.KEY_LOGGED_IN, "");
+
+                    if (!shareUser.trim().equals("")) {
+                        User loginUser = gson.fromJson(shareUser, User.class);
+                        LoginData loginData = new LoginData(loginUser.getPhoneNumber(), loginUser.getPasswordLogin(), this.deviceToken);
+                        viewModel.login(loginData)
+                                .subscribeOn(Schedulers.io())
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .subscribe(user -> {
+                                    viewModel.setLoading(false);
+                                    if (user != null) {
+                                        setDataToCurrentUser(user, loginUser.getPasswordLogin());
+
+                                        //login success -> set user latlong
+                                        final FusedLocationProviderClient mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+
+                                        mFusedLocationClient.getLastLocation().addOnSuccessListener(this, location -> {
+                                            if (location != null) {
+                                                UserLatLong userLatln = new UserLatLong(
+                                                        user.getId(),
+                                                        "" + location.getLatitude(),
+                                                        "" + location.getLongitude());
+                                                CurrentUser.getInstance().setLatitude("" + location.getLatitude());
+                                                CurrentUser.getInstance().setLongtitude("" + location.getLongitude());
+//                                                viewModel.setUserLatLong(userLatln, "Bearer " + user.getAccessToken())
+//                                                        .subscribeOn(Schedulers.io())
+//                                                        .observeOn(AndroidSchedulers.mainThread())
+//                                                        .subscribe(uLatlng -> {
+//                                                            CurrentUser.getInstance().setLatitude("" + uLatlng.getLatitude());
+//                                                            CurrentUser.getInstance().setLongtitude("" + uLatlng.getLongtitude());
+//                                                        }, throwable -> {
+//                                                            Log.e(TAG, "setUserLatLong: " + throwable.getMessage());
+//                                                        });
+                                            }
+                                        });
+
+
+                                        if (user.getRoleId() == 3) {
+                                            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                                            startActivity(intent);
+                                            finish();
+                                        } else if (user.getRoleId() == 2) {
+                                            if (user.getShop() != null)
+                                                CurrentUser.getInstance().setShop(user.getShop());
+                                            Intent intent = new Intent(LoginActivity.this, ShopMainActivity.class);
+                                            startActivity(intent);
+                                            finish();
+                                        } else {
+                                            errorTextView.setVisibility(View.VISIBLE);
+                                            errorTextView.setText("Số điện thoại hoặc mật khẩu không đúng!!!!");
+                                        }
+                                    }
+
+                                }, throwable -> {
+                                    viewModel.setLoading(false);
+                                    errorTextView.setVisibility(View.VISIBLE);
+                                    if (throwable.getMessage().contains("No address associated with hostname") || throwable.getMessage().contains("network")) {
+                                        errorTextView.setText("Lỗi mạng!!");
+                                    } else {
+                                        errorTextView.setText("Số điện thoại hoặc mật khẩu không đúng!!");
+                                    }
+                                    Log.e("LoginActivity", "" + throwable.getMessage());
+                                });
+                        viewModel.getLoading().observe(this, isLoading -> {
+                            if (isLoading != null) {
+                                if (isLoading) {
+                                    edtName.setEnabled(false);
+                                    edtPass.setEnabled(false);
+                                    btnLogin.setVisibility(View.GONE);
+                                    viewRegister.setVisibility(View.GONE);
+                                    errorTextView.setVisibility(View.GONE);
+                                    btnForgotPassword.setVisibility(View.GONE);
+                                    rotateLoading.start();
+                                } else {
+                                    edtName.setEnabled(true);
+                                    edtPass.setEnabled(true);
+                                    btnLogin.setVisibility(View.VISIBLE);
+                                    viewRegister.setVisibility(View.VISIBLE);
+                                    errorTextView.setVisibility(View.VISIBLE);
+                                    btnForgotPassword.setVisibility(View.VISIBLE);
+                                    rotateLoading.stop();
+                                }
+                            }
+                        });//end loading
                     }
-                }
-            });
-        }
-    }
+                }); //end get token
+        Log.e(TAG, "lat - long: " + CurrentUser.getInstance().getLatitude() + "---" + CurrentUser.getInstance().getLongtitude());
+    } //end create
 
     private void setDataToCurrentUser(User user, String pass) {
         CurrentUser.getInstance().setFullName(user.getFullName());
@@ -283,7 +298,7 @@ public class LoginActivity extends BaseActivity {
         CurrentUser.getInstance().setAccessToken("Bearer " + user.getAccessToken());
         CurrentUser.getInstance().setAvatarUrl(user.getAvatarUrl());
         CurrentUser.getInstance().setId(user.getId());
-        CurrentUser.getInstance().setDeviceToken(user.getDeviceToken());
+//        CurrentUser.getInstance().setDeviceToken(user.getDeviceToken());
         CurrentUser.getInstance().setAddress(user.getAddress());
         CurrentUser.getInstance().setEmail(user.getEmail());
         CurrentUser.getInstance().setPhoneNumber(user.getPhoneNumber());
@@ -299,27 +314,24 @@ public class LoginActivity extends BaseActivity {
         long currentTimeMillis = System.currentTimeMillis();
 
         String shareUser = SharedPreferenceHelper.getSharedPreferenceString(this, MyInstances.KEY_COUNT_CANCELATION, "");
-        Log.e(TAG, "last login mili sec before: " + CurrentUser.getInstance().getLastLogin());
 
         if (shareUser.equals("")) {
             CurrentUser.getInstance().setLastLogin(currentTimeMillis);
             CurrentUser.getInstance().setNumOfCancel(0);
+            Log.e(TAG, "shareUser.equals(null)");
         } else {
             User userLastLogin = gson.fromJson(shareUser, User.class);
             CurrentUser.getInstance().setLastLogin(userLastLogin.getLastLogin());
             CurrentUser.getInstance().setNumOfCancel(userLastLogin.getNumOfCancel());
 
-            if (CurrentUser.getInstance().getLastLogin() == 0) {
+            if ((currentTimeMillis - CurrentUser.getInstance().getLastLogin()) > MyInstances.ONE_DAY_MILLISECONDS) {
+                CurrentUser.getInstance().setNumOfCancel(0);
                 CurrentUser.getInstance().setLastLogin(currentTimeMillis);
-            } else {
-                if ((currentTimeMillis - CurrentUser.getInstance().getLastLogin()) > MyInstances.ONE_DAY_MILLISECONDS) {
-                    CurrentUser.getInstance().setNumOfCancel(0);
-                    Log.e(TAG, "set num of cancel = 0");
-                }
+                Log.e(TAG, "set num of cancel = 0");
             }
         }
         Log.e(TAG, "last login mili sec after: " + CurrentUser.getInstance().getLastLogin());
-
+        Log.e(TAG, "num of cancel: " + CurrentUser.getInstance().getNumOfCancel());
         String sharedPreferenceStr = gson.toJson(CurrentUser.getInstance());
         SharedPreferenceHelper.setSharedPreferenceString(LoginActivity.this, MyInstances.KEY_COUNT_CANCELATION, sharedPreferenceStr);
 

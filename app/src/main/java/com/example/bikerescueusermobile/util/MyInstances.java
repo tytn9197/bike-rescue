@@ -49,9 +49,10 @@ public class MyInstances {
     public static final int ERROR_VEHICLE_TYPE = 1;
 
     // algorithm
-    public static final double DISTANCE_WEIGHT = 0.5;
-    public static final double PRICE_WEIGHT = 0.3;
-    public static final double RATING_WEIGHT = 0.2;
+    public static final double DISTANCE_WEIGHT = 0.35;
+    public static final double PRICE_WEIGHT = 0.27;
+    public static final double RATING_WEIGHT = 0.15;
+    public static final double COMPLETED_REQ_WEIGHT = 0.23;
 
     public static final long ONE_DAY_MILLISECONDS = 86400000;
 
