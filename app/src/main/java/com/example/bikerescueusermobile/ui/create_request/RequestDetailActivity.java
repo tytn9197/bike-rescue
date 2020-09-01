@@ -309,6 +309,7 @@ public class RequestDetailActivity extends BaseActivity {
         txtReqDetailCreatedTime.setText(" Vào lúc " + MyMethods.convertTimeStampToTime(request.getCreatedDate()));
 
         if (request.getListReqShopService().get(0).getShopService().getShops().getAvatarUrl() != null) {
+            if (request.getListReqShopService().get(0).getShopService().getShops().getAvatarUrl().contains("imgur"))
             Picasso.with(this)
                     .load(request.getListReqShopService().get(0).getShopService().getShops().getAvatarUrl()).placeholder(R.drawable.ic_load)
                     .into(imgReqDetailShopAvatar);
@@ -378,7 +379,8 @@ public class RequestDetailActivity extends BaseActivity {
         txtReqDetailCreatedTime.setText(" Vào lúc " + MyMethods.convertTimeStampToTime(request.getCreatedDate()));
 
         if (request.getCreatedUser().getAvatarUrl() != null) {
-            Picasso.with(this)
+            if (request.getCreatedUser().getAvatarUrl().contains("imgur"))
+                Picasso.with(this)
                     .load(request.getCreatedUser().getAvatarUrl()).placeholder(R.drawable.ic_load)
                     .into(imgReqDetailShopAvatar);
         }
@@ -513,6 +515,7 @@ public class RequestDetailActivity extends BaseActivity {
 
         if (status.equals(MyInstances.STATUS_FINISHED)) {
             txtReqDetailStatus.setText("Yêu cầu đã hoàn thành");
+            btnReqDetailCallShop.setVisibility(View.GONE);
             btnReqDetailCancel.setVisibility(View.GONE);
             btnComplain.setVisibility(View.VISIBLE);
         }

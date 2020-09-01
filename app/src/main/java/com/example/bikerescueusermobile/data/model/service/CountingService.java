@@ -11,4 +11,6 @@ public class CountingService {
 
     @SerializedName("serviceName")
     private String serviceName;
+
+    private int reqId;
 }

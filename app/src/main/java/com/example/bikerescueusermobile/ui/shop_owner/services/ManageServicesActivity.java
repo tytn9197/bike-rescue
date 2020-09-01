@@ -182,7 +182,7 @@ public class ManageServicesActivity extends BaseActivity implements ShopServiceS
             cbLienHe.setEnabled(false);
             cbLienHe.setClickable(false);
 
-        } else {    
+        } else {
             btnConfirm.setText("Thêm");
         }
 

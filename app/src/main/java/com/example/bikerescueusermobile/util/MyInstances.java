@@ -28,6 +28,7 @@ public class MyInstances {
     public static final String KEY_SHOP_REQUEST= "shopReq";
     public static final String KEY_LOGGED_IN= "user";
     public static final String KEY_COUNT_CANCELATION= "KEY_COUNT_CANCELATION";
+    public static final String KEY_COUNT_DOWN_TIME= "KEY_COUNT_DOWN_TIME";
 
     //for noti message
     public static final String NOTI_CREATED = "NOTI_CREATED";

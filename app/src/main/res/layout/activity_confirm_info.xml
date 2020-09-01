@@ -283,7 +283,7 @@
                 android:layout_height="match_parent"
                 android:layout_marginTop="5dp"
                 android:padding="5dp"
-                android:text="Ảnh sản phẩm (nếu có):" />
+                android:text="Hình ảnh thêm (nếu có):" />
 
             <LinearLayout
                 android:layout_width="match_parent"

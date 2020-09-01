@@ -97,6 +97,7 @@ public class ShopHistoryRecyclerViewAdapter extends RecyclerView.Adapter<ShopHis
             txtShopFeedStatusParams.addRule(RelativeLayout.BELOW, R.id.imgShopFeed);
 
             if (request.getCreatedUser().getAvatarUrl() != null) {
+                if (request.getCreatedUser().getAvatarUrl().contains("imgur"))
                 Picasso.with(context)
                         .load(request.getCreatedUser().getAvatarUrl()).placeholder(R.drawable.ic_load)
                         .into(imgShopFeed);

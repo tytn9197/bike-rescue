@@ -105,7 +105,8 @@ public class ServiceRecycleViewAdapter extends RecyclerView.Adapter<ServiceRecyc
             txtServiceFeedStatusParams.addRule(RelativeLayout.BELOW, R.id.imgServiceFeed);
 
             if (shopServiceTable.getServiceAvatar() != null) {
-                Picasso.with(context)
+                if (shopServiceTable.getServiceAvatar().contains("imgur"))
+                    Picasso.with(context)
                         .load(shopServiceTable.getServiceAvatar()).placeholder(R.drawable.ic_load)
                         .into(imgServiceFeed);
             }

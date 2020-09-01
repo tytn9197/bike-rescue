@@ -83,7 +83,7 @@ public class ViewReviewRvAdapter extends RecyclerView.Adapter<ViewReviewRvAdapte
         void bind(ReviewRequestDTO review) {
             if(review.getCreated().getAvatarUrl().contains("imgur")){
                 Picasso.with(context)
-                        .load(CurrentUser.getInstance().getAvatarUrl()).placeholder(R.drawable.ic_load)
+                        .load(review.getCreated().getAvatarUrl()).placeholder(R.drawable.ic_load)
                         .into(reviewImg);
             }
 
@@ -104,9 +104,9 @@ public class ViewReviewRvAdapter extends RecyclerView.Adapter<ViewReviewRvAdapte
                 txtReviewComment.setText(review.getReviewComment());
             }
 
-            txtReviewDate.setText("Vao luc "+
+            txtReviewDate.setText("Vào lúc "+
                     MyMethods.convertTimeStampToTime(review.getReviewUpdateDate()) +
-                    " ngay " +
+                    " ngày " +
                     MyMethods.convertTimeStampToDate(review.getReviewUpdateDate()));
         }
 

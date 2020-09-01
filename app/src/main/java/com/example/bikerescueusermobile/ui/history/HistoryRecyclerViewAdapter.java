@@ -90,7 +90,8 @@ public class HistoryRecyclerViewAdapter extends RecyclerView.Adapter<HistoryRecy
             if (request.getListReqShopService().size() > 0) {
                 txtFeedProblem.setText(request.getListReqShopService().get(0).getShopService().getServices().getName());
                 if (request.getListReqShopService().get(0).getShopService().getShops().getAvatarUrl() != null) {
-                    Picasso.with(context)
+                    if (request.getListReqShopService().get(0).getShopService().getShops().getAvatarUrl().contains("imgur"))
+                        Picasso.with(context)
                             .load(request.getListReqShopService().get(0).getShopService().getShops().getAvatarUrl()).placeholder(R.drawable.ic_load)
                             .into(imgFeed);
                 }

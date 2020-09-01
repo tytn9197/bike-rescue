@@ -46,6 +46,7 @@ import com.example.bikerescueusermobile.data.model.user.UserLatLong;
 import com.example.bikerescueusermobile.ui.confirm.ConfirmViewModel;
 import com.example.bikerescueusermobile.ui.create_request.RequestDetailViewModel;
 import com.example.bikerescueusermobile.ui.login.UpdateLocationService;
+import com.example.bikerescueusermobile.ui.shopMain.ShopMainActivity;
 import com.example.bikerescueusermobile.ui.tracking_map.TrackingMapActivity;
 import com.example.bikerescueusermobile.ui.tracking_map.ViewReviewRvAdapter;
 import com.example.bikerescueusermobile.util.MyInstances;
@@ -77,6 +78,7 @@ import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -248,6 +250,7 @@ public class ShopHomeFragment extends BaseFragment {
                                                         getActivity().getSupportFragmentManager().beginTransaction()
                                                                 .replace(R.id.frame_container, new ShopHomeFragment())
                                                                 .commit();
+                                                        SharedPreferenceHelper.setSharedPreferenceString(getActivity(), MyInstances.KEY_COUNT_DOWN_TIME, "");
 
                                                         Intent serviceIntent = new Intent(getActivity(), UpdateLocationService.class);
                                                         CurrentUser.getInstance().setCurrentBikerId(req.getCreatedUser().getId());
@@ -266,37 +269,14 @@ public class ShopHomeFragment extends BaseFragment {
                                         sweetAlertDialog.show();
                                     });
 
-                                    //run cown down timer
-                                    countDownTimer = new CountDownTimer(CurrentUser.getInstance().getRejectTime() * 1000, 1000) {
-
-                                        @SuppressLint("DefaultLocale")
-                                        @Override
-                                        public void onTick(long millisUntilFinished) {
-                                            if (millisUntilFinished != 0) {
-                                                txtCountdown.setText(String.format(" Hệ thống sẽ từ chối yêu cầu sau %d giây", millisUntilFinished / 1000));
-                                            }
-                                        }
-
-                                        @Override
-                                        public void onFinish() {
-                                            if (countDownTimer != null) {
-                                                countDownTimer.cancel();
-                                                txtCountdown.setText("");
-                                                viewModel.updateStatusRequest(req.getId(), MyInstances.NOTI_AUTO_REJECTED)
-                                                        .subscribeOn(Schedulers.io())
-                                                        .observeOn(AndroidSchedulers.mainThread())
-                                                        .subscribe(responseDTO -> {
-                                                            SharedPreferenceHelper.setSharedPreferenceString(getActivity(), MyInstances.KEY_SHOP_REQUEST, "");
-                                                            getActivity().getSupportFragmentManager().beginTransaction()
-                                                                    .replace(R.id.frame_container, new ShopHomeFragment())
-                                                                    .commit();
-                                                        });
-                                            }
-                                        }
-                                    };
-                                    countDownTimer.start();
+                                    //run cown down timer first time
+                                    if (getActivity() != null)
+                                        SharedPreferenceHelper.setSharedPreferenceString
+                                                (getActivity(), MyInstances.KEY_COUNT_DOWN_TIME, "" + System.currentTimeMillis());
+                                    runCountDownTimer(req.getId(), CurrentUser.getInstance().getRejectTime());
                                 } else {
                                     SharedPreferenceHelper.setSharedPreferenceString(getActivity(), MyInstances.KEY_SHOP_REQUEST, "");
+                                    SharedPreferenceHelper.setSharedPreferenceString(getActivity(), MyInstances.KEY_COUNT_DOWN_TIME, "");
                                     txtNoReq.setVisibility(View.VISIBLE);
                                 }
                             });
@@ -305,6 +285,7 @@ public class ShopHomeFragment extends BaseFragment {
                 if (responeReq.getMessage().equals(MyInstances.NOTI_CANELED)) {
                     txtNoReq.setVisibility(View.VISIBLE);
                     SharedPreferenceHelper.setSharedPreferenceString(getActivity(), MyInstances.KEY_SHOP_REQUEST, "");
+                    SharedPreferenceHelper.setSharedPreferenceString(getActivity(), MyInstances.KEY_COUNT_DOWN_TIME, "");
 
                     //show dialog
                     SweetAlertDialog cancelReq = new SweetAlertDialog(getBaseActivity(), SweetAlertDialog.NORMAL_TYPE);
@@ -359,6 +340,20 @@ public class ShopHomeFragment extends BaseFragment {
 
                                     setDataToView(req);
 
+                                    //get count down timer and check
+                                    String shareCountDown = SharedPreferenceHelper
+                                            .getSharedPreferenceString(getActivity(), MyInstances.KEY_COUNT_DOWN_TIME, "");
+                                    if(!shareCountDown.equals("")){
+                                        long seconds = Long.parseLong(shareCountDown);
+                                        if((System.currentTimeMillis() - seconds) < 60 * 1000){
+                                            Log.e(TAG, "con count down timer ---- time: " + (System.currentTimeMillis() - seconds));
+                                            runCountDownTimer(req.getId(),
+                                                    (CurrentUser.getInstance().getRejectTime()-(System.currentTimeMillis() - seconds)/1000));
+                                        } else {
+                                            Log.e(TAG, "xoa count down share ref");
+                                            SharedPreferenceHelper.setSharedPreferenceString(getActivity(), MyInstances.KEY_COUNT_DOWN_TIME, "");
+                                        }
+                                    }
                                     String sharedPreferenceStr = gson.toJson(req);
                                     SharedPreferenceHelper.setSharedPreferenceString(getActivity(), MyInstances.KEY_SHOP_REQUEST, sharedPreferenceStr);
 
@@ -381,6 +376,7 @@ public class ShopHomeFragment extends BaseFragment {
                                                     .subscribeOn(Schedulers.io())
                                                     .observeOn(AndroidSchedulers.mainThread())
                                                     .subscribe(responseDTO -> {
+                                                        SharedPreferenceHelper.setSharedPreferenceString(getActivity(), MyInstances.KEY_COUNT_DOWN_TIME, "");
                                                         getActivity().getSupportFragmentManager().beginTransaction()
                                                                 .replace(R.id.frame_container, new ShopHomeFragment())
                                                                 .commit();
@@ -402,6 +398,7 @@ public class ShopHomeFragment extends BaseFragment {
                                     });
                                 } else {
                                     SharedPreferenceHelper.setSharedPreferenceString(getActivity(), MyInstances.KEY_SHOP_REQUEST, "");
+                                    SharedPreferenceHelper.setSharedPreferenceString(getActivity(), MyInstances.KEY_COUNT_DOWN_TIME, "");
                                     txtNoReq.setVisibility(View.VISIBLE);
                                 }
                             }
@@ -426,7 +423,7 @@ public class ShopHomeFragment extends BaseFragment {
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(listImgs -> {
-                        if (listImgs != null) {
+                        if (listImgs != null && listImgs.size() > 0) {
                             LinearLayout imageLayout = mView.findViewById(R.id.imageLayout);
 
                             for (int i = 0; i < listImgs.size(); i++) {
@@ -524,7 +521,7 @@ public class ShopHomeFragment extends BaseFragment {
             spinner.setOnItemSelectedListener((view, position, id, item) -> {
                 if (spinner.getText().toString().equals("Lý do khác")) {
                     txtReasonDetail.setVisibility(View.VISIBLE);
-                }else{
+                } else {
                     txtReasonDetail.setVisibility(View.GONE);
                 }
             });
@@ -654,7 +651,7 @@ public class ShopHomeFragment extends BaseFragment {
         txtStatus.setVisibility(View.GONE);
     }
 
-    private void rejectReq(int reqId){
+    private void rejectReq(int reqId) {
         LayoutInflater factory = LayoutInflater.from(getActivity());
         final View editDialogView = factory.inflate(R.layout.activity_cancel_reason, null);
         final AlertDialog editDialog = new AlertDialog.Builder(getActivity()).create();
@@ -685,7 +682,7 @@ public class ShopHomeFragment extends BaseFragment {
         spinner.setOnItemSelectedListener((view, position, id, item) -> {
             if (spinner.getText().toString().equals("Lý do khác")) {
                 txtReasonDetail.setVisibility(View.VISIBLE);
-            }else{
+            } else {
                 txtReasonDetail.setVisibility(View.GONE);
             }
         });
@@ -702,6 +699,7 @@ public class ShopHomeFragment extends BaseFragment {
                     .subscribe(isSuccess -> {
                         if (isSuccess) {
                             SharedPreferenceHelper.setSharedPreferenceString(getActivity(), MyInstances.KEY_BIKER_REQUEST, "");
+                            SharedPreferenceHelper.setSharedPreferenceString(getActivity(), MyInstances.KEY_COUNT_DOWN_TIME, "");
                             getActivity().getSupportFragmentManager().beginTransaction()
                                     .replace(R.id.frame_container, new ShopHomeFragment())
                                     .commit();
@@ -714,4 +712,36 @@ public class ShopHomeFragment extends BaseFragment {
         editDialog.show();
     }
 
+    private void runCountDownTimer(int reqId, long seconds) {
+        countDownTimer = new CountDownTimer(seconds * 1000, 1000) {
+
+            @SuppressLint("DefaultLocale")
+            @Override
+            public void onTick(long millisUntilFinished) {
+                if (millisUntilFinished != 0) {
+                    txtCountdown.setText(String.format(" Hệ thống sẽ từ chối yêu cầu sau %d giây", millisUntilFinished / 1000));
+                }
+            }
+
+            @Override
+            public void onFinish() {
+                if (countDownTimer != null) {
+                    Log.e(TAG, "count down onFinish");
+                    countDownTimer.cancel();
+                    SharedPreferenceHelper.setSharedPreferenceString(getActivity(), MyInstances.KEY_COUNT_DOWN_TIME, "");
+                    txtCountdown.setText("");
+                    viewModel.updateStatusRequest(reqId, MyInstances.NOTI_AUTO_REJECTED)
+                            .subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe(responseDTO -> {
+                                SharedPreferenceHelper.setSharedPreferenceString(getActivity(), MyInstances.KEY_SHOP_REQUEST, "");
+                                getActivity().getSupportFragmentManager().beginTransaction()
+                                        .replace(R.id.frame_container, new ShopHomeFragment())
+                                        .commit();
+                            });
+                }
+            }
+        };
+        countDownTimer.start();
+    }
 }

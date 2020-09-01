@@ -216,7 +216,10 @@ public class ShopMainActivity extends BaseActivity {
                         noti.setConfirmText("Xem thông báo");
                         noti.setConfirmClickListener(dialog -> {
                             dialog.dismiss();
+                            SharedPreferenceHelper.setSharedPreferenceString
+                                    (ShopMainActivity.this, MyInstances.KEY_COUNT_DOWN_TIME, "" + System.currentTimeMillis());
                             fragment = new ShopHomeFragment();
+                            isHomeFragmentRunning = true;
                             replaceFragment();
                         });
                         noti.show();
@@ -224,6 +227,7 @@ public class ShopMainActivity extends BaseActivity {
 
                     if (responeReq.getMessage().equals(MyInstances.NOTI_CANELED)) {
                         SharedPreferenceHelper.setSharedPreferenceString(ShopMainActivity.this, MyInstances.KEY_SHOP_REQUEST, "");
+                        SharedPreferenceHelper.setSharedPreferenceString(ShopMainActivity.this, MyInstances.KEY_COUNT_DOWN_TIME, "");
                         SweetAlertDialog cancelReq = new SweetAlertDialog(ShopMainActivity.this, SweetAlertDialog.NORMAL_TYPE);
                         cancelReq.setTitleText("Thông báo");
                         cancelReq.setConfirmText("Đóng");

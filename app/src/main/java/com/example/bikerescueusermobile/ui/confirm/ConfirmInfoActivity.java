@@ -304,7 +304,7 @@ public class ConfirmInfoActivity extends BaseActivity {
                                 err.setTitleText("Thông báo");
                                 err.setConfirmText("Đóng");
                                 err.setContentText("Bạn đã hủy yêu cầu quá " +
-                                        CurrentUser.getInstance().getNumOfCancel() +
+                                        (CurrentUser.getInstance().getNumOfCancel() - 1) +
                                         " lần, xin vui lòng thử lại sau 24 giờ.");
                                 err.setConfirmClickListener(Dialog::dismiss);
                                 err.show();

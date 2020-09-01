@@ -24,6 +24,7 @@ import com.example.bikerescueusermobile.base.BaseFragment;
 import com.example.bikerescueusermobile.data.model.service.CountingService;
 import com.example.bikerescueusermobile.data.model.shop_services.ShopServiceTable;
 import com.example.bikerescueusermobile.data.model.user.CurrentUser;
+import com.example.bikerescueusermobile.ui.create_request.RequestDetailActivity;
 import com.example.bikerescueusermobile.ui.favorite.FavoriteRecyclerViewAdapter;
 import com.example.bikerescueusermobile.ui.history.HistoryFragment;
 import com.example.bikerescueusermobile.ui.shop_owner.ShopUpdateInfoActivity;
@@ -190,14 +191,19 @@ public class ShopChartFragment extends BaseFragment implements DatePickerDialog.
                             for (int i = 0; i < listReq.size(); i++) {
                                 if (listReq.get(i).getPrice().longValue() > 0) {
                                     CountingService countingService = new CountingService();
-                                    countingService.setServiceName(listReq.get(i).getListReqShopService().get(0).getShopService().getServices().getName());
+                                    countingService.setServiceName(listReq.get(i).getRequestCode());
                                     countingService.setCountRequest(listReq.get(i).getPrice().longValue());
+                                    countingService.setReqId(listReq.get(i).getId());
                                     list.add(countingService);
                                 }
                             }
                             if (list.size() > 0) {
                                 rv.addItemDecoration(new DividerItemDecoration(getActivity(), DividerItemDecoration.VERTICAL));
-                                rv.setAdapter(new ServiceCoutingRecyclerViewAdapter(list, true));
+                                rv.setAdapter(new ServiceCoutingRecyclerViewAdapter(list, true, countingService -> {
+                                    Intent intent = new Intent(getActivity(), RequestDetailActivity.class);
+                                    intent.putExtra("reqId", countingService.getReqId());
+                                    startActivity(intent);
+                                }));
                                 rv.setLayoutManager(new LinearLayoutManager(getActivity()));
                                 doanhthuDialog.show();
                             } else {
@@ -225,7 +231,7 @@ public class ShopChartFragment extends BaseFragment implements DatePickerDialog.
                             count += countingService.getCountRequest();
                         }
 
-                        mRecyclerView.setAdapter(new ServiceCoutingRecyclerViewAdapter(listServices, false));
+                        mRecyclerView.setAdapter(new ServiceCoutingRecyclerViewAdapter(listServices, false, null));
                         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
                         Log.e(TAG, "count: " + count);

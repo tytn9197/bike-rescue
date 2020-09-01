@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -29,10 +30,12 @@ import butterknife.ButterKnife;
 public class ServiceCoutingRecyclerViewAdapter extends RecyclerView.Adapter<ServiceCoutingRecyclerViewAdapter.ViewHolder> {
     private List<CountingService> data;
     private boolean isPrice;
+    private ServiceCoutingSeletedListener listener;
 
-    public ServiceCoutingRecyclerViewAdapter(List<CountingService> data, boolean isPrice) {
+    public ServiceCoutingRecyclerViewAdapter(List<CountingService> data, boolean isPrice, ServiceCoutingSeletedListener listener) {
         this.data = data;
         this.isPrice = isPrice;
+        this.listener = listener;
     }
 
     @NonNull
@@ -68,6 +71,9 @@ public class ServiceCoutingRecyclerViewAdapter extends RecyclerView.Adapter<Serv
         @BindView(R.id.txtCountingName)
         TextView txtCountingName;
 
+        @BindView(R.id.countingSerWrapper)
+        LinearLayout wrapper;
+
         @SuppressLint("SetTextI18n")
         void bind(CountingService countingService) {
             if(!isPrice) {
@@ -76,6 +82,7 @@ public class ServiceCoutingRecyclerViewAdapter extends RecyclerView.Adapter<Serv
             } else {
                 txtCountingName.setText(countingService.getServiceName());
                 txtCountingNumber.setText("" + MyMethods.convertMoney(countingService.getCountRequest()*1000) + " vnd");
+                wrapper.setOnClickListener(v -> listener.onDetailSelected(countingService));
             }
         }
     }
