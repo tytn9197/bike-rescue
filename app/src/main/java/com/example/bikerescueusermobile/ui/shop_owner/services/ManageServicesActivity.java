@@ -29,6 +29,7 @@ import com.example.bikerescueusermobile.R;
 import com.example.bikerescueusermobile.base.BaseActivity;
 import com.example.bikerescueusermobile.data.model.service.Service;
 import com.example.bikerescueusermobile.data.model.shop.Shop;
+import com.example.bikerescueusermobile.data.model.shop_services.ShopServiceDTO;
 import com.example.bikerescueusermobile.data.model.shop_services.ShopServiceTable;
 import com.example.bikerescueusermobile.data.model.user.CurrentUser;
 import com.example.bikerescueusermobile.ui.shopMain.ShopMainActivity;
@@ -84,7 +85,8 @@ public class ManageServicesActivity extends BaseActivity implements ShopServiceS
         listSystemService = new ArrayList<>();
         //setup viewmodel
         viewModel = ViewModelProviders.of(this, viewModelFactory).get(ServiceViewModel.class);
-        viewModel.getShopServiceByShopOwnerId(CurrentUser.getInstance().getId())
+
+        viewModel.getAllShopServiceByShopId(CurrentUser.getInstance().getShop().getId())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(listServices -> {
@@ -144,9 +146,9 @@ public class ManageServicesActivity extends BaseActivity implements ShopServiceS
         cbLienHe = serviceView.findViewById(R.id.cbLienHe);
 
         cbLienHe.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            if(isChecked){
+            if (isChecked) {
                 lienHeMode();
-            } else{
+            } else {
                 priceMode();
             }
         });
@@ -165,14 +167,19 @@ public class ManageServicesActivity extends BaseActivity implements ShopServiceS
 
         if (isUpdate) {
             btnConfirm.setText("Cập nhập");
-            if(service.getPrice() >= 0) {
-                edtSerPrice.setText("" + service.getPrice());
+            if (service.getPrice() >= 0) {
+                edtSerPrice.setText("" + service.getPrice().intValue());
                 priceMode();
             } else {
                 lienHeMode();
             }
             status.setChecked(service.isStatus());
-            listService.setSelection(listSerPosition);
+            listService.setAdapter(serviceNames);
+            listService.setEnabled(false);
+            listService.setClickable(false);
+            cbLienHe.setEnabled(false);
+            cbLienHe.setClickable(false);
+
         } else {
             btnConfirm.setText("Thêm");
         }
@@ -186,21 +193,80 @@ public class ManageServicesActivity extends BaseActivity implements ShopServiceS
         btnConfirm.setOnClickListener(confirmView -> {
             serviceDialog.dismiss();
             if (isUpdate) {
+                ShopServiceTable updateService = new ShopServiceTable();
+                //newService.setServices(service.getServices());
+                //newService.setShops(CurrentUser.getInstance().getShop());
+                if(service.getPrice() >= 0){
+                    updateService.setPrice(Double.parseDouble(edtSerPrice.getText().toString()));
+                } else {
+                    updateService.setPrice(Double.parseDouble("-1"));
+                }
+                //status
+                if (status.isChecked()) {
+                    updateService.setStatus(true);
+                } else {
+                    updateService.setStatus(false);
+                }
 
+                viewModel.updateShopService(service.getId(), updateService)
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(response -> {
+                            if (response != null) {
+                                finish();
+                                startActivity(getIntent());
+                            }
+                        }, throwable -> {
+                            Log.e(TAG, "Update Service: " + throwable.getMessage());
+                        });
             } else {
+                ShopServiceDTO newService = new ShopServiceDTO();
+                //set shop Id
+                newService.setShopId(CurrentUser.getInstance().getShop().getId());
 
+                //set service Id
+                int position = listService.getSelectedItemPosition();
+                newService.setServiceId(listSystemService.get(position).getId());
+                //set price
+
+                if(cbLienHe.isChecked()){
+                    newService.setPrice(Double.parseDouble("-1"));
+                } else {
+                    newService.setPrice(Double.parseDouble(edtSerPrice.getText().toString()));
+                }
+                //status
+                if (status.isChecked()) {
+                    newService.setStatus(true);
+                } else {
+                    newService.setStatus(false);
+                }
+                //set unit
+
+                viewModel.createShopService(newService)
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(response -> {
+                            if (response != null) {
+                                finish();
+                                startActivity(getIntent());
+                            }
+                        }, throwable -> {
+                            Log.e(TAG, "Add new service: " + throwable.getMessage());
+                        });
             }
         });
         serviceDialog.show();
     }
 
-    private void lienHeMode(){
+    private void lienHeMode() {
         cbLienHe.setChecked(true);
         edtSerPrice.setVisibility(View.GONE);
     }
 
-    private void priceMode(){
+    private void priceMode() {
         cbLienHe.setChecked(false);
         edtSerPrice.setVisibility(View.VISIBLE);
     }
+
+
 }

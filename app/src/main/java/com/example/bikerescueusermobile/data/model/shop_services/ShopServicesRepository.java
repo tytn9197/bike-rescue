@@ -44,4 +44,16 @@ public class ShopServicesRepository {
     public Single<List<ReviewRequestDTO>> getReviewCommentByShopId(int shopId){
         return shopServices.getReviewCommentByShopId(shopId, CurrentUser.getInstance().getAccessToken());
     }
+
+    public Single<List<ShopServiceTable>> getAllShopServiceByShopId(int shopId,String token){
+        return shopServices.getAllShopServiceByShopId(shopId, token);
+    }
+
+    public Single<ShopServiceTable> updateShopService(int shopServiceId, ShopServiceTable shopServiceTable, String token){
+        return shopServices.updateShopService(shopServiceId, shopServiceTable, token);
+    }
+
+    public Single<ShopServiceDTO> createShopService(ShopServiceDTO shopServiceDTO, String token){
+        return shopServices.createShopService(shopServiceDTO, token);
+    }
 }

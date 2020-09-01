@@ -17,8 +17,10 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.bikerescueusermobile.R;
 import com.example.bikerescueusermobile.data.model.shop_services.ShopService;
 import com.example.bikerescueusermobile.data.model.shop_services.ShopServiceTable;
+import com.example.bikerescueusermobile.util.MyMethods;
 import com.squareup.picasso.Picasso;
 
+import java.text.DecimalFormat;
 import java.util.List;
 
 import butterknife.BindView;
@@ -90,7 +92,7 @@ public class ServiceRecycleViewAdapter extends RecyclerView.Adapter<ServiceRecyc
         void bind(ShopServiceTable shopServiceTable) {
             txtServiceName.setText(shopServiceTable.getServices().getName());
             txtCategory.setText(shopServiceTable.getServices().getCategory().getCategoryName());
-            txtServicePrice.setText(shopServiceTable.getPrice().toString());
+            txtServicePrice.setText("" + MyMethods.convertMoney(shopServiceTable.getPrice().floatValue()*1000) + " đ");
             txtUnit.setText("/ " + shopServiceTable.getServices().getUnit());
 
 
@@ -109,7 +111,7 @@ public class ServiceRecycleViewAdapter extends RecyclerView.Adapter<ServiceRecyc
             }
 
 
-            if(shopServiceTable.getServices().isStatus()){
+            if(shopServiceTable.isStatus()){
                 txtStatus.setText("Hoạt động");
                 txtStatus.setTextColor(Color.parseColor("#0EA92D"));
             } else{

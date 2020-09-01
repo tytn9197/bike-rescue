@@ -7,6 +7,7 @@ import com.example.bikerescueusermobile.data.model.service.CountingService;
 import com.example.bikerescueusermobile.data.model.service.Service;
 import com.example.bikerescueusermobile.data.model.shop.Shop;
 import com.example.bikerescueusermobile.data.model.shop.ShopRepository;
+import com.example.bikerescueusermobile.data.model.shop_services.ShopServiceDTO;
 import com.example.bikerescueusermobile.data.model.shop_services.ShopServiceTable;
 import com.example.bikerescueusermobile.data.model.shop_services.ShopServicesRepository;
 import com.example.bikerescueusermobile.data.model.user.CurrentUser;
@@ -55,5 +56,17 @@ public class ServiceViewModel extends ViewModel {
 
     public Single<Double> sumPriceRequestFromTo(int shopOwnerId, String from, String to){
         return shopRepository.sumPriceRequestFromTo(shopOwnerId, from, to);
+    }
+
+    public Single<List<ShopServiceTable>> getAllShopServiceByShopId(int shopOwnerId){
+        return shopServicesRepository.getAllShopServiceByShopId(shopOwnerId, CurrentUser.getInstance().getAccessToken());
+    }
+
+    public Single<ShopServiceTable> updateShopService(int shopServiceId, ShopServiceTable shopServiceTable ){
+        return shopServicesRepository.updateShopService(shopServiceId, shopServiceTable, CurrentUser.getInstance().getAccessToken());
+    }
+
+    public Single<ShopServiceDTO> createShopService(ShopServiceDTO shopServiceDTO){
+        return shopServicesRepository.createShopService(shopServiceDTO, CurrentUser.getInstance().getAccessToken());
     }
 }
