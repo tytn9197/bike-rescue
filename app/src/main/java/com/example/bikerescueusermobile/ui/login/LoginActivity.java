@@ -130,16 +130,16 @@ public class LoginActivity extends BaseActivity {
                                                         user.getId(),
                                                         "" + location.getLatitude(),
                                                         "" + location.getLongitude());
-
-                                                viewModel.setUserLatLong(userLatln, "Bearer " + user.getAccessToken())
-                                                        .subscribeOn(Schedulers.io())
-                                                        .observeOn(AndroidSchedulers.mainThread())
-                                                        .subscribe(uLatlng -> {
-                                                            CurrentUser.getInstance().setLatitude("" + uLatlng.getLatitude());
-                                                            CurrentUser.getInstance().setLongtitude("" + uLatlng.getLongtitude());
-                                                        }, throwable -> {
-                                                            Log.e(TAG, "setUserLatLong: " + throwable.getMessage());
-                                                        });
+                                                CurrentUser.getInstance().setLatitude("" + location.getLatitude());
+                                                CurrentUser.getInstance().setLongtitude("" + location.getLongitude());
+//                                                viewModel.setUserLatLong(userLatln, "Bearer " + user.getAccessToken())
+//                                                        .subscribeOn(Schedulers.io())
+//                                                        .observeOn(AndroidSchedulers.mainThread())
+//                                                        .subscribe(uLatlng -> {
+//
+//                                                        }, throwable -> {
+//                                                            Log.e(TAG, "setUserLatLong: " + throwable.getMessage());
+//                                                        });
                                             }
                                         });
 
@@ -225,16 +225,17 @@ public class LoginActivity extends BaseActivity {
                                                         user.getId(),
                                                         "" + location.getLatitude(),
                                                         "" + location.getLongitude());
-
-                                                viewModel.setUserLatLong(userLatln, "Bearer " + user.getAccessToken())
-                                                        .subscribeOn(Schedulers.io())
-                                                        .observeOn(AndroidSchedulers.mainThread())
-                                                        .subscribe(uLatlng -> {
-                                                            CurrentUser.getInstance().setLatitude("" + uLatlng.getLatitude());
-                                                            CurrentUser.getInstance().setLongtitude("" + uLatlng.getLongtitude());
-                                                        }, throwable -> {
-                                                            Log.e(TAG, "setUserLatLong: " + throwable.getMessage());
-                                                        });
+                                                CurrentUser.getInstance().setLatitude("" + location.getLatitude());
+                                                CurrentUser.getInstance().setLongtitude("" + location.getLongitude());
+//                                                viewModel.setUserLatLong(userLatln, "Bearer " + user.getAccessToken())
+//                                                        .subscribeOn(Schedulers.io())
+//                                                        .observeOn(AndroidSchedulers.mainThread())
+//                                                        .subscribe(uLatlng -> {
+//                                                            CurrentUser.getInstance().setLatitude("" + uLatlng.getLatitude());
+//                                                            CurrentUser.getInstance().setLongtitude("" + uLatlng.getLongtitude());
+//                                                        }, throwable -> {
+//                                                            Log.e(TAG, "setUserLatLong: " + throwable.getMessage());
+//                                                        });
                                             }
                                         });
 
@@ -288,6 +289,7 @@ public class LoginActivity extends BaseActivity {
                         });//end loading
                     }
                 }); //end get token
+        Log.e(TAG, "lat - long: " + CurrentUser.getInstance().getLatitude() + "---" + CurrentUser.getInstance().getLongtitude());
     } //end create
 
     private void setDataToCurrentUser(User user, String pass) {
