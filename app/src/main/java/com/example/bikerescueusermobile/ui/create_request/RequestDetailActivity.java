@@ -221,6 +221,12 @@ public class RequestDetailActivity extends BaseActivity {
                     btnReqDetailCancel.setVisibility(View.GONE);
                     SharedPreferenceHelper.setSharedPreferenceString(getApplicationContext(), MyInstances.KEY_BIKER_REQUEST, "");
 
+                    btnComplain.setOnClickListener(v -> {
+                        Intent i = new Intent(RequestDetailActivity.this, ComplainActivity.class);
+                        i.putExtra("reqId", responeReq.getReqId());
+                        startActivity(i);
+                    });
+
                     //review reruest
                     setupReviewView(responeReq.getReqId(), responeReq.getReqCode(), responeReq.getReqPrice());
                     reviewDialog.show();
@@ -355,6 +361,7 @@ public class RequestDetailActivity extends BaseActivity {
         if(request.getStatus().equals(MyInstances.STATUS_FINISHED)){
             btnComplain.setOnClickListener(v -> {
                 Intent i = new Intent(this, ComplainActivity.class);
+                i.putExtra("reqId", request.getId());
                 startActivity(i);
             });
         }

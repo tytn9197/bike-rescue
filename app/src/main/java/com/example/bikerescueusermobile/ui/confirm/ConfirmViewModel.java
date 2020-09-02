@@ -3,6 +3,8 @@ package com.example.bikerescueusermobile.ui.confirm;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import com.example.bikerescueusermobile.data.model.complain.Complain;
+import com.example.bikerescueusermobile.data.model.complain.ComplainRepository;
 import com.example.bikerescueusermobile.data.model.configuration.ConfigurationRepository;
 import com.example.bikerescueusermobile.data.model.configuration.MyConfiguaration;
 import com.example.bikerescueusermobile.data.model.request.RequestDTO;
@@ -26,6 +28,7 @@ public class ConfirmViewModel extends ViewModel {
     private final ConfigurationRepository configurationRepository;
     private final RequestRepository requestRepository;
     private final VehicleRepository vehicleRepository;
+    private final ComplainRepository complainRepository;
     private final ShopServicesRepository shopServicesRepository;
     private final MutableLiveData<Boolean> loading = new MutableLiveData<>();
 
@@ -38,9 +41,10 @@ public class ConfirmViewModel extends ViewModel {
     }
 
     @Inject
-    public ConfirmViewModel(ConfigurationRepository configurationRepository, RequestRepository requestRepository, VehicleRepository vehicleRepository, ShopServicesRepository shopServicesRepository) {
+    public ConfirmViewModel(ConfigurationRepository configurationRepository, RequestRepository requestRepository, VehicleRepository vehicleRepository, ComplainRepository complainRepository, ShopServicesRepository shopServicesRepository) {
         this.requestRepository = requestRepository;
         this.vehicleRepository = vehicleRepository;
+        this.complainRepository = complainRepository;
         this.shopServicesRepository = shopServicesRepository;
         loading.setValue(true);
         this.configurationRepository = configurationRepository;
@@ -86,4 +90,7 @@ public class ConfirmViewModel extends ViewModel {
         return vehicleRepository.updateVehicle(vehicle, vehicleID);
     }
 
+    public Single<Boolean> sendComplain(Complain complain, List<MultipartBody.Part> listImg){
+        return complainRepository.sendComplain(complain, listImg);
+    }
 }
