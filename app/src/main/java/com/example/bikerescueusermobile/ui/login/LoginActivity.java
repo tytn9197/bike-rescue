@@ -101,6 +101,11 @@ public class LoginActivity extends BaseActivity {
                         return;
                     }
 
+                    if(task.getResult() == null) {
+                        Log.e(TAG, "task.getResult() == null");
+                        finish();
+                        startActivity(getIntent());
+                    }
                     deviceToken = task.getResult().getToken();
 
                     Log.e(TAG, "device token: " + task.getResult().getToken());
@@ -119,6 +124,7 @@ public class LoginActivity extends BaseActivity {
                                         user.setPasswordLogin(edtPass.getText().toString());
                                         String sharedPreferenceStr = gson.toJson(user);
                                         SharedPreferenceHelper.setSharedPreferenceString(LoginActivity.this, MyInstances.KEY_LOGGED_IN, sharedPreferenceStr);
+                                        CurrentUser.getInstance().setDeviceToken(this.deviceToken);
                                         setDataToCurrentUser(user, edtPass.getText().toString());
 
                                         //login success -> set user latlong
@@ -214,6 +220,7 @@ public class LoginActivity extends BaseActivity {
                                 .subscribe(user -> {
                                     viewModel.setLoading(false);
                                     if (user != null) {
+                                        CurrentUser.getInstance().setDeviceToken(this.deviceToken);
                                         setDataToCurrentUser(user, loginUser.getPasswordLogin());
 
                                         //login success -> set user latlong
@@ -295,7 +302,7 @@ public class LoginActivity extends BaseActivity {
 
     private void setDataToCurrentUser(User user, String pass) {
         CurrentUser.getInstance().setFullName(user.getFullName());
-        CurrentUser.getInstance().setDeviceToken(this.deviceToken);
+//        CurrentUser.getInstance().setDeviceToken(this.deviceToken);
         CurrentUser.getInstance().setAccessToken("Bearer " + user.getAccessToken());
         CurrentUser.getInstance().setAvatarUrl(user.getAvatarUrl());
         CurrentUser.getInstance().setId(user.getId());
