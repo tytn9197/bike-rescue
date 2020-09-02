@@ -24,11 +24,13 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.bikerescueusermobile.R;
 import com.example.bikerescueusermobile.base.BaseFragment;
+import com.example.bikerescueusermobile.data.model.favorite.Favorite;
 import com.example.bikerescueusermobile.data.model.shop.Shop;
 import com.example.bikerescueusermobile.data.model.shop_services.ShopService;
 import com.example.bikerescueusermobile.data.model.user.CurrentUser;
 import com.example.bikerescueusermobile.data.model.user.UserLatLong;
 import com.example.bikerescueusermobile.ui.confirm.ConfirmInfoActivity;
+import com.example.bikerescueusermobile.ui.favorite.FavoriteViewModel;
 import com.example.bikerescueusermobile.ui.map.MapActivity;
 import com.example.bikerescueusermobile.util.MyMethods;
 import com.example.bikerescueusermobile.util.ViewModelFactory;
@@ -52,7 +54,7 @@ public class SearchShopServiceFragment extends BaseFragment implements TopShopSe
         return R.layout.fragment_search_shop_service;
     }
 
-    private static final String TAG = "SearchShopServiceFragment";
+    private static final String TAG = "SearchShopService";
 
     @BindView(R.id.rvTopShop)
     RecyclerView mRecyclerView;
@@ -248,6 +250,24 @@ public class SearchShopServiceFragment extends BaseFragment implements TopShopSe
         intent.putExtra("dis", distance);
         intent.putExtra("listShop", shops);
         startActivity(intent);
+    }
+
+    @Override
+    public void onFavoriteSelected(Shop shop, float rating) {
+        Favorite favorite = new Favorite();
+        favorite.setShopId(shop.getId());
+        favorite.setUserId(CurrentUser.getInstance().getId());
+        ViewModelProviders.of(getActivity(), viewModelFactory).get(FavoriteViewModel.class)
+                .createFavorite(favorite, rating == 1)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(responeFavo -> {
+                    if(responeFavo != null){
+                        Log.e(TAG, "createFavorite ok");
+                    }
+                }, throwable -> {
+                    Log.e(TAG, "createFavorite: " + throwable.getMessage());
+                });
     }
 
     @Override

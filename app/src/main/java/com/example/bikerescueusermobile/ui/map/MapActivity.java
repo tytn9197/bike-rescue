@@ -34,6 +34,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.example.bikerescueusermobile.R;
+import com.example.bikerescueusermobile.data.model.favorite.Favorite;
 import com.example.bikerescueusermobile.data.model.request.ReviewRequestDTO;
 import com.example.bikerescueusermobile.data.model.shop.Shop;
 import com.example.bikerescueusermobile.data.model.shop_services.ShopService;
@@ -41,7 +42,9 @@ import com.example.bikerescueusermobile.data.model.shop_services.ShopServiceTabl
 import com.example.bikerescueusermobile.data.model.user.CurrentUser;
 import com.example.bikerescueusermobile.ui.confirm.ConfirmInfoActivity;
 import com.example.bikerescueusermobile.ui.favorite.FavoriteRecyclerViewAdapter;
+import com.example.bikerescueusermobile.ui.favorite.FavoriteViewModel;
 import com.example.bikerescueusermobile.ui.home.HomeFragment;
+import com.example.bikerescueusermobile.ui.main.MainActivity;
 import com.example.bikerescueusermobile.ui.seach_shop_service.ShopServiceViewModel;
 import com.example.bikerescueusermobile.ui.seach_shop_service.TopShopRecyclerViewAdapter;
 import com.example.bikerescueusermobile.ui.seach_shop_service.TopShopSelectedListener;
@@ -738,5 +741,23 @@ public class MapActivity extends DaggerAppCompatActivity implements
         if (mSweetSheetShop.isShow()) {
             mSweetSheetShop.dismiss();
         }
+    }
+
+    @Override
+    public void onFavoriteSelected(Shop shop, float rating) {
+        Favorite favorite = new Favorite();
+        favorite.setShopId(shop.getId());
+        favorite.setUserId(CurrentUser.getInstance().getId());
+        ViewModelProviders.of(this, viewModelFactory).get(FavoriteViewModel.class)
+                .createFavorite(favorite, rating == 1)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(responeFavo -> {
+                    if(responeFavo != null){
+                        Log.e(TAG, "createFavorite ok");
+                    }
+                }, throwable -> {
+                    Log.e(TAG, "createFavorite: " + throwable.getMessage());
+                });
     }
 }

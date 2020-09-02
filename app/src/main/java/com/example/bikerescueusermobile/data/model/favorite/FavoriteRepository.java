@@ -21,4 +21,8 @@ public class FavoriteRepository {
     public Single<List<Shop>> getFavoriteShopByUserId(int id){
         return favoriteService.getFavoriteShopByUserId(id, CurrentUser.getInstance().getAccessToken());
     }
+
+    public Single<Favorite> createFavorite(Favorite favorite, boolean status){
+        return favoriteService.createFavorite(favorite, status, CurrentUser.getInstance().getAccessToken());
+    }
 }

@@ -25,4 +25,8 @@ public class FavoriteViewModel extends ViewModel {
     public Single<List<Shop>> getFavoriteShopByUserId(int id){
         return favoriteRepository.getFavoriteShopByUserId(id);
     }
+
+    public Single<Favorite> createFavorite(Favorite favorite, boolean status){
+        return favoriteRepository.createFavorite(favorite, status);
+    }
 }

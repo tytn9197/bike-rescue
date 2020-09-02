@@ -18,6 +18,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.example.bikerescueusermobile.R;
 import com.example.bikerescueusermobile.base.BaseFragment;
+import com.example.bikerescueusermobile.data.model.favorite.Favorite;
 import com.example.bikerescueusermobile.data.model.shop.Shop;
 import com.example.bikerescueusermobile.data.model.user.CurrentUser;
 import com.example.bikerescueusermobile.ui.login.LoginModel;
@@ -115,5 +116,22 @@ public class FavoriteShopFragment extends BaseFragment implements FavoriteSelect
         shop.setDistanceFromUser(distance);
         intent.putExtra("dis", distance);
         startActivity(intent);
+    }
+
+    @Override
+    public void onFavoriteSelected(Shop shop, float rating) {
+        Favorite favorite = new Favorite();
+        favorite.setShopId(shop.getId());
+        favorite.setUserId(CurrentUser.getInstance().getId());
+        viewModel.createFavorite(favorite, rating == 1)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(responeFavo -> {
+                    if(responeFavo != null){
+                        Log.e(TAG, "createFavorite ok");
+                    }
+                }, throwable -> {
+                    Log.e(TAG, "createFavorite: " + throwable.getMessage());
+                });
     }
 }

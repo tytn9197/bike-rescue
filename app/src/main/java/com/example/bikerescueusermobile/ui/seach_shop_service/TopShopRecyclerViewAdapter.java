@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.bikerescueusermobile.R;
 import com.example.bikerescueusermobile.data.model.shop.Shop;
 import com.squareup.picasso.Picasso;
+import com.willy.ratingbar.BaseRatingBar;
 import com.willy.ratingbar.ScaleRatingBar;
 
 import java.util.ArrayList;
@@ -73,6 +74,9 @@ public class TopShopRecyclerViewAdapter extends RecyclerView.Adapter<TopShopRecy
         @BindView(R.id.txtDistance)
         TextView txtDistance;
 
+        @BindView(R.id.savedTopShopRatingBar)
+        ScaleRatingBar savedTopShopRatingBar;
+
         private Context context;
 
         public ViewHolder(View itemView) {
@@ -107,6 +111,13 @@ public class TopShopRecyclerViewAdapter extends RecyclerView.Adapter<TopShopRecy
                             .load(shop.getAvatarUrl()).placeholder(R.drawable.ic_load)
                             .into(imgTopShop);
             }
+
+            savedTopShopRatingBar.setOnRatingChangeListener(new BaseRatingBar.OnRatingChangeListener() {
+                @Override
+                public void onRatingChange(BaseRatingBar ratingBar, float rating, boolean fromUser) {
+                    listener.onFavoriteSelected(shop, rating);
+                }
+            });
         }
 
     }

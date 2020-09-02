@@ -18,6 +18,7 @@ import com.example.bikerescueusermobile.R;
 import com.example.bikerescueusermobile.data.model.shop.Shop;
 import com.example.bikerescueusermobile.data.model.user.CurrentUser;
 import com.squareup.picasso.Picasso;
+import com.willy.ratingbar.BaseRatingBar;
 import com.willy.ratingbar.ScaleRatingBar;
 
 import java.util.ArrayList;
@@ -27,7 +28,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class FavoriteRecyclerViewAdapter  extends RecyclerView.Adapter<FavoriteRecyclerViewAdapter.ViewHolder>{
-    private List<Shop> data = new ArrayList<>();
+    private List<Shop> data;
     private FavoriteSelectedListener listener;
 
     public FavoriteRecyclerViewAdapter(List<Shop> viewModel,
@@ -55,8 +56,6 @@ public class FavoriteRecyclerViewAdapter  extends RecyclerView.Adapter<FavoriteR
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
-
-        private Shop shop;
 
         @BindView(R.id.favorite_wrapper)
         RelativeLayout favoriteWrapper;
@@ -88,8 +87,6 @@ public class FavoriteRecyclerViewAdapter  extends RecyclerView.Adapter<FavoriteR
         }
 
         void bind(Shop shop) {
-            this.shop = shop;
-
             txtFavoriteShopName.setText(shop.getShopName());
 
             txtFavoriteShopAddress.setText(shop.getAddress());
@@ -108,6 +105,12 @@ public class FavoriteRecyclerViewAdapter  extends RecyclerView.Adapter<FavoriteR
             favoriteWrapper.setOnClickListener((View.OnClickListener) v -> listener.onDetailSelected(shop));
 
             savedShopRatingBar.setRating(1);
+            savedShopRatingBar.setOnRatingChangeListener(new BaseRatingBar.OnRatingChangeListener() {
+                @Override
+                public void onRatingChange(BaseRatingBar ratingBar, float rating, boolean fromUser) {
+                    listener.onFavoriteSelected(shop, rating);
+                }
+            });
         }
 
     }
