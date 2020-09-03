@@ -224,7 +224,7 @@ public class RequestDetailActivity extends BaseActivity {
                     btnComplain.setOnClickListener(v -> {
                         Intent i = new Intent(RequestDetailActivity.this, ComplainActivity.class);
                         i.putExtra("reqId", responeReq.getReqId());
-                        startActivity(i);
+                        startActivityForResult(i, 111);
                     });
 
                     //review reruest
@@ -254,7 +254,7 @@ public class RequestDetailActivity extends BaseActivity {
     };
 
     @SuppressLint("DefaultLocale")
-    private void setupReviewView(int reqId, String code, double price){
+    private void setupReviewView(int reqId, String code, double price) {
         //set up review dialog
         LayoutInflater factory = LayoutInflater.from(this);
         final View reviewView = factory.inflate(R.layout.dialog_review_request, null);
@@ -266,7 +266,7 @@ public class RequestDetailActivity extends BaseActivity {
         TextView txtPrice = reviewView.findViewById(R.id.txtReviewPrice);
 
         txtReqCode.setText(code);
-        txtPrice.setText("Giá: " + MyMethods.convertMoney((float)price*1000) + " vnd");
+        txtPrice.setText("Giá: " + MyMethods.convertMoney((float) price * 1000) + " vnd");
 
         reviewDialog.setView(reviewView);
         reviewView.findViewById(R.id.btn_confirm).setOnClickListener(confirmView -> {
@@ -316,9 +316,9 @@ public class RequestDetailActivity extends BaseActivity {
 
         if (request.getListReqShopService().get(0).getShopService().getShops().getAvatarUrl() != null) {
             if (request.getListReqShopService().get(0).getShopService().getShops().getAvatarUrl().contains("imgur"))
-            Picasso.with(this)
-                    .load(request.getListReqShopService().get(0).getShopService().getShops().getAvatarUrl()).placeholder(R.drawable.ic_load)
-                    .into(imgReqDetailShopAvatar);
+                Picasso.with(this)
+                        .load(request.getListReqShopService().get(0).getShopService().getShops().getAvatarUrl()).placeholder(R.drawable.ic_load)
+                        .into(imgReqDetailShopAvatar);
         }
 
         if (request.getCancelReason() != null) {
@@ -346,7 +346,7 @@ public class RequestDetailActivity extends BaseActivity {
             startActivityForResult(intent, MyInstances.SHOP_RESULT_CODE);
         });
 
-        if(!request.getStatus().equals(MyInstances.STATUS_REJECTED) &&
+        if (!request.getStatus().equals(MyInstances.STATUS_REJECTED) &&
                 !request.getStatus().equals(MyInstances.STATUS_FINISHED) &&
                 !request.getStatus().equals(MyInstances.STATUS_CANCELED)) {
             btnReqDetailCallShop.setVisibility(View.VISIBLE);
@@ -358,11 +358,11 @@ public class RequestDetailActivity extends BaseActivity {
             });
         }
 
-        if(request.getStatus().equals(MyInstances.STATUS_FINISHED)){
+        if (request.getStatus().equals(MyInstances.STATUS_FINISHED)) {
             btnComplain.setOnClickListener(v -> {
                 Intent i = new Intent(this, ComplainActivity.class);
                 i.putExtra("reqId", request.getId());
-                startActivity(i);
+                startActivityForResult(i, 111);
             });
         }
     }
@@ -388,8 +388,8 @@ public class RequestDetailActivity extends BaseActivity {
         if (request.getCreatedUser().getAvatarUrl() != null) {
             if (request.getCreatedUser().getAvatarUrl().contains("imgur"))
                 Picasso.with(this)
-                    .load(request.getCreatedUser().getAvatarUrl()).placeholder(R.drawable.ic_load)
-                    .into(imgReqDetailShopAvatar);
+                        .load(request.getCreatedUser().getAvatarUrl()).placeholder(R.drawable.ic_load)
+                        .into(imgReqDetailShopAvatar);
         }
         btnComplain.setVisibility(View.GONE);
         if (request.getCancelReason() != null && request.getStatus().equals(MyInstances.STATUS_CANCELED)) {
@@ -412,9 +412,9 @@ public class RequestDetailActivity extends BaseActivity {
 
         btnReqDetailCallShop.setVisibility(View.GONE);
 
-        if(request.getStatus().equals(MyInstances.STATUS_FINISHED)){
+        if (request.getStatus().equals(MyInstances.STATUS_FINISHED)) {
             txtFinishPrice.setVisibility(View.VISIBLE);
-            txtFinishPrice.setText(" Giá: " + MyMethods.convertMoney(request.getPrice().floatValue()*1000) + " vnd");
+            txtFinishPrice.setText(" Giá: " + MyMethods.convertMoney(request.getPrice().floatValue() * 1000) + " vnd");
         }
     }
 
@@ -451,7 +451,7 @@ public class RequestDetailActivity extends BaseActivity {
             spinner.setOnItemSelectedListener((view, position, id, item) -> {
                 if (spinner.getText().toString().equals("Lý do khác")) {
                     txtReasonDetail.setVisibility(View.VISIBLE);
-                }else{
+                } else {
                     txtReasonDetail.setVisibility(View.GONE);
                 }
             });
@@ -545,10 +545,16 @@ public class RequestDetailActivity extends BaseActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         Log.e(TAG, "onActivityResult: result code = " + resultCode);
-        if(resultCode == Activity.RESULT_OK) {
-            Intent intent = getIntent();
-            finish();
-            startActivity(intent);
+        if (requestCode != 111)
+            if (resultCode == Activity.RESULT_OK) {
+                Intent intent = getIntent();
+                finish();
+                startActivity(intent);
+            }
+
+        if (requestCode == 111) {
+            if (resultCode == Activity.RESULT_OK)
+                btnComplain.setVisibility(View.GONE);
         }
     }
 }

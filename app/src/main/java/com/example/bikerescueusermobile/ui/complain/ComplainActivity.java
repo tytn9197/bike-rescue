@@ -102,6 +102,7 @@ public class ComplainActivity extends BaseActivity {
                                     success.setContentText("Gửi thành công! Xin vui lòng đợi trong vòng 24h làm việc!");
                                     success.setConfirmClickListener(sweetAlertDialog -> {
                                         sweetAlertDialog.dismiss();
+                                        setResult(Activity.RESULT_OK);
                                         finish();
                                     });
                                     success.show();
@@ -129,9 +130,16 @@ public class ComplainActivity extends BaseActivity {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
+            setResult(Activity.RESULT_CANCELED);
             finish();
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onBackPressed() {
+        setResult(Activity.RESULT_CANCELED);
+        super.onBackPressed();
     }
 
     @Override
