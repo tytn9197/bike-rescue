@@ -293,7 +293,7 @@ public class TrackingMapActivity extends DaggerAppCompatActivity implements
                     SharedPreferenceHelper.setSharedPreferenceString(getApplicationContext(), MyInstances.KEY_BIKER_REQUEST, "");
 
                     //review reruest
-                    setupReviewView(responeReq.getReqId(), responeReq.getReqCode(), responeReq.getReqPrice());
+                    setupReviewView(responeReq.getReqId(), responeReq.getReqCode(), responeReq.getReqPrice(), responeReq.getQuantity());
                     reviewDialog.show();
                 }
 
@@ -513,8 +513,8 @@ public class TrackingMapActivity extends DaggerAppCompatActivity implements
                 iconOffset(new Float[]{0f, -4f})));
     }
 
-    @SuppressLint("DefaultLocale")
-    private void setupReviewView(int reqId, String code, double price) {
+    @SuppressLint({"DefaultLocale", "SetTextI18n"})
+    private void setupReviewView(int reqId, String code, double price, int quantity) {
         //set up review dialog
         LayoutInflater factory = LayoutInflater.from(this);
         final View reviewView = factory.inflate(R.layout.dialog_review_request, null);
@@ -524,6 +524,36 @@ public class TrackingMapActivity extends DaggerAppCompatActivity implements
         EditText edtComment = reviewView.findViewById(R.id.edtCommentDetail);
         TextView txtReqCode = reviewView.findViewById(R.id.txtReviewReqCode);
         TextView txtPrice = reviewView.findViewById(R.id.txtReviewPrice);
+        TextView reviewSerName = reviewView.findViewById(R.id.reviewSerName);
+        TextView txtReviewQuantity = reviewView.findViewById(R.id.txtReviewQuantity);
+        TextView txtUnitPrice = reviewView.findViewById(R.id.txtUnitPrice);
+        TextView txtPriceSum = reviewView.findViewById(R.id.txtPriceSum);
+
+        ViewModelProviders.of(this, viewModelFactory).get(RequestDetailViewModel.class)
+                .getRequestById(reqId)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(req -> {
+                    if (req != null) {
+                        float serPrice = req.getListReqShopService().get(0).getShopService().getPrice().floatValue() * 1000;
+                        reviewSerName.setText(req.getListReqShopService().get(0).getShopService().getServices().getName());
+                        txtReviewQuantity.setText("Số lượng: " + quantity);
+                        txtUnitPrice.setText("Giá: " +
+                                MyMethods.convertMoney(serPrice) +
+                                " vnd / " + req.getListReqShopService().get(0).getShopService().getServices().getUnit());
+                        if(req.getListReqShopService().get(0).getShopService().getServices().getName().equals("Đổ xăng")){
+                            txtPriceSum.setText("Tổng tiền: " + MyMethods.convertMoney((float) price * 1000) + " vnd");
+                            txtReviewQuantity.setVisibility(View.GONE);
+                            txtUnitPrice.setVisibility(View.GONE);
+                        } else {
+                            txtPriceSum.setText("Tổng tiền: " + MyMethods.convertMoney(serPrice * quantity) + " vnd");
+                            txtReviewQuantity.setVisibility(View.VISIBLE);
+                            txtUnitPrice.setVisibility(View.VISIBLE);
+                        }
+                    }
+                }, throwable -> {
+                    Log.e(TAG, "getRequestById: " + throwable.getMessage());
+                });
 
         txtReqCode.setText(code);
         txtPrice.setText("Giá: " + MyMethods.convertMoney((float) price * 1000) + " vnd");
@@ -538,7 +568,8 @@ public class TrackingMapActivity extends DaggerAppCompatActivity implements
             ReviewRequestDTO reviewDTO = new ReviewRequestDTO(comment, star);
             Log.e(TAG, "review: " + reviewDTO.toString());
 
-            ViewModelProviders.of(this, viewModelFactory).get(RequestDetailViewModel.class).reviewRequest(reqId, reviewDTO)
+            ViewModelProviders.of(this, viewModelFactory).get(RequestDetailViewModel.class)
+                    .reviewRequest(reqId, reviewDTO)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(respone -> {
@@ -547,12 +578,7 @@ public class TrackingMapActivity extends DaggerAppCompatActivity implements
                             notiDialog.setTitleText("Thông báo");
                             notiDialog.setContentText("Đánh giá thành công");
                             notiDialog.setConfirmText("OK");
-                            notiDialog.setConfirmClickListener(sweetAlertDialog -> {
-                                sweetAlertDialog.dismiss();
-                                Intent i = new Intent();
-                                TrackingMapActivity.this.setResult(Activity.RESULT_OK, i);
-                                finish();
-                            });
+                            notiDialog.setConfirmClickListener(Dialog::dismiss);
                             notiDialog.show();
                         }
                     }, throwable -> {

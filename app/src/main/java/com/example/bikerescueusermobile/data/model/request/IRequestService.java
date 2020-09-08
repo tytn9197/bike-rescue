@@ -43,7 +43,9 @@ public interface IRequestService {
                                                      @Header("Authorization") String token);
 
     @GET("/shop/finishedRequest")
-    Single<Boolean> finishedRequest(@Query("id") int reqID, @Query("price") double price, @Header("Authorization") String token);
+    Single<Boolean> finishedRequest(@Query("id") int reqID, @Query("price") double price,
+                                    @Query("quantity") int quantity,
+                                    @Header("Authorization") String token);
 
     @GET("/biker/getRequestByBikerIdFromTo/{bikerId}")
     Single<List<Request>> getRequestByBikerId(@Path("bikerId") int bikerId, @Query("from") String fromDate,

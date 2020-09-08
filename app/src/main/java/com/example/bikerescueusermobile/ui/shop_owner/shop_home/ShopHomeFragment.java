@@ -567,7 +567,7 @@ public class ShopHomeFragment extends BaseFragment {
                         error.show();
                     } else if (spinnerSerName.getText().toString().equals("Đổ xăng")) {
                         double price = Double.parseDouble(txtConfirmPrice.getText().toString());
-                        viewModel.finishedRequest(request.getId(), price)
+                        viewModel.finishedRequest(request.getId(), price, quantity)
                                 .subscribeOn(Schedulers.io())
                                 .observeOn(AndroidSchedulers.mainThread())
                                 .subscribe(isSuccess -> {
@@ -578,7 +578,7 @@ public class ShopHomeFragment extends BaseFragment {
                                     }
                                 });
                     } else {
-                        viewModel.finishedRequest(request.getId(), (serPrice * quantity) / 1000)
+                        viewModel.finishedRequest(request.getId(), (serPrice * quantity) / 1000, quantity)
                                 .subscribeOn(Schedulers.io())
                                 .observeOn(AndroidSchedulers.mainThread())
                                 .subscribe(isSuccess -> {

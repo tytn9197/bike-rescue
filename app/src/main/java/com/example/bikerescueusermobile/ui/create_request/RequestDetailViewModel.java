@@ -35,8 +35,8 @@ public class RequestDetailViewModel extends ViewModel {
         return requestRepository.updateStatusRequest(reqId, status);
     }
 
-    public Single<Boolean> finishedRequest(int reqId, double price){
-        return requestRepository.finishedRequest(reqId, price);
+    public Single<Boolean> finishedRequest(int reqId, double price, int quantity){
+        return requestRepository.finishedRequest(reqId, price, quantity);
     }
 
     public Single<ReviewRequestDTO> reviewRequest(int requestId, ReviewRequestDTO reviewRequestDTO){

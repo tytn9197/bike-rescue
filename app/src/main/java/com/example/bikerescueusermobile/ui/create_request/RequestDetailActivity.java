@@ -228,7 +228,7 @@ public class RequestDetailActivity extends BaseActivity {
                     });
 
                     //review reruest
-                    setupReviewView(responeReq.getReqId(), responeReq.getReqCode(), responeReq.getReqPrice());
+                    setupReviewView(responeReq.getReqId(), responeReq.getReqCode(), responeReq.getReqPrice(), responeReq.getQuantity());
                     reviewDialog.show();
                 }
 
@@ -253,8 +253,8 @@ public class RequestDetailActivity extends BaseActivity {
         }
     };
 
-    @SuppressLint("DefaultLocale")
-    private void setupReviewView(int reqId, String code, double price) {
+    @SuppressLint({"DefaultLocale", "SetTextI18n"})
+    private void setupReviewView(int reqId, String code, double price, int quantity) {
         //set up review dialog
         LayoutInflater factory = LayoutInflater.from(this);
         final View reviewView = factory.inflate(R.layout.dialog_review_request, null);
@@ -264,6 +264,35 @@ public class RequestDetailActivity extends BaseActivity {
         EditText edtComment = reviewView.findViewById(R.id.edtCommentDetail);
         TextView txtReqCode = reviewView.findViewById(R.id.txtReviewReqCode);
         TextView txtPrice = reviewView.findViewById(R.id.txtReviewPrice);
+        TextView reviewSerName = reviewView.findViewById(R.id.reviewSerName);
+        TextView txtReviewQuantity = reviewView.findViewById(R.id.txtReviewQuantity);
+        TextView txtUnitPrice = reviewView.findViewById(R.id.txtUnitPrice);
+        TextView txtPriceSum = reviewView.findViewById(R.id.txtPriceSum);
+
+        viewModel.getRequestById(reqId)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(req -> {
+                    if (req != null) {
+                        float serPrice = req.getListReqShopService().get(0).getShopService().getPrice().floatValue() * 1000;
+                        reviewSerName.setText("Dịch vụ: " + req.getListReqShopService().get(0).getShopService().getServices().getName());
+                        txtReviewQuantity.setText("Số lượng: " + quantity);
+                        txtUnitPrice.setText("Giá: " +
+                                MyMethods.convertMoney(serPrice) +
+                                " vnd / " + req.getListReqShopService().get(0).getShopService().getServices().getUnit());
+                        if(req.getListReqShopService().get(0).getShopService().getServices().getName().equals("Đổ xăng")){
+                            txtPriceSum.setText("Tổng tiền: " + MyMethods.convertMoney((float) price * 1000) + " vnd");
+                            txtReviewQuantity.setVisibility(View.GONE);
+                            txtUnitPrice.setVisibility(View.GONE);
+                        } else {
+                            txtPriceSum.setText("Tổng tiền: " + MyMethods.convertMoney(serPrice * quantity) + " vnd");
+                            txtReviewQuantity.setVisibility(View.VISIBLE);
+                            txtUnitPrice.setVisibility(View.VISIBLE);
+                        }
+                    }
+                }, throwable -> {
+                    Log.e(TAG, "getRequestById: " + throwable.getMessage());
+                });
 
         txtReqCode.setText(code);
         txtPrice.setText("Giá: " + MyMethods.convertMoney((float) price * 1000) + " vnd");
