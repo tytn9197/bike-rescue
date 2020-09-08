@@ -120,6 +120,8 @@
                 android:layout_marginTop="5dp"
                 android:drawableLeft="@drawable/ic_baseline_help_24"
                 android:hint=" Giá tiền đổ xăng (Ví dụ: 20,...)"
+                android:inputType="numberDecimal"
+                android:maxLength="10"
                 android:paddingBottom="15dp"
                 android:visibility="gone" />
 
@@ -304,14 +306,14 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="5dp"
                     android:visibility="gone">
+
                     <LinearLayout
                         android:id="@+id/imageLayout"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_margin="5dp"
                         android:orientation="horizontal"
-                        android:padding="5dp">
-                    </LinearLayout>
+                        android:padding="5dp"></LinearLayout>
                 </HorizontalScrollView>
 
             </LinearLayout>

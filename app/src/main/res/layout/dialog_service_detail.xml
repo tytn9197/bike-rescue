@@ -40,6 +40,8 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="5dp"
             android:hint="Giá tiền"
+            android:inputType="numberDecimal"
+            android:maxLength="10"
             android:textSize="22sp" />
 
         <CheckBox

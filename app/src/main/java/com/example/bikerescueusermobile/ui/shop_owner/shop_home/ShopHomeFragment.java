@@ -7,81 +7,56 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.CountDownTimer;
-import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
-import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
-import androidx.recyclerview.widget.DividerItemDecoration;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.example.bikerescueusermobile.R;
 import com.example.bikerescueusermobile.base.BaseFragment;
-import com.example.bikerescueusermobile.data.model.request.CurrentRequest;
 import com.example.bikerescueusermobile.data.model.request.MessageRequestFB;
 import com.example.bikerescueusermobile.data.model.request.Request;
-import com.example.bikerescueusermobile.data.model.request.ReviewRequestDTO;
+import com.example.bikerescueusermobile.data.model.shop_services.ShopServiceTable;
 import com.example.bikerescueusermobile.data.model.user.CurrentUser;
-import com.example.bikerescueusermobile.data.model.user.UserLatLong;
 import com.example.bikerescueusermobile.ui.confirm.ConfirmViewModel;
 import com.example.bikerescueusermobile.ui.create_request.RequestDetailViewModel;
 import com.example.bikerescueusermobile.ui.login.UpdateLocationService;
-import com.example.bikerescueusermobile.ui.shopMain.ShopMainActivity;
+import com.example.bikerescueusermobile.ui.seach_shop_service.ShopServiceViewModel;
 import com.example.bikerescueusermobile.ui.tracking_map.TrackingMapActivity;
-import com.example.bikerescueusermobile.ui.tracking_map.ViewReviewRvAdapter;
 import com.example.bikerescueusermobile.util.MyInstances;
+import com.example.bikerescueusermobile.util.MyMethods;
 import com.example.bikerescueusermobile.util.SharedPreferenceHelper;
 import com.example.bikerescueusermobile.util.ViewModelFactory;
-import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 import com.google.gson.Gson;
 import com.jaredrummler.materialspinner.MaterialSpinner;
-import com.mapbox.api.directions.v5.DirectionsCriteria;
-import com.mapbox.api.directions.v5.MapboxDirections;
-import com.mapbox.api.directions.v5.models.DirectionsResponse;
-import com.mapbox.geojson.Point;
-import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mingle.sweetpick.CustomDelegate;
 import com.mingle.sweetpick.SweetSheet;
 import com.squareup.picasso.Picasso;
-import com.willy.ratingbar.ScaleRatingBar;
-
-import org.jetbrains.annotations.NotNull;
 
 import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.inject.Inject;
 
@@ -89,9 +64,6 @@ import butterknife.BindView;
 import cn.pedant.SweetAlert.SweetAlertDialog;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 public class ShopHomeFragment extends BaseFragment {
 
@@ -183,6 +155,10 @@ public class ShopHomeFragment extends BaseFragment {
     private CountDownTimer countDownTimer;
     private double distance = -1;
     private SweetSheet mSweetSheet;
+    private ArrayList<ShopServiceTable> listAllShopServices;
+    private int vanDeKhacPos = -1;
+    private int quantity = -1;
+    private float serPrice = -1;
 
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
         @Override
@@ -315,6 +291,20 @@ public class ShopHomeFragment extends BaseFragment {
 
         txtNoReq.setVisibility(View.VISIBLE);
 
+        //get shop services
+        ViewModelProviders.of(this, viewModelFactory).get(ShopServiceViewModel.class)
+                .getShopServiceByShopId(CurrentUser.getInstance().getShop().getId())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(listServices -> {
+                    if (listServices != null) {
+                        listAllShopServices = new ArrayList<>();
+                        listAllShopServices.addAll(listServices);
+                    }
+                }, throwable -> {
+                    Log.e(TAG, "getShopServiceByShopId: " + throwable.getMessage());
+                });
+
         if (!request.trim().equals("")) {
             Request requestFromPref = gson.fromJson(request, Request.class);
 
@@ -343,12 +333,12 @@ public class ShopHomeFragment extends BaseFragment {
                                     //get count down timer and check
                                     String shareCountDown = SharedPreferenceHelper
                                             .getSharedPreferenceString(getActivity(), MyInstances.KEY_COUNT_DOWN_TIME, "");
-                                    if(!shareCountDown.equals("")){
+                                    if (!shareCountDown.equals("")) {
                                         long seconds = Long.parseLong(shareCountDown);
-                                        if((System.currentTimeMillis() - seconds) < 60 * 1000){
+                                        if ((System.currentTimeMillis() - seconds) < 60 * 1000) {
                                             Log.e(TAG, "con count down timer ---- time: " + (System.currentTimeMillis() - seconds));
                                             runCountDownTimer(req.getId(),
-                                                    (CurrentUser.getInstance().getRejectTime()-(System.currentTimeMillis() - seconds)/1000));
+                                                    (CurrentUser.getInstance().getRejectTime() - (System.currentTimeMillis() - seconds) / 1000));
                                         } else {
                                             Log.e(TAG, "xoa count down share ref");
                                             SharedPreferenceHelper.setSharedPreferenceString(getActivity(), MyInstances.KEY_COUNT_DOWN_TIME, "");
@@ -446,32 +436,137 @@ public class ShopHomeFragment extends BaseFragment {
         });
 
         btnFinish.setOnClickListener(v -> {
-
             LayoutInflater factory = LayoutInflater.from(getActivity());
             final View priceView = factory.inflate(R.layout.dialog_confirm_price, null);
             AlertDialog priceDialog = new AlertDialog.Builder(getActivity()).create();
 
-            TextView txtPrice = priceView.findViewById(R.id.txtConfirmPrice);
-            TextView txtServiceName = priceView.findViewById(R.id.txtConfirmSerName);
+            TextView spinnerSerName = priceView.findViewById(R.id.spinnerSerName);
+            LinearLayout layoutQuantity = priceView.findViewById(R.id.layoutQuantity);
+            Spinner spinnerQuantity = priceView.findViewById(R.id.spinnerQuantity);
+            TextView txtUnitPrice = priceView.findViewById(R.id.txtUnitPrice);
+            TextView txtPriceSum = priceView.findViewById(R.id.txtPriceSum);
+            TextView txtConfirmPrice = priceView.findViewById(R.id.txtConfirmPrice);
 
-            if (request.getListReqShopService().get(0).getShopService().getPrice() > 0) {
-                txtPrice.setText("" + request.getListReqShopService().get(0).getShopService().getPrice().intValue());
+            //init value
+            if (request.getListReqShopService().get(0).getShopService().getServices().getName().equals("Đổ xăng")
+                    || request.getListReqShopService().get(0).getShopService().getServices().getName().equals("Vấn đề khác")) {
+                txtConfirmPrice.setVisibility(View.VISIBLE);
+                layoutQuantity.setVisibility(View.GONE);
+                txtUnitPrice.setVisibility(View.GONE);
+                txtPriceSum.setVisibility(View.GONE);
+            } else {
+                txtConfirmPrice.setVisibility(View.GONE);
+                layoutQuantity.setVisibility(View.VISIBLE);
+                txtUnitPrice.setVisibility(View.VISIBLE);
+                txtPriceSum.setVisibility(View.VISIBLE);
             }
 
-            txtServiceName.setText("Tên dịch vụ: " + request.getListReqShopService().get(0).getShopService().getServices().getName());
+            if (request.getListReqShopService().get(0).getShopService().getServices().getName().equals("Vấn đề khác")) {
+                spinnerSerName.setText("Vui lòng chọn một dịch vụ");
+                txtConfirmPrice.setVisibility(View.GONE);
+            } else {
+                spinnerSerName.setText(request.getListReqShopService().get(0).getShopService().getServices().getName());
+            }
+
+            serPrice = request.getListReqShopService().get(0).getShopService().getPrice().floatValue() * 1000;
+            spinnerQuantity.setPrompt("1");
+            quantity = 1;
+            txtUnitPrice.setText("Giá: " +
+                    MyMethods.convertMoney(serPrice) +
+                    " vnd / " + request.getListReqShopService().get(0).getShopService().getServices().getUnit());
+            txtPriceSum.setText("Tổng tiền: " + MyMethods.convertMoney(serPrice * quantity) + " vnd");
+
+            ArrayAdapter<String> quantityNumberAdapter = new ArrayAdapter<>(getActivity(), R.layout.support_simple_spinner_dropdown_item);
+            for (int i = 1; i < 6; i++) {
+                quantityNumberAdapter.add("" + i);
+            }
+            spinnerQuantity.setAdapter(quantityNumberAdapter);
+
+            spinnerQuantity.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                    quantity = position + 1;
+                    txtPriceSum.setText("Tổng tiền: " + MyMethods.convertMoney(serPrice * quantity) + " vnd");
+                }
+
+                @Override
+                public void onNothingSelected(AdapterView<?> parent) {
+
+                }
+            });
+
+            spinnerSerName.setOnClickListener(v1 -> {
+                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                builder.setTitle(request.getListReqShopService().get(0).getShopService().getServices().getName());
+
+                ArrayAdapter<String> problems = new ArrayAdapter<>(getActivity(),
+                        android.R.layout.simple_list_item_1);
+                for (int i = 0; i < listAllShopServices.size(); i++) {
+                    if (!listAllShopServices.get(i).getServices().getName().equals("Vấn đề khác")) {
+                        problems.add(listAllShopServices.get(i).getServices().getName());
+                    } else {
+                        vanDeKhacPos = i;
+                    }
+                }
+
+                builder.setAdapter(problems, (dialog, which) -> {
+                    dialog.dismiss();
+                    int serId = -1;
+                    if (which < vanDeKhacPos) {
+                        spinnerSerName.setText(listAllShopServices.get(which).getServices().getName());
+                        serId = listAllShopServices.get(which).getServices().getId();
+                    } else {
+                        spinnerSerName.setText(listAllShopServices.get(which + 1).getServices().getName());
+                        serId = listAllShopServices.get(which + 1).getServices().getId();
+                    }
+
+                    //get lai service price cua shop do
+                    ViewModelProviders.of(this, viewModelFactory).get(ConfirmViewModel.class)
+                            .getShopServiceId(CurrentUser.getInstance().getShop().getId(), serId)
+                            .subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe(shopService -> {
+                                if (shopService != null) {
+                                    serPrice = shopService.getPrice().floatValue() * 1000;
+                                    txtUnitPrice.setText("Giá: " +
+                                            MyMethods.convertMoney(serPrice) +
+                                            " vnd / " + shopService.getServices().getUnit());
+
+                                    txtPriceSum.setText("Tổng tiền: " + MyMethods.convertMoney(serPrice * quantity) + " vnd");
+
+                                    // neu la dich vu do xang thi an~ gia tien va cho nhap gia tien
+                                    if (listAllShopServices.get(which).getServices().getName().equals("Đổ xăng")) {
+                                        txtConfirmPrice.setVisibility(View.VISIBLE);
+                                        layoutQuantity.setVisibility(View.GONE);
+                                        txtUnitPrice.setVisibility(View.GONE);
+                                        txtPriceSum.setVisibility(View.GONE);
+                                    } else {
+                                        txtConfirmPrice.setVisibility(View.GONE);
+                                        layoutQuantity.setVisibility(View.VISIBLE);
+                                        txtUnitPrice.setVisibility(View.VISIBLE);
+                                        txtPriceSum.setVisibility(View.VISIBLE);
+                                    }
+                                }
+                            }, throwable -> {
+                                Log.e(TAG, "getShopServiceId: " + throwable.getMessage());
+                            });
+                });
+                AlertDialog alertDialog = builder.create();
+                alertDialog.show();
+            });
 
             priceDialog.setView(priceView);
             priceView.findViewById(R.id.btn_confirm).setOnClickListener(confirmView -> {
-                priceDialog.dismiss();
                 SweetAlertDialog error = new SweetAlertDialog(getBaseActivity(), SweetAlertDialog.ERROR_TYPE);
                 error.setTitleText("Thông báo");
                 error.setConfirmText("Đóng");
-                error.setContentText("Gía tiền không hợp lệ, vui lòng kiểm tra lại");
                 error.setConfirmClickListener(Dialog::dismiss);
                 try {
-                    double price = Double.parseDouble(txtPrice.getText().toString());
-
-                    if (price >= 0) {
+                    if (spinnerSerName.getText().toString().equals("Vui lòng chọn một dịch vụ")) {
+                        error.setContentText("Vui lòng chọn một dịch vụ");
+                        error.show();
+                    } else if (spinnerSerName.getText().toString().equals("Đổ xăng")) {
+                        double price = Double.parseDouble(txtConfirmPrice.getText().toString());
                         viewModel.finishedRequest(request.getId(), price)
                                 .subscribeOn(Schedulers.io())
                                 .observeOn(AndroidSchedulers.mainThread())
@@ -479,12 +574,23 @@ public class ShopHomeFragment extends BaseFragment {
                                     if (isSuccess) {
                                         SharedPreferenceHelper.setSharedPreferenceString(getActivity(), MyInstances.KEY_SHOP_REQUEST, "");
                                         txtNoReq.setVisibility(View.VISIBLE);
+                                        priceDialog.dismiss();
                                     }
                                 });
                     } else {
-                        error.show();
+                        viewModel.finishedRequest(request.getId(), (serPrice * quantity) / 1000)
+                                .subscribeOn(Schedulers.io())
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .subscribe(isSuccess -> {
+                                    if (isSuccess) {
+                                        SharedPreferenceHelper.setSharedPreferenceString(getActivity(), MyInstances.KEY_SHOP_REQUEST, "");
+                                        txtNoReq.setVisibility(View.VISIBLE);
+                                        priceDialog.dismiss();
+                                    }
+                                });
                     }
                 } catch (Exception e) {
+                    error.setContentText("Vui lòng kiểm tra lại");
                     error.show();
                     Log.e(TAG, "can't parse double: " + e.getMessage());
                 }

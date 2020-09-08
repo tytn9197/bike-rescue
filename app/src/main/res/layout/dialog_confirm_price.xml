@@ -15,9 +15,10 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="15dp"
-            android:text="Vui lòng xác nhận lại giá dịch vụ \n(đơn vị: nghìn vnd)"
+            android:text="Vui lòng xác nhận lại giá dịch vụ"
             android:textColor="@color/black"
-            android:textSize="17dp" />
+            android:textSize="18dp"
+            android:textStyle="bold" />
 
         <View
             android:layout_width="match_parent"
@@ -25,15 +26,29 @@
             android:background="@color/grey" />
 
         <TextView
-            android:id="@+id/txtConfirmSerName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginStart="18dp"
             android:layout_marginTop="10dp"
-            android:layout_marginBottom="5dp"
-            android:layout_marginStart="15dp"
-            android:text="Tên dịch vụ: abc"
+            android:text="Dịch vụ:"
+            android:textColor="@color/black"
             android:textSize="17sp"
-            android:textColor="@color/black"/>
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/spinnerSerName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="15dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="30dp"
+            android:layout_marginBottom="10dp"
+            android:background="@drawable/border"
+            android:drawableEnd="@drawable/ic_baseline_chevron_right_24"
+            android:padding="13dp"
+            android:text="Dịch vụ"
+            android:textColor="@color/black"
+            android:textSize="17dp" />
 
         <EditText
             android:id="@+id/txtConfirmPrice"
@@ -41,8 +56,82 @@
             android:layout_height="wrap_content"
             android:layout_margin="10dp"
             android:background="@color/white"
-            android:hint="Giá dịch vụ (ví dụ: 80, 200,...)"
-            android:padding="10dp" />
+            android:hint="Giá (ví dụ: 80, 200,...)"
+            android:inputType="numberDecimal"
+            android:maxLength="3"
+            android:padding="10dp"
+            android:visibility="gone" />
+
+        <LinearLayout
+            android:id="@+id/layoutQuantity"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="15dp"
+                android:text="Số lượng: "
+                android:textColor="@color/black"
+                android:textSize="17sp"
+                android:textStyle="bold" />
+
+            <!--            <EditText-->
+            <!--                android:id="@+id/edtQuantity"-->
+            <!--                android:layout_width="100dp"-->
+            <!--                android:layout_height="wrap_content"-->
+            <!--                android:layout_marginStart="10dp"-->
+            <!--                android:inputType="numberDecimal"-->
+            <!--                android:maxLength="1"-->
+            <!--                android:padding="10dp"-->
+            <!--                android:textColor="@color/black"/>-->
+
+            <Spinner
+                android:id="@+id/spinnerQuantity"
+                android:layout_width="150dp"
+                android:layout_height="wrap_content"
+                android:background="@android:drawable/btn_dropdown"
+                android:spinnerMode="dropdown" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/txtUnitPrice"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="15dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
+            android:text="Giá trên 1 đơn vị"
+            android:textColor="@color/black"
+            android:textSize="17sp" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/grey" />
+
+        <TextView
+            android:id="@+id/txtPriceSum"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="15dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
+            android:text="Thành tiền"
+            android:textColor="@color/black"
+            android:textSize="17sp" />
+
+        <!--        <TextView-->
+        <!--            android:id="@+id/txtConfirmSerName"-->
+        <!--            android:layout_width="match_parent"-->
+        <!--            android:layout_height="wrap_content"-->
+        <!--            android:layout_marginTop="10dp"-->
+        <!--            android:layout_marginBottom="5dp"-->
+        <!--            android:layout_marginStart="15dp"-->
+        <!--            android:text="Tên dịch vụ: abc"-->
+        <!--            android:textSize="17sp"-->
+        <!--            android:textColor="@color/black"/>-->
 
         <LinearLayout
             android:layout_width="match_parent"

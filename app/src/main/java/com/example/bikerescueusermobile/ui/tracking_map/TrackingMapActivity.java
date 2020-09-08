@@ -125,7 +125,7 @@ public class TrackingMapActivity extends DaggerAppCompatActivity implements
     private FusedLocationProviderClient mFusedLocationClient;
     private MapboxDirections client;
     private DirectionsRoute currentRoute;
-    private LatLng destination;
+    private LatLng destination = new LatLng(10.8411847, 106.8092702);
     private GeoJsonSource source;
 
     @BindView(R.id.btnTrackingMapBack)
@@ -142,7 +142,7 @@ public class TrackingMapActivity extends DaggerAppCompatActivity implements
 
 
     private LoginModel viewModel;
-    private boolean isBikerTracking;
+    private boolean isBikerTracking = false;
     private DatabaseReference mDatabase;
     private List<UserLatLong> userLatLongList = new ArrayList<>();
     private RequestDetailViewModel reqViewModel;
@@ -156,132 +156,128 @@ public class TrackingMapActivity extends DaggerAppCompatActivity implements
         viewModel = ViewModelProviders.of(this, viewModelFactory).get(LoginModel.class);
         reqViewModel = ViewModelProviders.of(this, viewModelFactory).get(RequestDetailViewModel.class);
 
-        isBikerTracking = getIntent().getBooleanExtra("isBikerTracking", true);
+        try {
+            isBikerTracking = getIntent().getBooleanExtra("isBikerTracking", false);
 
-        if (isBikerTracking) {
-            LocalBroadcastManager.getInstance(this).registerReceiver(
-                    mMessageReceiver, new IntentFilter("BikeRescueBiker"));
-        }
+            if (isBikerTracking) {
+                LocalBroadcastManager.getInstance(this).registerReceiver(
+                        mMessageReceiver, new IntentFilter("BikeRescueBiker"));
+            }
 
-        int reqId = getIntent().getIntExtra("reqId", -1);
-        String reqStatus = "";
-        reqStatus = getIntent().getStringExtra("reqStatus");
+            int reqId = getIntent().getIntExtra("reqId", -1);
+            String reqStatus = "";
+            reqStatus = getIntent().getStringExtra("reqStatus");
 
-        destination = new LatLng(Double.parseDouble(CurrentUser.getInstance().getLatitude()), Double.parseDouble(CurrentUser.getInstance().getLongtitude()));
+            //set destination
+            if (reqId == -1) {
+                Log.e(TAG, "onCreate: cannot get reqId");
+            } else {
+                Mapbox.getInstance(TrackingMapActivity.this, getString(R.string.mapbox_access_token));
+                setContentView(layoutRes());
+                ButterKnife.bind(TrackingMapActivity.this);
 
-        //set destination
-        if (reqId == -1) {
-            Log.e(TAG, "onCreate: cannot get reqId");
-        } else {
-            Mapbox.getInstance(TrackingMapActivity.this, getString(R.string.mapbox_access_token));
-            setContentView(layoutRes());
-            ButterKnife.bind(TrackingMapActivity.this);
+                mapView = findViewById(R.id.trackingMap);
+                mapView.onCreate(savedInstanceState);
+                mapView.getMapAsync(TrackingMapActivity.this);
+                mFusedLocationClient = LocationServices.getFusedLocationProviderClient(TrackingMapActivity.this);
 
-            mapView = findViewById(R.id.trackingMap);
-            mapView.onCreate(savedInstanceState);
-            mapView.getMapAsync(TrackingMapActivity.this);
-            mFusedLocationClient = LocationServices.getFusedLocationProviderClient(TrackingMapActivity.this);
+                if (reqStatus != null)
+                    if (reqStatus.equals(MyInstances.STATUS_ARRIVED) || reqStatus.equals(MyInstances.STATUS_CREATED)) {
+                        btnArrived.setVisibility(View.GONE);
+                    }
 
-            if (reqStatus != null)
-                if (reqStatus.equals(MyInstances.STATUS_ARRIVED) || reqStatus.equals(MyInstances.STATUS_CREATED)) {
+                if (isBikerTracking) {
                     btnArrived.setVisibility(View.GONE);
                 }
 
-            if (isBikerTracking) {
-                btnArrived.setVisibility(View.GONE);
-            }
+                btnBack.setOnClickListener(v -> {
+                    Intent i = new Intent();
+                    setResult(Activity.RESULT_OK, i);
+                    finish();
+                });
 
-            btnBack.setOnClickListener(v -> {
-                Intent i = new Intent();
-                setResult(Activity.RESULT_OK, i);
-                finish();
-            });
-
-            mDatabase = FirebaseDatabase.getInstance().getReference(MyInstances.APP);
-            mDatabase.addValueEventListener(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NotNull DataSnapshot dataSnapshot) {
-                    if (getLifecycle().getCurrentState().isAtLeast(Lifecycle.State.STARTED)) {
-                        userLatLongList.clear();
-                        for (DataSnapshot listUserLatlng : dataSnapshot.getChildren()) {
-                            Log.e(TAG, "value is biker: " + listUserLatlng.getValue().toString() + "---- getChosenShopOwnerId id:" + CurrentUser.getInstance().getChosenShopOwnerId());
-                            userLatLongList.add(listUserLatlng.getValue(UserLatLong.class));
-                        }
-                        if (userLatLongList.size() > 0) {
-                            if (isBikerTracking) {
-                                Log.e(TAG, "list size: " + userLatLongList.size());
-                                int pos = -1;
-                                for (int i = 0; i < userLatLongList.size(); i++) {
-                                    if (userLatLongList.get(i).getId() == CurrentUser.getInstance().getChosenShopOwnerId())
-                                        pos = i;
+                mDatabase = FirebaseDatabase.getInstance().getReference(MyInstances.APP);
+                mDatabase.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NotNull DataSnapshot dataSnapshot) {
+                        if (getLifecycle().getCurrentState().isAtLeast(Lifecycle.State.STARTED)) {
+                            try {
+                                userLatLongList.clear();
+                                for (DataSnapshot listUserLatlng : dataSnapshot.getChildren()) {
+                                    Log.e(TAG, "value is biker: " + listUserLatlng.getValue().toString() + "---- getChosenShopOwnerId id:" + CurrentUser.getInstance().getChosenShopOwnerId());
+                                    userLatLongList.add(listUserLatlng.getValue(UserLatLong.class));
                                 }
-                                if (pos > -1) {
-                                    Log.e(TAG, "pos: " + pos);
-                                    UserLatLong newUser = userLatLongList.get(pos);
-                                    Log.e(TAG, "onChildChanged: " + newUser.toString());
-                                    destination = new LatLng(Double.parseDouble(newUser.getLatitude()), Double.parseDouble(newUser.getLongtitude()));
-                                    updateRoute();
-                                }
-                            } else { // for shop owner
-                                Log.e(TAG, "list size: " + userLatLongList.size());
-                                int pos = -1;
-                                for (int i = 0; i < userLatLongList.size(); i++) {
-                                    if (userLatLongList.get(i).getId() == CurrentUser.getInstance().getCurrentBikerId())
-                                        pos = i;
-                                }
-                                if (pos > -1) {
-                                    Log.e(TAG, "pos: " + pos);
-                                    UserLatLong newUser = userLatLongList.get(pos);
-                                    Log.e(TAG, "onChildChanged: " + newUser.toString());
-                                    destination = new LatLng(Double.parseDouble(newUser.getLatitude()), Double.parseDouble(newUser.getLongtitude()));
-                                    updateRoute();
-
-//                                    if (distance > 0 && distance < 0.5) {
-//                                        reqViewModel.updateStatusRequest(reqId, MyInstances.STATUS_ARRIVED)
-//                                                .subscribeOn(Schedulers.io())
-//                                                .observeOn(AndroidSchedulers.mainThread())
-//                                                .subscribe(responseDTO -> {
-//                                                    Intent i = new Intent();
-//                                                    setResult(Activity.RESULT_OK, i);
-//                                                    finish();
-//                                                });
-//                                    }
-
-                                    //set up btn arrive
-                                    btnArrived.setOnClickListener(view -> {
-                                        Log.e(TAG, "distance: " + distance + " ---- current: " + CurrentUser.getInstance().getArriveDistance());
-                                        if (distance > 0 && distance < CurrentUser.getInstance().getArriveDistance()) {
-                                            reqViewModel.updateStatusRequest(reqId, MyInstances.STATUS_ARRIVED)
-                                                    .subscribeOn(Schedulers.io())
-                                                    .observeOn(AndroidSchedulers.mainThread())
-                                                    .subscribe(responseDTO -> {
-                                                        Intent i = new Intent();
-                                                        setResult(Activity.RESULT_OK, i);
-                                                        finish();
-                                                    });
-                                        } else {
-                                            SweetAlertDialog errorDialog = new SweetAlertDialog(TrackingMapActivity.this, SweetAlertDialog.ERROR_TYPE);
-                                            errorDialog.setTitleText("Thông báo");
-                                            errorDialog.setConfirmText("OK");
-                                            errorDialog.setContentText("Vị trí của bạn và khách quá xa nhau");
-                                            errorDialog.setConfirmClickListener(Dialog::dismiss);
-                                            errorDialog.show();
+                                if (userLatLongList.size() > 0) {
+                                    if (isBikerTracking) {
+                                        Log.e(TAG, "list size: " + userLatLongList.size());
+                                        int pos = -1;
+                                        for (int i = 0; i < userLatLongList.size(); i++) {
+                                            if (userLatLongList.get(i).getId() == CurrentUser.getInstance().getChosenShopOwnerId())
+                                                pos = i;
                                         }
-                                    });
+                                        if (pos > -1) {
+                                            Log.e(TAG, "pos: " + pos);
+                                            UserLatLong newUser = userLatLongList.get(pos);
+                                            Log.e(TAG, "onChildChanged: " + newUser.toString());
+                                            destination = new LatLng(Double.parseDouble(newUser.getLatitude()), Double.parseDouble(newUser.getLongtitude()));
+                                            updateRoute();
+                                        }
+                                    } else { // for shop owner
+                                        Log.e(TAG, "list size: " + userLatLongList.size());
+                                        int pos = -1;
+                                        for (int i = 0; i < userLatLongList.size(); i++) {
+                                            if (userLatLongList.get(i).getId() == CurrentUser.getInstance().getCurrentBikerId())
+                                                pos = i;
+                                        }
+                                        if (pos > -1) {
+                                            Log.e(TAG, "pos: " + pos);
+                                            UserLatLong newUser = userLatLongList.get(pos);
+                                            Log.e(TAG, "onChildChanged: " + newUser.toString());
+                                            destination = new LatLng(Double.parseDouble(newUser.getLatitude()), Double.parseDouble(newUser.getLongtitude()));
+                                            updateRoute();
+
+                                            //set up btn arrive
+                                            btnArrived.setOnClickListener(view -> {
+                                                Log.e(TAG, "distance: " + distance + " ---- current: " + CurrentUser.getInstance().getArriveDistance());
+                                                if (distance > 0 && distance < CurrentUser.getInstance().getArriveDistance()) {
+                                                    reqViewModel.updateStatusRequest(reqId, MyInstances.STATUS_ARRIVED)
+                                                            .subscribeOn(Schedulers.io())
+                                                            .observeOn(AndroidSchedulers.mainThread())
+                                                            .subscribe(responseDTO -> {
+                                                                Intent i = new Intent();
+                                                                setResult(Activity.RESULT_OK, i);
+                                                                finish();
+                                                            });
+                                                } else {
+                                                    SweetAlertDialog errorDialog = new SweetAlertDialog(TrackingMapActivity.this, SweetAlertDialog.ERROR_TYPE);
+                                                    errorDialog.setTitleText("Thông báo");
+                                                    errorDialog.setConfirmText("OK");
+                                                    errorDialog.setContentText("Vị trí của bạn và khách quá xa nhau");
+                                                    errorDialog.setConfirmClickListener(Dialog::dismiss);
+                                                    errorDialog.show();
+                                                }
+                                            });
+                                        }
+                                    }
                                 }
+                            } catch (Exception e) {
+                                Log.e(TAG, "onCreate: " + e.getMessage());
+                                e.printStackTrace();
                             }
+                        }//end if (getLifecycle().getCurrentState().isAtLeast(Lifecycle.State.STARTED))
+                    }//end data change
 
-                        }
-                    }//end if (getLifecycle().getCurrentState().isAtLeast(Lifecycle.State.STARTED))
-                }//end data change
-
-                @Override
-                public void onCancelled(@NotNull DatabaseError error) {
-                    // Failed to read value
-                    Log.e(TAG, "Failed to read value." + error.toException());
-                }
-            });
-        }//end if (reqId == -1)
+                    @Override
+                    public void onCancelled(@NotNull DatabaseError error) {
+                        // Failed to read value
+                        Log.e(TAG, "Failed to read value." + error.toException());
+                    }
+                });
+            }//end if (reqId == -1)
+        } catch (Exception e) {
+            Log.e(TAG, "onCreate: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
@@ -530,7 +526,7 @@ public class TrackingMapActivity extends DaggerAppCompatActivity implements
         TextView txtPrice = reviewView.findViewById(R.id.txtReviewPrice);
 
         txtReqCode.setText(code);
-        txtPrice.setText("Giá: " + MyMethods.convertMoney((float)price*1000) + " vnd");
+        txtPrice.setText("Giá: " + MyMethods.convertMoney((float) price * 1000) + " vnd");
 
         reviewDialog.setView(reviewView);
         reviewView.findViewById(R.id.btn_confirm).setOnClickListener(confirmView -> {
@@ -591,6 +587,8 @@ public class TrackingMapActivity extends DaggerAppCompatActivity implements
     @Override
     protected void onStop() {
         super.onStop();
+        Intent serviceIntent = new Intent(this, UpdateLocationService.class);
+        stopService(serviceIntent);
         if (mapView != null)
             mapView.onStop();
     }
