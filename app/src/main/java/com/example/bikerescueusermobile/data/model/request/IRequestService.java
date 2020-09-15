@@ -1,7 +1,5 @@
 package com.example.bikerescueusermobile.data.model.request;
 
-import com.example.bikerescueusermobile.data.model.user.CurrentUser;
-
 import java.util.List;
 
 import io.reactivex.Single;
@@ -42,9 +40,8 @@ public interface IRequestService {
                                                      @Query("status") String status,
                                                      @Header("Authorization") String token);
 
-    @GET("/shop/finishedRequest")
-    Single<Boolean> finishedRequest(@Query("id") int reqID, @Query("price") double price,
-                                    @Query("quantity") int quantity,
+    @POST("/shop/finishedRequest")
+    Single<Boolean> finishedRequest(@Body ReqShopSerDTO reqShopSerDTO,
                                     @Header("Authorization") String token);
 
     @GET("/biker/getRequestByBikerIdFromTo/{bikerId}")

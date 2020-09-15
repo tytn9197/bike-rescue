@@ -20,6 +20,4 @@ public class MessageRequestFB implements Serializable {
     private String reqCode;
     @SerializedName("reqPrice")
     private double reqPrice;
-    @SerializedName("quantity")
-    private int quantity;
 }

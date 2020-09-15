@@ -10,6 +10,9 @@ public class RequestShopService {
     @SerializedName("id")
     private int id;
 
+    @SerializedName("quantity")
+    private Integer quantity;
+
     @SerializedName("request")
     private Request request;
 

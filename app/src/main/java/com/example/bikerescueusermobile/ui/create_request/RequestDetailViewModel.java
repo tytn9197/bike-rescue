@@ -2,6 +2,7 @@ package com.example.bikerescueusermobile.ui.create_request;
 
 import androidx.lifecycle.ViewModel;
 
+import com.example.bikerescueusermobile.data.model.request.ReqShopSerDTO;
 import com.example.bikerescueusermobile.data.model.request.Request;
 import com.example.bikerescueusermobile.data.model.request.RequestDTO;
 import com.example.bikerescueusermobile.data.model.request.RequestImg;
@@ -35,8 +36,8 @@ public class RequestDetailViewModel extends ViewModel {
         return requestRepository.updateStatusRequest(reqId, status);
     }
 
-    public Single<Boolean> finishedRequest(int reqId, double price, int quantity){
-        return requestRepository.finishedRequest(reqId, price, quantity);
+    public Single<Boolean> finishedRequest(ReqShopSerDTO reqShopSerDTO){
+        return requestRepository.finishedRequest(reqShopSerDTO);
     }
 
     public Single<ReviewRequestDTO> reviewRequest(int requestId, ReviewRequestDTO reviewRequestDTO){

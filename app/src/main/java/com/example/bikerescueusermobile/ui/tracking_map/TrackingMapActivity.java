@@ -293,8 +293,8 @@ public class TrackingMapActivity extends DaggerAppCompatActivity implements
                     SharedPreferenceHelper.setSharedPreferenceString(getApplicationContext(), MyInstances.KEY_BIKER_REQUEST, "");
 
                     //review reruest
-                    setupReviewView(responeReq.getReqId(), responeReq.getReqCode(), responeReq.getReqPrice(), responeReq.getQuantity());
-                    reviewDialog.show();
+//                    setupReviewView(responeReq.getReqId(), responeReq.getReqCode(), responeReq.getReqPrice(), responeReq.getQuantity());
+//                    reviewDialog.show();
                 }
 
                 if (responeReq.getMessage().equals(MyInstances.NOTI_REJECTED) || responeReq.getMessage().equals(MyInstances.NOTI_CANELED)) {

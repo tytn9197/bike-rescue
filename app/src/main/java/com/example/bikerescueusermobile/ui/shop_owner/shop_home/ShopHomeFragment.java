@@ -28,15 +28,21 @@ import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.bikerescueusermobile.R;
 import com.example.bikerescueusermobile.base.BaseFragment;
 import com.example.bikerescueusermobile.data.model.request.MessageRequestFB;
+import com.example.bikerescueusermobile.data.model.request.ReqShopSerDTO;
 import com.example.bikerescueusermobile.data.model.request.Request;
+import com.example.bikerescueusermobile.data.model.request.RequestShopService;
+import com.example.bikerescueusermobile.data.model.shop_services.ShopServiceQuantity;
 import com.example.bikerescueusermobile.data.model.shop_services.ShopServiceTable;
 import com.example.bikerescueusermobile.data.model.user.CurrentUser;
 import com.example.bikerescueusermobile.ui.confirm.ConfirmViewModel;
 import com.example.bikerescueusermobile.ui.create_request.RequestDetailViewModel;
+import com.example.bikerescueusermobile.ui.favorite.FavoriteRecyclerViewAdapter;
 import com.example.bikerescueusermobile.ui.login.UpdateLocationService;
 import com.example.bikerescueusermobile.ui.seach_shop_service.ShopServiceViewModel;
 import com.example.bikerescueusermobile.ui.tracking_map.TrackingMapActivity;
@@ -55,6 +61,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -148,6 +155,9 @@ public class ShopHomeFragment extends BaseFragment {
     @BindView(R.id.shopHomeRelativeLayout)
     RelativeLayout shopHomeRelativeLayout;
 
+    @BindView(R.id.btnAddShopService)
+    Button btnAddShopService;
+
     @Inject
     ViewModelFactory viewModelFactory;
 
@@ -157,8 +167,11 @@ public class ShopHomeFragment extends BaseFragment {
     private SweetSheet mSweetSheet;
     private ArrayList<ShopServiceTable> listAllShopServices;
     private int vanDeKhacPos = -1;
-    private int quantity = -1;
+    private int quantity = 1;
     private float serPrice = -1;
+    private ShopServiceTable selectedShopSer;
+    private List<RequestShopService> listReqShopSer = new ArrayList<>();
+    private double totalPrice = 0;
 
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
         @Override
@@ -196,6 +209,14 @@ public class ShopHomeFragment extends BaseFragment {
                             .subscribe(req -> {
                                 if (req != null) {
                                     setDataToView(req);
+
+                                    listReqShopSer = new ArrayList<>();
+                                    if (!req.getListReqShopService().get(0).getShopService().getServices().getName().equals("Vấn đề khác")) {
+                                        RequestShopService requestShopService = new RequestShopService();
+                                        requestShopService.setShopService(req.getListReqShopService().get(0).getShopService());
+                                        requestShopService.setQuantity(1);
+                                        listReqShopSer.add(requestShopService);
+                                    }
 
                                     String sharedPreferenceStr = gson.toJson(req);
                                     SharedPreferenceHelper.setSharedPreferenceString(getActivity(), MyInstances.KEY_SHOP_REQUEST, sharedPreferenceStr);
@@ -330,6 +351,14 @@ public class ShopHomeFragment extends BaseFragment {
 
                                     setDataToView(req);
 
+                                    listReqShopSer = new ArrayList<>();
+                                    if (!req.getListReqShopService().get(0).getShopService().getServices().getName().equals("Vấn đề khác")) {
+                                        RequestShopService requestShopService = new RequestShopService();
+                                        requestShopService.setShopService(req.getListReqShopService().get(0).getShopService());
+                                        requestShopService.setQuantity(1);
+                                        listReqShopSer.add(requestShopService);
+                                    }
+
                                     //get count down timer and check
                                     String shareCountDown = SharedPreferenceHelper
                                             .getSharedPreferenceString(getActivity(), MyInstances.KEY_COUNT_DOWN_TIME, "");
@@ -435,9 +464,10 @@ public class ShopHomeFragment extends BaseFragment {
                     });
         });
 
-        btnFinish.setOnClickListener(v -> {
+        btnAddShopService.setOnClickListener(v -> {
+            selectedShopSer = null;
             LayoutInflater factory = LayoutInflater.from(getActivity());
-            final View priceView = factory.inflate(R.layout.dialog_confirm_price, null);
+            final View priceView = factory.inflate(R.layout.dialog_add_shop_service, null);
             AlertDialog priceDialog = new AlertDialog.Builder(getActivity()).create();
 
             TextView spinnerSerName = priceView.findViewById(R.id.spinnerSerName);
@@ -445,39 +475,18 @@ public class ShopHomeFragment extends BaseFragment {
             Spinner spinnerQuantity = priceView.findViewById(R.id.spinnerQuantity);
             TextView txtUnitPrice = priceView.findViewById(R.id.txtUnitPrice);
             TextView txtPriceSum = priceView.findViewById(R.id.txtPriceSum);
-            TextView txtConfirmPrice = priceView.findViewById(R.id.txtConfirmPrice);
 
-            //init value
-            if (request.getListReqShopService().get(0).getShopService().getServices().getName().equals("Đổ xăng")
-                    || request.getListReqShopService().get(0).getShopService().getServices().getName().equals("Vấn đề khác")) {
-                txtConfirmPrice.setVisibility(View.VISIBLE);
-                layoutQuantity.setVisibility(View.GONE);
-                txtUnitPrice.setVisibility(View.GONE);
-                txtPriceSum.setVisibility(View.GONE);
-            } else {
-                txtConfirmPrice.setVisibility(View.GONE);
-                layoutQuantity.setVisibility(View.VISIBLE);
-                txtUnitPrice.setVisibility(View.VISIBLE);
-                txtPriceSum.setVisibility(View.VISIBLE);
-            }
+            //moi tao => ẩn hết, chỉ hiện nút chọn dịch vụ
+            spinnerSerName.setText("Vui lòng chọn một dịch vụ");
+            layoutQuantity.setVisibility(View.GONE);
+            txtUnitPrice.setVisibility(View.GONE);
+            txtPriceSum.setVisibility(View.GONE);
 
-            if (request.getListReqShopService().get(0).getShopService().getServices().getName().equals("Vấn đề khác")) {
-                spinnerSerName.setText("Vui lòng chọn một dịch vụ");
-                txtConfirmPrice.setVisibility(View.GONE);
-            } else {
-                spinnerSerName.setText(request.getListReqShopService().get(0).getShopService().getServices().getName());
-            }
-
-            serPrice = request.getListReqShopService().get(0).getShopService().getPrice().floatValue() * 1000;
+            // init so luong tu 1 -> 3
             spinnerQuantity.setPrompt("1");
             quantity = 1;
-            txtUnitPrice.setText("Giá: " +
-                    MyMethods.convertMoney(serPrice) +
-                    " vnd / " + request.getListReqShopService().get(0).getShopService().getServices().getUnit());
-            txtPriceSum.setText("Tổng tiền: " + MyMethods.convertMoney(serPrice * quantity) + " vnd");
-
             ArrayAdapter<String> quantityNumberAdapter = new ArrayAdapter<>(getActivity(), R.layout.support_simple_spinner_dropdown_item);
-            for (int i = 1; i < 6; i++) {
+            for (int i = 1; i < 4; i++) {
                 quantityNumberAdapter.add("" + i);
             }
             spinnerQuantity.setAdapter(quantityNumberAdapter);
@@ -495,6 +504,7 @@ public class ShopHomeFragment extends BaseFragment {
                 }
             });
 
+            //set spinner của dịch vụ
             spinnerSerName.setOnClickListener(v1 -> {
                 AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
                 builder.setTitle(request.getListReqShopService().get(0).getShopService().getServices().getName());
@@ -527,6 +537,7 @@ public class ShopHomeFragment extends BaseFragment {
                             .observeOn(AndroidSchedulers.mainThread())
                             .subscribe(shopService -> {
                                 if (shopService != null) {
+                                    selectedShopSer = shopService;
                                     serPrice = shopService.getPrice().floatValue() * 1000;
                                     txtUnitPrice.setText("Giá: " +
                                             MyMethods.convertMoney(serPrice) +
@@ -534,18 +545,11 @@ public class ShopHomeFragment extends BaseFragment {
 
                                     txtPriceSum.setText("Tổng tiền: " + MyMethods.convertMoney(serPrice * quantity) + " vnd");
 
-                                    // neu la dich vu do xang thi an~ gia tien va cho nhap gia tien
-                                    if (listAllShopServices.get(which).getServices().getName().equals("Đổ xăng")) {
-                                        txtConfirmPrice.setVisibility(View.VISIBLE);
-                                        layoutQuantity.setVisibility(View.GONE);
-                                        txtUnitPrice.setVisibility(View.GONE);
-                                        txtPriceSum.setVisibility(View.GONE);
-                                    } else {
-                                        txtConfirmPrice.setVisibility(View.GONE);
-                                        layoutQuantity.setVisibility(View.VISIBLE);
-                                        txtUnitPrice.setVisibility(View.VISIBLE);
-                                        txtPriceSum.setVisibility(View.VISIBLE);
-                                    }
+                                    //set lai view khi chon 1 dich vu
+                                    spinnerSerName.setText(shopService.getServices().getName());
+                                    layoutQuantity.setVisibility(View.VISIBLE);
+                                    txtUnitPrice.setVisibility(View.VISIBLE);
+                                    txtPriceSum.setVisibility(View.VISIBLE);
                                 }
                             }, throwable -> {
                                 Log.e(TAG, "getShopServiceId: " + throwable.getMessage());
@@ -555,49 +559,107 @@ public class ShopHomeFragment extends BaseFragment {
                 alertDialog.show();
             });
 
+            //set thêm dịch vụ button
             priceDialog.setView(priceView);
             priceView.findViewById(R.id.btn_confirm).setOnClickListener(confirmView -> {
                 SweetAlertDialog error = new SweetAlertDialog(getBaseActivity(), SweetAlertDialog.ERROR_TYPE);
                 error.setTitleText("Thông báo");
                 error.setConfirmText("Đóng");
                 error.setConfirmClickListener(Dialog::dismiss);
-                try {
-                    if (spinnerSerName.getText().toString().equals("Vui lòng chọn một dịch vụ")) {
-                        error.setContentText("Vui lòng chọn một dịch vụ");
-                        error.show();
-                    } else if (spinnerSerName.getText().toString().equals("Đổ xăng")) {
-                        double price = Double.parseDouble(txtConfirmPrice.getText().toString());
-                        viewModel.finishedRequest(request.getId(), price, quantity)
-                                .subscribeOn(Schedulers.io())
-                                .observeOn(AndroidSchedulers.mainThread())
-                                .subscribe(isSuccess -> {
-                                    if (isSuccess) {
-                                        SharedPreferenceHelper.setSharedPreferenceString(getActivity(), MyInstances.KEY_SHOP_REQUEST, "");
-                                        txtNoReq.setVisibility(View.VISIBLE);
-                                        priceDialog.dismiss();
-                                    }
-                                });
-                    } else {
-                        viewModel.finishedRequest(request.getId(), (serPrice * quantity) / 1000, quantity)
-                                .subscribeOn(Schedulers.io())
-                                .observeOn(AndroidSchedulers.mainThread())
-                                .subscribe(isSuccess -> {
-                                    if (isSuccess) {
-                                        SharedPreferenceHelper.setSharedPreferenceString(getActivity(), MyInstances.KEY_SHOP_REQUEST, "");
-                                        txtNoReq.setVisibility(View.VISIBLE);
-                                        priceDialog.dismiss();
-                                    }
-                                });
+                boolean isHasService = false;
+                if (selectedShopSer != null) {
+                    for (int i = 0; i < listReqShopSer.size(); i++) {
+                        if (listReqShopSer.get(i).getShopService().getId() == selectedShopSer.getId()) {
+                            isHasService = true;
+                            break;
+                        }
                     }
-                } catch (Exception e) {
-                    error.setContentText("Vui lòng kiểm tra lại");
+
+                    if (isHasService) {
+                        error.setContentText("Đã chọn dịch vụ này");
+                        error.show();
+                    } else {
+                        RequestShopService requestShopService = new RequestShopService();
+                        requestShopService.setQuantity(quantity);
+                        requestShopService.setShopService(selectedShopSer);
+                        requestShopService.setRequest(request);
+                        listReqShopSer.add(requestShopService);
+                        error.changeAlertType(SweetAlertDialog.SUCCESS_TYPE);
+                        error.setContentText("Thêm thành công");
+                        error.show();
+                        priceDialog.dismiss();
+                        Log.e(TAG, "add service success: " + requestShopService.toString());
+                    }
+                } else {
+                    error.setContentText("Vui lòng chọn một dịch vụ");
                     error.show();
-                    Log.e(TAG, "can't parse double: " + e.getMessage());
                 }
             });
+
             priceView.findViewById(R.id.btn_return).setOnClickListener(v1 -> priceDialog.dismiss());
             priceDialog.show();
-        });
+        }); //end button add service onclick
+
+        btnFinish.setOnClickListener(v -> {
+            SweetAlertDialog error = new SweetAlertDialog(getBaseActivity(), SweetAlertDialog.ERROR_TYPE);
+            error.setTitleText("Thông báo");
+            error.setConfirmText("Đóng");
+            error.setConfirmClickListener(Dialog::dismiss);
+
+            if (listReqShopSer.size() == 0) {
+                error.setContentText("Vui lòng thêm một dịch vụ");
+                error.show();
+            } else {
+                LayoutInflater factory = LayoutInflater.from(getActivity());
+                final View priceView = factory.inflate(R.layout.dialog_confirm_price, null);
+                AlertDialog priceDialog = new AlertDialog.Builder(getActivity()).create();
+
+                TextView txtTotalPrice = priceView.findViewById(R.id.txtTotalPrice);
+                RecyclerView rvConfirmPrice = priceView.findViewById(R.id.rvConfirmPrice);
+                totalPrice = 0;
+                List<ShopServiceQuantity> listQuantity = new ArrayList<>();
+                for (int i = 0; i < listReqShopSer.size(); i++) {
+                    double price = listReqShopSer.get(i).getShopService().getPrice() * listReqShopSer.get(i).getQuantity();
+                    ShopServiceQuantity shopServiceQuantity = new ShopServiceQuantity();
+                    shopServiceQuantity.setQuantity(listReqShopSer.get(i).getQuantity());
+                    shopServiceQuantity.setShopServiceId(listReqShopSer.get(i).getShopService().getId());
+                    listQuantity.add(shopServiceQuantity);
+                    totalPrice += price;
+                }
+
+                rvConfirmPrice.setAdapter(new ConfirmPriceRecyclerViewAdapter(listReqShopSer, requestShopService -> {
+                    Log.e(TAG, "onDeleteClick");
+                    listReqShopSer.remove(requestShopService);
+                    priceDialog.dismiss();
+                    btnFinish.callOnClick();
+                }));
+                rvConfirmPrice.setLayoutManager(new LinearLayoutManager(getActivity()));
+
+                txtTotalPrice.setText(MyMethods.convertMoney((float) totalPrice * 1000) + " vnd");
+
+                priceDialog.setView(priceView);
+                priceView.findViewById(R.id.btn_confirm).setOnClickListener(confirmView -> {
+                    ReqShopSerDTO reqShopSerDTO = new ReqShopSerDTO();
+                    reqShopSerDTO.setReqId(request.getId());
+                    reqShopSerDTO.setPrice(totalPrice);
+                    reqShopSerDTO.setListShopService(listQuantity);
+                    viewModel.finishedRequest(reqShopSerDTO)
+                            .subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe(isSuccess -> {
+                                if (isSuccess) {
+                                    SharedPreferenceHelper.setSharedPreferenceString(getActivity(), MyInstances.KEY_SHOP_REQUEST, "");
+                                    txtNoReq.setVisibility(View.VISIBLE);
+                                    priceDialog.dismiss();
+                                }
+                            }, throwable -> {
+                                Log.e(TAG, "finishedRequest: " + throwable.toString());
+                            });
+                });
+                priceView.findViewById(R.id.btn_return).setOnClickListener(v1 -> priceDialog.dismiss());
+                priceDialog.show();
+            }
+        }); // end button finish on click
 
         btnCancelReq.setOnClickListener(v -> {
             LayoutInflater factory = LayoutInflater.from(getActivity());
@@ -717,6 +779,7 @@ public class ShopHomeFragment extends BaseFragment {
 
         if (status.equals(MyInstances.STATUS_ARRIVED)) {
             btnFinish.setVisibility(View.VISIBLE);
+            btnAddShopService.setVisibility(View.VISIBLE);
             btnTracking.setVisibility(View.VISIBLE);
             btnCancelReq.setVisibility(View.VISIBLE);
             txtStatus.setVisibility(View.VISIBLE);
@@ -751,6 +814,7 @@ public class ShopHomeFragment extends BaseFragment {
 //        btnReqImg.setVisibility(View.GONE);
         statusCreated.setVisibility(View.GONE);
         btnFinish.setVisibility(View.GONE);
+        btnAddShopService.setVisibility(View.GONE);
         btnArrived.setVisibility(View.GONE);
         btnTracking.setVisibility(View.GONE);
         txtReqCancelReason.setVisibility(View.GONE);

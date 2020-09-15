@@ -228,8 +228,8 @@ public class RequestDetailActivity extends BaseActivity {
                     });
 
                     //review reruest
-                    setupReviewView(responeReq.getReqId(), responeReq.getReqCode(), responeReq.getReqPrice(), responeReq.getQuantity());
-                    reviewDialog.show();
+//                    setupReviewView(responeReq.getReqId(), responeReq.getReqCode(), responeReq.getReqPrice(), responeReq.getQuantity());
+//                    reviewDialog.show();
                 }
 
                 if (responeReq.getMessage().equals(MyInstances.NOTI_CANELED)) {
