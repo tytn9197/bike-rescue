@@ -627,7 +627,7 @@ public class ShopHomeFragment extends BaseFragment {
                     totalPrice += price;
                 }
 
-                rvConfirmPrice.setAdapter(new ConfirmPriceRecyclerViewAdapter(listReqShopSer, requestShopService -> {
+                rvConfirmPrice.setAdapter(new ConfirmPriceRecyclerViewAdapter(listReqShopSer, false, requestShopService -> {
                     Log.e(TAG, "onDeleteClick");
                     listReqShopSer.remove(requestShopService);
                     priceDialog.dismiss();

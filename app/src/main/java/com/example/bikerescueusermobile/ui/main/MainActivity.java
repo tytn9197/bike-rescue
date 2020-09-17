@@ -34,6 +34,8 @@ import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.bikerescueusermobile.R;
 import com.example.bikerescueusermobile.base.BaseActivity;
@@ -47,6 +49,7 @@ import com.example.bikerescueusermobile.ui.home.HomeFragment;
 import com.example.bikerescueusermobile.ui.login.LoginActivity;
 import com.example.bikerescueusermobile.ui.profile.ProfileFragment;
 import com.example.bikerescueusermobile.ui.seach_shop_service.SearchShopServiceFragment;
+import com.example.bikerescueusermobile.ui.shop_owner.shop_home.ConfirmPriceRecyclerViewAdapter;
 import com.example.bikerescueusermobile.util.MyInstances;
 import com.example.bikerescueusermobile.util.MyMethods;
 import com.example.bikerescueusermobile.util.SharedPreferenceHelper;
@@ -300,8 +303,8 @@ public class MainActivity extends BaseActivity {
                     SharedPreferenceHelper.setSharedPreferenceString(getApplicationContext(), MyInstances.KEY_BIKER_REQUEST, "");
 
                     //review reruest
-//                    setupReviewView(responeReq.getReqId(), responeReq.getReqCode(), responeReq.getReqPrice());
-//                    reviewDialog.show();
+                    setupReviewView(responeReq.getReqId(), responeReq.getReqCode(), responeReq.getReqPrice());
+                    reviewDialog.show();
                 }
 
                 if (responeReq.getMessage().equals(MyInstances.NOTI_CANELED)) {
@@ -320,7 +323,7 @@ public class MainActivity extends BaseActivity {
     };
 
     @SuppressLint({"DefaultLocale", "SetTextI18n"})
-    private void setupReviewView(int reqId, String code, double price, int quantity) {
+    private void setupReviewView(int reqId, String code, double price) {
         //set up review dialog
         LayoutInflater factory = LayoutInflater.from(this);
         final View reviewView = factory.inflate(R.layout.dialog_review_request, null);
@@ -330,52 +333,34 @@ public class MainActivity extends BaseActivity {
         EditText edtComment = reviewView.findViewById(R.id.edtCommentDetail);
         TextView txtReqCode = reviewView.findViewById(R.id.txtReviewReqCode);
         TextView txtPrice = reviewView.findViewById(R.id.txtReviewPrice);
-        TextView reviewSerName = reviewView.findViewById(R.id.reviewSerName);
-        TextView txtReviewQuantity = reviewView.findViewById(R.id.txtReviewQuantity);
-        TextView txtUnitPrice = reviewView.findViewById(R.id.txtUnitPrice);
-        TextView txtPriceSum = reviewView.findViewById(R.id.txtPriceSum);
+        RecyclerView rvReviewServicePrice = reviewView.findViewById(R.id.rvReviewServicePrice);
 
         ViewModelProviders.of(this, viewModelFactory).get(RequestDetailViewModel.class)
-                .getRequestById(reqId)
+                .getAllReqShopSerById(reqId)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(req -> {
-                    if (req != null) {
-                        float serPrice = req.getListReqShopService().get(0).getShopService().getPrice().floatValue() * 1000;
-                        reviewSerName.setText(req.getListReqShopService().get(0).getShopService().getServices().getName());
-                        txtReviewQuantity.setText("Số lượng: " + quantity);
-                        txtUnitPrice.setText("Giá: " +
-                                MyMethods.convertMoney(serPrice) +
-                                " vnd / " + req.getListReqShopService().get(0).getShopService().getServices().getUnit());
-                        if(req.getListReqShopService().get(0).getShopService().getServices().getName().equals("Đổ xăng")){
-                            txtPriceSum.setText("Tổng tiền: " + MyMethods.convertMoney((float) price * 1000) + " vnd");
-                            txtReviewQuantity.setVisibility(View.GONE);
-                            txtUnitPrice.setVisibility(View.GONE);
-                        } else {
-                            txtPriceSum.setText("Tổng tiền: " + MyMethods.convertMoney(serPrice * quantity) + " vnd");
-                            txtReviewQuantity.setVisibility(View.VISIBLE);
-                            txtUnitPrice.setVisibility(View.VISIBLE);
-                        }
+                .subscribe(listReqShopSer -> {
+                    if (listReqShopSer != null) {
+                        rvReviewServicePrice.setAdapter(new ConfirmPriceRecyclerViewAdapter(listReqShopSer, true, requestShopService -> {
+                            // on button click do nothing
+                        }));
+                        rvReviewServicePrice.setLayoutManager(new LinearLayoutManager(this));
                     }
                 }, throwable -> {
-                    Log.e(TAG, "getRequestById: " + throwable.getMessage());
+                    Log.e(TAG, "setupReviewView - getRequestById: " + throwable.getMessage());
                 });
 
+        txtPrice.setText("" + MyMethods.convertMoney((float) price * 1000) + " vnd");
         txtReqCode.setText(code);
-        txtPrice.setText("Giá: " + MyMethods.convertMoney((float) price * 1000) + " vnd");
 
         reviewDialog.setView(reviewView);
         reviewView.findViewById(R.id.btn_confirm).setOnClickListener(confirmView -> {
             reviewDialog.dismiss();
-
             String comment = edtComment.getText().toString();
             double star = ratingBar.getRating();
 
             ReviewRequestDTO reviewDTO = new ReviewRequestDTO(comment, star);
-            Log.e(TAG, "review: " + reviewDTO.toString());
-
-            ViewModelProviders.of(this, viewModelFactory).get(RequestDetailViewModel.class)
-                    .reviewRequest(reqId, reviewDTO)
+            ViewModelProviders.of(this, viewModelFactory).get(RequestDetailViewModel.class).reviewRequest(reqId, reviewDTO)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(respone -> {

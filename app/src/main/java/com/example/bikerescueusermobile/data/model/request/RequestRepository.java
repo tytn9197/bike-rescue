@@ -30,6 +30,10 @@ public class RequestRepository {
         return iRequestService.getRequestById(reqId, CurrentUser.getInstance().getAccessToken());
     }
 
+    public Single<List<RequestShopService>> getAllReqShopSerById(int reqId) {
+        return iRequestService.getAllReqShopSerById(reqId, CurrentUser.getInstance().getAccessToken());
+    }
+
     public Single<Boolean> cancleRequest(int reqID, boolean isSendToShop, String reason) {
         return iRequestService.cancleRequest(reqID, isSendToShop, reason, CurrentUser.getInstance().getAccessToken());
     }

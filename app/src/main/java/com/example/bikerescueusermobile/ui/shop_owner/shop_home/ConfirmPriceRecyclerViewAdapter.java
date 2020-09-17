@@ -25,12 +25,13 @@ import butterknife.ButterKnife;
 public class ConfirmPriceRecyclerViewAdapter extends RecyclerView.Adapter<ConfirmPriceRecyclerViewAdapter.ViewHolder>{
     private List<RequestShopService> data;
     private ConfirmPriceSelectedListener listener;
+    private boolean isReview;
 
-    public ConfirmPriceRecyclerViewAdapter(List<RequestShopService> viewModel,
+    public ConfirmPriceRecyclerViewAdapter(List<RequestShopService> viewModel, boolean isReview,
                                        ConfirmPriceSelectedListener selectedListener) {
         data = viewModel;
         this.listener = selectedListener;
-
+        this.isReview = isReview;
     }
 
     @NonNull
@@ -84,6 +85,9 @@ public class ConfirmPriceRecyclerViewAdapter extends RecyclerView.Adapter<Confir
             txtPrice.setText("" + MyMethods.convertMoney(requestShopService.getShopService().getPrice().floatValue() * 1000 * requestShopService.getQuantity())+ " vnd");
             btnDeleteService.setOnClickListener(v -> listener.onDeleteClick(requestShopService));
 
+            if(isReview){
+                btnDeleteService.setVisibility(View.GONE);
+            }
         }
 
     }

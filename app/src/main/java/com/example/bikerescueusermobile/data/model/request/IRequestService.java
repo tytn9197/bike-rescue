@@ -29,6 +29,9 @@ public interface IRequestService {
     @GET("/biker/request/{id}")
     Single<Request> getRequestById(@Path("id") int reqId,@Header("Authorization") String token);
 
+    @GET("/biker/req-shop-ser/{reqId}")
+    Single<List<RequestShopService>> getAllReqShopSerById(@Path("reqId") int reqId, @Header("Authorization") String token);
+
     @GET("/biker/cancleRequest")
     Single<Boolean> cancleRequest(@Query("id") int reqID,
                                   @Query("isSendToShop") boolean isSendToShop,

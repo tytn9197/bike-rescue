@@ -7,6 +7,7 @@ import com.example.bikerescueusermobile.data.model.request.Request;
 import com.example.bikerescueusermobile.data.model.request.RequestDTO;
 import com.example.bikerescueusermobile.data.model.request.RequestImg;
 import com.example.bikerescueusermobile.data.model.request.RequestRepository;
+import com.example.bikerescueusermobile.data.model.request.RequestShopService;
 import com.example.bikerescueusermobile.data.model.request.Response;
 import com.example.bikerescueusermobile.data.model.request.ReviewRequestDTO;
 
@@ -26,6 +27,10 @@ public class RequestDetailViewModel extends ViewModel {
 
     public Single<Request> getRequestById(int reqId) {
         return requestRepository.getRequestById(reqId);
+    }
+
+    public Single<List<RequestShopService>> getAllReqShopSerById(int reqId) {
+        return requestRepository.getAllReqShopSerById(reqId);
     }
 
     public Single<Boolean> cancleRequest(int reqID, boolean isSendToShop, String reason) {

@@ -21,7 +21,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
                 android:layout_marginTop="10dp"
-                android:layout_marginBottom="5dp"
+                android:layout_marginBottom="3dp"
                 android:layout_weight="2"
                 android:text="Mã đơn hàng"
                 android:textColor="@color/white" />
@@ -32,7 +32,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
                 android:layout_marginEnd="10dp"
-                android:layout_marginBottom="5dp"
+                android:layout_marginBottom="3dp"
                 android:layout_weight="3"
                 android:gravity="end"
                 android:text="000000000000"
@@ -43,74 +43,76 @@
             android:id="@+id/select_content"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="15dp"
-            android:text="Yêu cầu của bạn đã hoàn thành, xin vui lòng đánh giá dịch vụ này"
+            android:layout_margin="5dp"
+            android:text="Yêu cầu đã hoàn thành, vui lòng đánh giá dịch vụ này"
             android:textColor="@color/black"
-            android:textSize="17dp" />
+             />
 
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:background="@color/grey" />
 
-        <TextView
-            android:id="@+id/txtReviewPrice"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="15dp"
-            android:gravity="center"
-            android:text="Giá: 80k VND"
-            android:textColor="@color/black"
-            android:textSize="18sp"
-            android:visibility="gone"/>
+<!--        <TextView-->
+<!--            android:id="@+id/txtReviewPrice"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_marginTop="15dp"-->
+<!--            android:gravity="center"-->
+<!--            android:text="Giá: 80k VND"-->
+<!--            android:textColor="@color/black"-->
+<!--            android:textSize="18sp"-->
+<!--            android:visibility="gone"/>-->
 
         <TextView
-            android:id="@+id/reviewSerName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="15dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginEnd="30dp"
-            android:layout_marginBottom="10dp"
-            android:text="Dịch vụ"
+            android:layout_marginStart="18dp"
+            android:layout_marginTop="5dp"
+            android:text="Danh sách dịch vụ:"
             android:textColor="@color/black"
-            android:textSize="17dp" />
+            android:textSize="15sp"
+            android:textStyle="bold" />
 
-        <TextView
-            android:id="@+id/txtReviewQuantity"
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvReviewServicePrice"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="15dp"
-            android:text="Số lượng: 1"
-            android:textColor="@color/black"
-            android:textSize="17sp" />
-
-        <TextView
-            android:id="@+id/txtUnitPrice"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="15dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginBottom="10dp"
-            android:text="Giá trên 1 đơn vị"
-            android:textColor="@color/black"
-            android:textSize="17sp" />
+            android:layout_height="180dp"
+            android:layout_margin="5dp"/>
 
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:background="@color/grey" />
 
-        <TextView
-            android:id="@+id/txtPriceSum"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="15dp"
-            android:layout_marginTop="10dp"
-            android:text="Thành tiền"
-            android:textColor="@color/black"
-            android:textSize="17sp" />
+            android:orientation="horizontal">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="18dp"
+                android:layout_marginTop="10dp"
+                android:text="Tổng tiền:"
+                android:textColor="@color/black"
+                android:textSize="15sp"
+                android:textStyle="bold" />
 
+            <TextView
+                android:id="@+id/txtReviewPrice"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginTop="10dp"
+                android:gravity="end"
+                android:text="100,000 vnd"
+                android:layout_marginEnd="10dp"
+                android:textColor="@color/black"
+                android:textSize="15sp"
+                android:textStyle="bold" />
+        </LinearLayout>
 
         <com.willy.ratingbar.ScaleRatingBar
             android:id="@+id/reviewRatingBar"
@@ -119,29 +121,29 @@
             android:layout_marginStart="30dp"
             android:layout_marginTop="10dp"
             android:layout_marginEnd="30dp"
-            android:layout_marginBottom="20dp"
+            android:layout_marginBottom="10dp"
             app:srb_drawableEmpty="@drawable/ic_star_empty"
             app:srb_drawableFilled="@drawable/ic_star_filled"
             app:srb_numStars="5"
-            app:srb_starHeight="40dp"
-            app:srb_starWidth="40dp"
+            app:srb_starHeight="30dp"
+            app:srb_starWidth="30dp"
             app:srb_stepSize="0.5" />
 
         <EditText
             android:id="@+id/edtCommentDetail"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="10dp"
+            android:layout_margin="5dp"
             android:background="@color/white"
             android:hint="Chia sẽ thêm trải nghiệm của bạn"
-            android:lines="5"
+            android:lines="3"
             android:padding="10dp" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="15dp"
-            android:layout_marginBottom="10dp"
+            android:layout_marginTop="2dp"
+            android:layout_marginBottom="5dp"
             android:gravity="center"
             android:orientation="horizontal">
 
@@ -161,7 +163,7 @@
                 android:id="@+id/btn_confirm"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_margin="10dp"
+                android:layout_margin="5dp"
                 android:layout_weight="1"
                 android:background="@drawable/border_login"
                 android:text="Gửi đánh giá"
