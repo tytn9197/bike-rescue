@@ -251,6 +251,8 @@ public class TrackingMapActivity extends DaggerAppCompatActivity implements
                                                                 Intent i = new Intent();
                                                                 setResult(Activity.RESULT_OK, i);
                                                                 finish();
+                                                            }, throwable -> {
+                                                                Log.e(TAG, "updateStatusRequest: " + throwable.getMessage());
                                                             });
                                                 } else {
                                                     SweetAlertDialog errorDialog = new SweetAlertDialog(TrackingMapActivity.this, SweetAlertDialog.ERROR_TYPE);

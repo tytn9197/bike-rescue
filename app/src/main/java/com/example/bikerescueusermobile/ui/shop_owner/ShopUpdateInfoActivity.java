@@ -163,6 +163,8 @@ public class ShopUpdateInfoActivity extends BaseActivity {
                             });
                             sweetAlertDialog.show();
                         }
+                    }, throwable -> {
+                        Log.e(TAG, "updateInfo: " + throwable.getMessage());
                     });
         });
 

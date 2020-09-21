@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -17,6 +18,7 @@ import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
 import androidx.lifecycle.ViewModelProviders;
@@ -78,7 +80,9 @@ public class ManageServicesActivity extends BaseActivity implements ShopServiceS
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        shopServiceToolbar.setTitle("Danh sách dịch vụ");
+//        shopServiceToolbar.setTitle("Danh sách dịch vụ");
+        setSupportActionBar(shopServiceToolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         serviceNames = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item);
         serviceList = new ArrayList<>();
@@ -122,6 +126,11 @@ public class ManageServicesActivity extends BaseActivity implements ShopServiceS
         });
     }
 
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        finish();
+        return super.onOptionsItemSelected(item);
+    }
 
     @Override
     protected int layoutRes() {

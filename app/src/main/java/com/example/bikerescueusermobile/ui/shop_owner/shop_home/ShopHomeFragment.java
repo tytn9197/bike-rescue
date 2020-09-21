@@ -37,6 +37,7 @@ import com.example.bikerescueusermobile.data.model.request.MessageRequestFB;
 import com.example.bikerescueusermobile.data.model.request.ReqShopSerDTO;
 import com.example.bikerescueusermobile.data.model.request.Request;
 import com.example.bikerescueusermobile.data.model.request.RequestShopService;
+import com.example.bikerescueusermobile.data.model.shop_services.CurrentShopService;
 import com.example.bikerescueusermobile.data.model.shop_services.ShopServiceQuantity;
 import com.example.bikerescueusermobile.data.model.shop_services.ShopServiceTable;
 import com.example.bikerescueusermobile.data.model.user.CurrentUser;
@@ -211,11 +212,14 @@ public class ShopHomeFragment extends BaseFragment {
                                     setDataToView(req);
 
                                     listReqShopSer = new ArrayList<>();
+                                    CurrentShopService.getInstance().clear();
+                                    CurrentShopService.setDelete(false);
                                     if (!req.getListReqShopService().get(0).getShopService().getServices().getName().equals("Vấn đề khác")) {
                                         RequestShopService requestShopService = new RequestShopService();
                                         requestShopService.setShopService(req.getListReqShopService().get(0).getShopService());
                                         requestShopService.setQuantity(1);
                                         listReqShopSer.add(requestShopService);
+                                        CurrentShopService.getInstance().add(requestShopService);
                                     }
 
                                     String sharedPreferenceStr = gson.toJson(req);
@@ -259,6 +263,8 @@ public class ShopHomeFragment extends BaseFragment {
                                                         tracking.putExtra("reqId", req.getId());
                                                         tracking.putExtra("reqStatus", MyInstances.STATUS_ACCEPT);
                                                         startActivityForResult(tracking, MyInstances.SHOP_RESULT_CODE);
+                                                    }, throwable -> {
+                                                        Log.e(TAG, "updateStatusRequest: " + throwable.getMessage());
                                                     });
                                             btnCancelReq.setVisibility(View.VISIBLE);
 //                                            btnArrived.setVisibility(View.VISIBLE);
@@ -276,6 +282,8 @@ public class ShopHomeFragment extends BaseFragment {
                                     SharedPreferenceHelper.setSharedPreferenceString(getActivity(), MyInstances.KEY_COUNT_DOWN_TIME, "");
                                     txtNoReq.setVisibility(View.VISIBLE);
                                 }
+                            }, throwable -> {
+                                Log.e(TAG, "getRequestById: " + throwable.getMessage());
                             });
                 }
 
@@ -302,7 +310,11 @@ public class ShopHomeFragment extends BaseFragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        Log.e(TAG, "onViewCreated start");
+        if(CurrentShopService.getInstance().size() > 0){
+            listReqShopSer = new ArrayList<>();
+            listReqShopSer.addAll(CurrentShopService.getInstance());
+        }
+        Log.e(TAG, "onViewCreated start - list shop service size: " + CurrentShopService.getInstance().size());
 
         LocalBroadcastManager.getInstance(getActivity()).registerReceiver(
                 mMessageReceiver, new IntentFilter("BikeRescueShop"));
@@ -359,6 +371,14 @@ public class ShopHomeFragment extends BaseFragment {
                                         listReqShopSer.add(requestShopService);
                                     }
 
+                                    if(CurrentShopService.getInstance().size() > 0){
+                                        listReqShopSer = new ArrayList<>();
+                                        listReqShopSer.addAll(CurrentShopService.getInstance());
+                                    }
+
+                                    if(CurrentShopService.isDelete()){
+                                        listReqShopSer = new ArrayList<>();
+                                    }
                                     //get count down timer and check
                                     String shareCountDown = SharedPreferenceHelper
                                             .getSharedPreferenceString(getActivity(), MyInstances.KEY_COUNT_DOWN_TIME, "");
@@ -409,6 +429,8 @@ public class ShopHomeFragment extends BaseFragment {
                                                         tracking.putExtra("reqId", req.getId());
                                                         tracking.putExtra("reqStatus", MyInstances.STATUS_ACCEPT);
                                                         startActivityForResult(tracking, MyInstances.SHOP_RESULT_CODE);
+                                                    }, throwable -> {
+                                                        Log.e(TAG, "updateStatusRequest: " + throwable.getMessage());
                                                     });
                                             btnCancelReq.setVisibility(View.VISIBLE);
 //                                            btnArrived.setVisibility(View.VISIBLE);
@@ -423,6 +445,8 @@ public class ShopHomeFragment extends BaseFragment {
                             }
 //                            setBtnArrived(req.getId());
                         }// req ->
+                    }, throwable -> {
+                        Log.e(TAG, "oncreate - getRequestById: " + throwable.getMessage());
                     });
         }//end of else
     }
@@ -584,9 +608,14 @@ public class ShopHomeFragment extends BaseFragment {
                         requestShopService.setShopService(selectedShopSer);
                         requestShopService.setRequest(request);
                         listReqShopSer.add(requestShopService);
+
                         error.changeAlertType(SweetAlertDialog.SUCCESS_TYPE);
                         error.setContentText("Thêm thành công");
                         error.show();
+
+                        if(CurrentShopService.isDelete()){
+                            CurrentShopService.setDelete(false);
+                        }
                         priceDialog.dismiss();
                         Log.e(TAG, "add service success: " + requestShopService.toString());
                     }
@@ -631,6 +660,10 @@ public class ShopHomeFragment extends BaseFragment {
                     Log.e(TAG, "onDeleteClick");
                     listReqShopSer.remove(requestShopService);
                     priceDialog.dismiss();
+                    if(listReqShopSer.size() == 0) {
+                        CurrentShopService.getInstance().clear();
+                        CurrentShopService.setDelete(true);
+                    }
                     btnFinish.callOnClick();
                 }));
                 rvConfirmPrice.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -650,6 +683,11 @@ public class ShopHomeFragment extends BaseFragment {
                                 if (isSuccess) {
                                     SharedPreferenceHelper.setSharedPreferenceString(getActivity(), MyInstances.KEY_SHOP_REQUEST, "");
                                     txtNoReq.setVisibility(View.VISIBLE);
+                                    CurrentShopService.getInstance().clear();
+                                    listReqShopSer.clear();
+                                    if(CurrentShopService.isDelete()){
+                                        CurrentShopService.setDelete(false);
+                                    }
                                     priceDialog.dismiss();
                                 }
                             }, throwable -> {
@@ -713,6 +751,11 @@ public class ShopHomeFragment extends BaseFragment {
                                     sweetAlertDialog.dismiss();
                                     SharedPreferenceHelper.setSharedPreferenceString(getActivity(), MyInstances.KEY_BIKER_REQUEST, "");
                                     txtNoReq.setVisibility(View.VISIBLE);
+                                    CurrentShopService.getInstance().clear();
+                                    listReqShopSer.clear();
+                                    if(CurrentShopService.isDelete()){
+                                        CurrentShopService.setDelete(false);
+                                    }
                                 });
                                 notiDialog.show();
                             }
@@ -798,14 +841,6 @@ public class ShopHomeFragment extends BaseFragment {
         if (status.equals(MyInstances.STATUS_CANCELED) || status.equals(MyInstances.STATUS_REJECTED) || status.equals(MyInstances.STATUS_FINISHED)) {
             txtNoReq.setVisibility(View.VISIBLE);
             SharedPreferenceHelper.setSharedPreferenceString(getActivity(), MyInstances.KEY_SHOP_REQUEST, "");
-        }
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        if (countDownTimer != null) {
-            countDownTimer.cancel();
         }
     }
 
@@ -908,10 +943,25 @@ public class ShopHomeFragment extends BaseFragment {
                                 getActivity().getSupportFragmentManager().beginTransaction()
                                         .replace(R.id.frame_container, new ShopHomeFragment())
                                         .commit();
+                            }, throwable -> {
+                                Log.e(TAG, "updateStatusRequest: " + throwable.getMessage());
                             });
                 }
             }
         };
         countDownTimer.start();
     }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if (countDownTimer != null) {
+            countDownTimer.cancel();
+        }
+        if(listReqShopSer.size() > 0) {
+            CurrentShopService.getInstance().clear();
+            CurrentShopService.getInstance().addAll(listReqShopSer);
+        }
+    }
+
 }

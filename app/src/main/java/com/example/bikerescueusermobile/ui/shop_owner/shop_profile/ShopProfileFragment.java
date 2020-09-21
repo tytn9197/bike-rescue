@@ -209,6 +209,8 @@ public class ShopProfileFragment extends BaseFragment {
                             Log.e("updateUserStatus", "OK");
                             shopOwnerStatus.setEnabled(true);
                         }
+                    }, throwable -> {
+                        Log.e("ShopProfile", "updateUserStatus: " + throwable.getMessage());
                     });
         });
     }

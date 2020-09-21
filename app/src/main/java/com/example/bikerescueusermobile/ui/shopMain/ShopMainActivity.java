@@ -132,6 +132,8 @@ public class ShopMainActivity extends BaseActivity {
                             Log.e("updateUserStatus", "OK");
                             shopOwnerStatus.setEnabled(true);
                         }
+                    }, throwable -> {
+                        Log.e("ShopMainActivity", "updateUserStatus: " + throwable.getMessage());
                     });
         });
     }
