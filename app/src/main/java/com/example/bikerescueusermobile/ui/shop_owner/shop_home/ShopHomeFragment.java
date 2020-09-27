@@ -656,15 +656,44 @@ public class ShopHomeFragment extends BaseFragment {
                     totalPrice += price;
                 }
 
-                rvConfirmPrice.setAdapter(new ConfirmPriceRecyclerViewAdapter(listReqShopSer, false, requestShopService -> {
-                    Log.e(TAG, "onDeleteClick");
-                    listReqShopSer.remove(requestShopService);
-                    priceDialog.dismiss();
-                    if(listReqShopSer.size() == 0) {
-                        CurrentShopService.getInstance().clear();
-                        CurrentShopService.setDelete(true);
+                rvConfirmPrice.setAdapter(new ConfirmPriceRecyclerViewAdapter(listReqShopSer, false, new ConfirmPriceSelectedListener() {
+                    @Override
+                    public void onDeleteClick(RequestShopService requestShopService) {
+                        Log.e(TAG, "onDeleteClick");
+                        listReqShopSer.remove(requestShopService);
+                        priceDialog.dismiss();
+                        if(listReqShopSer.size() == 0) {
+                            CurrentShopService.getInstance().clear();
+                            CurrentShopService.setDelete(true);
+                        }
+                        btnFinish.callOnClick();
                     }
-                    btnFinish.callOnClick();
+
+                    @Override
+                    public void onChangeQuantityClick(RequestShopService requestShopService) {
+                        Log.e(TAG, "onChangeQuantityClick");
+
+                        ArrayAdapter<String> quantityNumberAdapter = new ArrayAdapter<>(getActivity(), R.layout.support_simple_spinner_dropdown_item);
+                        for (int i = 1; i < 4; i++) {
+                            quantityNumberAdapter.add("" + i);
+                        }
+
+                        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                        builder.setTitle("Vui lòng chọn số lượng");
+                        builder.setAdapter(quantityNumberAdapter, (dialog, which) -> {
+                            for (int i = 0; i < listReqShopSer.size(); i++) {
+                                if(listReqShopSer.get(i).equals(requestShopService)){
+                                    listReqShopSer.get(i).setQuantity(which + 1);
+                                    break;
+                                }
+                            }
+                            dialog.dismiss();
+                            priceDialog.dismiss();
+                            btnFinish.callOnClick();
+                        });
+                        AlertDialog quantityDialog = builder.create();
+                        quantityDialog.show();
+                    }
                 }));
                 rvConfirmPrice.setLayoutManager(new LinearLayoutManager(getActivity()));
 

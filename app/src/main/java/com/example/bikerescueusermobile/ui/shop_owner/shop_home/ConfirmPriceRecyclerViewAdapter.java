@@ -70,6 +70,9 @@ public class ConfirmPriceRecyclerViewAdapter extends RecyclerView.Adapter<Confir
         @BindView(R.id.btnDeleteService)
         Button btnDeleteService;
 
+        @BindView(R.id.btnChangeQuantity)
+        Button btnChangeQuantity;
+
         public ViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
@@ -84,9 +87,11 @@ public class ConfirmPriceRecyclerViewAdapter extends RecyclerView.Adapter<Confir
             txtQuantity.setText("" + requestShopService.getQuantity());
             txtPrice.setText("" + MyMethods.convertMoney(requestShopService.getShopService().getPrice().floatValue() * 1000 * requestShopService.getQuantity())+ " vnd");
             btnDeleteService.setOnClickListener(v -> listener.onDeleteClick(requestShopService));
+            btnChangeQuantity.setOnClickListener(v -> listener.onChangeQuantityClick(requestShopService));
 
             if(isReview){
                 btnDeleteService.setVisibility(View.GONE);
+                btnChangeQuantity.setVisibility(View.GONE);
             }
         }
 

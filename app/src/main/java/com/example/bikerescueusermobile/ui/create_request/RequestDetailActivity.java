@@ -38,6 +38,7 @@ import com.example.bikerescueusermobile.base.BaseActivity;
 import com.example.bikerescueusermobile.data.model.request.CurrentRequest;
 import com.example.bikerescueusermobile.data.model.request.MessageRequestFB;
 import com.example.bikerescueusermobile.data.model.request.Request;
+import com.example.bikerescueusermobile.data.model.request.RequestShopService;
 import com.example.bikerescueusermobile.data.model.request.ReviewRequestDTO;
 import com.example.bikerescueusermobile.data.model.user.CurrentUser;
 import com.example.bikerescueusermobile.ui.complain.ComplainActivity;
@@ -46,6 +47,7 @@ import com.example.bikerescueusermobile.ui.confirm.ConfirmViewModel;
 import com.example.bikerescueusermobile.ui.login.LoginActivity;
 import com.example.bikerescueusermobile.ui.login.UpdateLocationService;
 import com.example.bikerescueusermobile.ui.shop_owner.shop_home.ConfirmPriceRecyclerViewAdapter;
+import com.example.bikerescueusermobile.ui.shop_owner.shop_home.ConfirmPriceSelectedListener;
 import com.example.bikerescueusermobile.ui.shop_owner.shop_home.ShopHomeFragment;
 import com.example.bikerescueusermobile.ui.tracking_map.TrackingMapActivity;
 import com.example.bikerescueusermobile.util.MyInstances;
@@ -274,8 +276,16 @@ public class RequestDetailActivity extends BaseActivity {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(listReqShopSer -> {
                     if (listReqShopSer != null) {
-                        rvReviewServicePrice.setAdapter(new ConfirmPriceRecyclerViewAdapter(listReqShopSer, true, requestShopService -> {
-                            // on button click do nothing
+                        rvReviewServicePrice.setAdapter(new ConfirmPriceRecyclerViewAdapter(listReqShopSer, true, new ConfirmPriceSelectedListener() {
+                            @Override
+                            public void onDeleteClick(RequestShopService requestShopService) {
+                                //do nothing
+                            }
+
+                            @Override
+                            public void onChangeQuantityClick(RequestShopService requestShopService) {
+                                //do nothing
+                            }
                         }));
                         rvReviewServicePrice.setLayoutManager(new LinearLayoutManager(RequestDetailActivity.this));
                     }
